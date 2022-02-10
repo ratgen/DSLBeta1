@@ -3,18 +3,12 @@
  */
 package no.hal.bdd.ui.labeling
 
-import com.google.inject.Inject
-import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
+//import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider
-import no.hal.bdd.bddDsl.IntValue
 import no.hal.bdd.bddDsl.EntityRef
-import no.hal.bdd.bddDsl.ActionDef
-import no.hal.bdd.bddDsl.Model
 import no.hal.bdd.bddDsl.Scenario
 import no.hal.bdd.bddDsl.ScenarioState
 import no.hal.bdd.bddDsl.PropertyDef
-import no.hal.bdd.bddDsl.EntityStatePhrase
-import no.hal.bdd.bddDsl.StateDef
 
 /**
  * Provides labels for EObjects.
