@@ -4,3 +4,5 @@ target/
 **/*.xtendbin
 **/*.xtextbin
 **/*._trace
+**/src-gen/
+**/xtend-gen/
