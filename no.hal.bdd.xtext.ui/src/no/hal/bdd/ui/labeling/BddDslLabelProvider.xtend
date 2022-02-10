@@ -6,6 +6,15 @@ package no.hal.bdd.ui.labeling
 import com.google.inject.Inject
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
 import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider
+import no.hal.bdd.bddDsl.IntValue
+import no.hal.bdd.bddDsl.EntityRef
+import no.hal.bdd.bddDsl.ActionDef
+import no.hal.bdd.bddDsl.Model
+import no.hal.bdd.bddDsl.Scenario
+import no.hal.bdd.bddDsl.ScenarioState
+import no.hal.bdd.bddDsl.PropertyDef
+import no.hal.bdd.bddDsl.EntityStatePhrase
+import no.hal.bdd.bddDsl.StateDef
 
 /**
  * Provides labels for EObjects.
@@ -14,18 +23,36 @@ import org.eclipse.xtext.ui.label.DefaultEObjectLabelProvider
  */
 class BddDslLabelProvider extends DefaultEObjectLabelProvider {
 
-	@Inject
+	/* @Inject
 	new(AdapterFactoryLabelProvider delegate) {
 		super(delegate);
-	}
+	}*/
 
 	// Labels and icons can be computed like this:
+	override doGetText(Object a){
+		System.out.println(a.getClass().toString());
+		System.out.println(super.doGetText(a));
+		return super.doGetText(a)
+	}
+		
+	def text(Scenario a) {
+		return a.name
+	}
 	
-//	def text(Greeting ele) {
-//		'A greeting to ' + ele.name
-//	}
-//
-//	def image(Greeting ele) {
-//		'Greeting.gif'
-//	}
+	def text(ScenarioState s){
+		return "Phrase"
+	}
+	
+	def text(EntityRef s){
+		if (s.entity.name !== null)
+			return s.entity.name + " : " + s.name
+		else
+			return s.name
+	}
+	
+	def text(PropertyDef p) {
+		System.out.println("PropertyDef " + p);
+		return p.name
+	}
+ 
 }
