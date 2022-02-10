@@ -6,3 +6,8 @@ target/
 **/*._trace
 **/src-gen/
 **/xtend-gen/
+/.metadata/
+**/test-bin/
+**/generated/
+**/.DS_Store
+**/*.xml_gen
