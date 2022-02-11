@@ -1,0 +1,30 @@
+model mobile using widgets
+
+entity homeScreen {
+	actions: open wishlist, create a wishlist
+	states: void
+	properties: wishlists
+}
+
+entity wishlist {
+	actions: create, edit, delete, share, view
+	states: shared, nonshared
+	properties: name, wish
+}
+
+Scenario: Creating a wishlist - creation succeeded
+Given the wishlists for the homeScreen "Home" is void
+	which means
+		Given the BrowserWindow "Home" is displayed
+		When I click on "See wishlists" 
+		Then the WishlistCard "Your wishlists" is empty
+When I 
+	which means
+		Given the BrowserWindow "Create wishlist" is displayed
+		When I type "New wishlist" into the field "Wishlist name"
+		Then the Notification "Your wishlist has been successfully processed" is displayed
+Then the wishlists on the homeScreen is not void
+	which means
+		Given the BrowserWindow "Home" is displayed
+		When I click on "See wishlists"
+		Then wishlists are not empty

@@ -2,7 +2,7 @@ model widgets
 
 entity widget {
 	actions: move
-	states: displayed, shown, available, enabled/disabled
+	states: displayed, shown, available, enabled/disabled, empty
 }
 
 entity field is widget {
@@ -226,4 +226,10 @@ entity VideoPlayer is widget {
 	actions: play, pause, fast forward, rewind, toggle full screen, exit full screen, turn the volume up, turn the volume down
 	states: played, paused, fast forwarded, rewound, toggled, exited, turned up, turned down
 	properties: full screen, volume, video 
+}
+
+entity WishlistCard is widget {
+	actions: open
+	states: empty
+	properties: name, images
 }
