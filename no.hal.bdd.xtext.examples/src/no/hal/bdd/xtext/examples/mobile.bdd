@@ -1,13 +1,36 @@
 model mobile using widgets
 
-entity screen {
-	actions: open wishlist, create wishlist 
+entity screen is widget {
+	actions: open, create 
 	states: void
-	properties: List
+	properties: List, WishList
 }
 
+entity List is widget {
+	actions: refresh
+	properties: contents
+}
+
+entity WishList is List {
+	actions: share
+	states: shared
+}
+
+entity WishListCard is widget {
+	actions: open
+	states: empty
+	properties: name, images
+}
+
+entity WishCard is widget {
+	actions: open
+	states: empty
+	properties: name, image
+}
+
+
 Scenario: Creating a wishlist - creation succeeded
-Given the List for the screen "Home" is void
+Given the List on the screen "Home" is empty
 	which means
 		Given the BrowserWindow "Home" is displayed 
 		When I refresh the List "Your wishlists"
@@ -17,8 +40,52 @@ When I create wishlist "Wishes" on the screen "Home"
 		Given the BrowserWindow "Create wishlist" is displayed
 		When I type "Wishes" into the field "Wishlist name" And I click the Button "Add"
 		Then the WishListCard "Wishes" is displayed
-Then the List for the screen "Home" is not void
+Then the List on the screen "Home" is not empty
 	which means
 		Given the BrowserWindow "Home" is displayed
 		When I click on "See wishlists"
 		Then the List "Your wishlists" is not empty
+		
+	
+Scenario: Adding a wish - adding succeeded
+Given the List on the screen "Wishlist" is empty
+	which means
+		Given the BrowserWindow "Wishlist" is displayed
+		When I refresh the List "Wishes"
+		Then the List "Wishes" is empty
+When I create wish "Dog" on the screen "Wishlist"
+	which means
+		Given the BrowserWindow "Add wish" is displayed
+		When I type "Dog" into the TextField "Wish Title"
+			And I paste "http://amazon.de/myDog" into the TextField "Link"
+			And I click the Button "Add wish to wishlist"
+		Then the WishCard "Dog" is displayed
+Then the List on the screen "Wishlist" is not empty
+	which means
+		Given the BrowserWindow "Wishlist" is displayed
+		When I refresh the List "Wishes"
+		Then the List "Wishes" is not empty
+		
+Scenario: Sharing a wishlist - sharing succeeded
+Given the contents of the WishList "Wishes" is not shared
+	which means
+		Given the screen "Wishlist" is displayed
+		When I click on the Button "Share"
+		Then the value for the TextField "Shared" is "Not shared yet"
+When I share WishList "Wishes"
+	which means
+		Given the screen "Share wishlist" is displayed
+		When I click "Share this list"
+		Then the TextField "URL" is copied
+Then the contents of the WishList "Wishes" is shared
+	which means
+		Given the screen "Wishlist" is displayed
+		When I click on the Button "Share"
+		Then the value for the TextField "Shared" is "This list has been shared"
+	
+	
+	
+	
+	
+		
+		

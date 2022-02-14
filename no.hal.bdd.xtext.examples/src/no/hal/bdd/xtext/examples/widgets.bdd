@@ -90,13 +90,13 @@ entity Grid is widget {
 }
 
 entity TextField is widget {
-	actions: type, set, fill [in]
-	states: typed, set, filled
+	actions: type, set, fill [in], paste
+	states: typed, set, filled, copied
 	properties: value
 }
 
 entity TextArea is widget {
-	actions: type, set, fill [in]
+	actions: type, set, fill [in], paste
 	states: typed, set, filled
 	properties: text
 	
@@ -228,8 +228,24 @@ entity VideoPlayer is widget {
 	properties: full screen, volume, video 
 }
 
-entity WishlistCard is widget {
+entity List is widget {
+	actions: refresh
+	properties: contents
+}
+
+entity WishList is List {
+	actions: share
+	states: shared
+}
+
+entity WishListCard is widget {
 	actions: open
 	states: empty
 	properties: name, images
+}
+
+entity WishCard is widget {
+	actions: open
+	states: empty
+	properties: name, image
 }
