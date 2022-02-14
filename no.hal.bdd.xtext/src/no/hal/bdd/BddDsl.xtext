@@ -89,17 +89,17 @@ ENTITY_IDENTITY: '#'? (INT | STRING);
 OPTION:'#'? (INT | STRING) ;
 
 EntityRef:
-	 (WORD OPTION 'for' 'the')? ('for'|'of')? (('the'|'all' 'the') entity = [EntityDef | WORD] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
+	 (WORD OPTION 'for' 'the' |'on' 'the')? ('for'|'of'|'on')? (('the'|'all' 'the') entity = [EntityDef | WORD] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
 ;
 
 EntityStatePhrase:
-	(property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('for'|'for' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'))? 
+	(property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('for'|'for' 'the'|'on'|'on' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'|'on'|'on' 'the'))? 
 	entity = EntityRef ('is'|'are') 'not'? state = [StateName] WORD?
 	 
 ;
 
 EntityPropertyStatePhrase:
-	 property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = EntityRef
+	 property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the'|'on' 'the')  entity = EntityRef
 	((('is'|'is' 'not') value = PropertyValue WORD?) WORD? | (('are'|'are' 'not') (values += PropertyValue) WORD? | (',' values += PropertyValue)*) WORD?) 
 ;
 
@@ -135,7 +135,7 @@ BooleanValue:
 ActionPhrase: VerbAction | VerifyAction;
 
 VerbAction:
-	action = ActionRef 'and'? WORD? 'on'? (WORD'-'WORD)? ('for' 'the'| 'the'|'on')? (entity = EntityDef)? ('on'|'off'|'in')? entity = EntityRef ('on'|'off'|'in')? ('of'|'for'|'for' 'the'|'of' 'the')? PREP? entity = EntityRef?
+	action = ActionRef 'and'? WORD? 'on'? (WORD'-'WORD)? ('for' 'the'| 'the'|'on'|'on' 'the')? (entity = EntityDef)? ('on'|'off'|'in')? entity = EntityRef ('on'|'off'|'in')? ('of'|'for'|'for' 'the'|'of' 'the'|'on' 'the')? PREP? entity = EntityRef?
 ;
 
 ActionRef: verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = EntityDef))? ;
