@@ -1,6 +1,6 @@
 model mobile using widgets
 
-entity screen is widget {
+entity Screen is widget {
 	actions: open, create 
 	states: void
 	properties: List, WishList
@@ -30,56 +30,56 @@ entity WishCard is widget {
 
 
 Scenario: Creating a wishlist - creation succeeded
-Given the List on the screen "Home" is empty
+Given the List on the Screen "Home" is empty
 	which means
-		Given the BrowserWindow "Home" is displayed 
+		Given the Screen "Home" is displayed 
 		When I refresh the List "Your wishlists"
 		Then the List "Your wishlists" is empty
-When I create wishlist "Wishes" on the screen "Home"
+When I create wishlist "Wishes" on the Screen "Home"
 	which means
-		Given the BrowserWindow "Create wishlist" is displayed
+		Given the Screen "Create wishlist" is displayed
 		When I type "Wishes" into the field "Wishlist name" And I click the Button "Add"
 		Then the WishListCard "Wishes" is displayed
-Then the List on the screen "Home" is not empty
+Then the List on the Screen "Home" is not empty
 	which means
-		Given the BrowserWindow "Home" is displayed
+		Given the Screen "Home" is displayed
 		When I click on "See wishlists"
 		Then the List "Your wishlists" is not empty
 		
 	
 Scenario: Adding a wish - adding succeeded
-Given the List on the screen "Wishlist" is empty
+Given the List on the Screen "Wishlist" is empty
 	which means
-		Given the BrowserWindow "Wishlist" is displayed
+		Given the Screen "Wishlist" is displayed
 		When I refresh the List "Wishes"
 		Then the List "Wishes" is empty
-When I create wish "Dog" on the screen "Wishlist"
+When I create wish "Dog" on the Screen "Wishlist"
 	which means
-		Given the BrowserWindow "Add wish" is displayed
+		Given the Screen "Add wish" is displayed
 		When I type "Dog" into the TextField "Wish Title"
 			And I paste "http://amazon.de/myDog" into the TextField "Link"
 			And I click the Button "Add wish to wishlist"
 		Then the WishCard "Dog" is displayed
-Then the List on the screen "Wishlist" is not empty
+Then the List on the Screen "Wishlist" is not empty
 	which means
-		Given the BrowserWindow "Wishlist" is displayed
+		Given the Screen "Wishlist" is displayed
 		When I refresh the List "Wishes"
 		Then the List "Wishes" is not empty
 		
 Scenario: Sharing a wishlist - sharing succeeded
 Given the contents of the WishList "Wishes" is not shared
 	which means
-		Given the screen "Wishlist" is displayed
+		Given the Screen "Wishlist" is displayed
 		When I click on the Button "Share"
 		Then the value for the TextField "Shared" is "Not shared yet"
 When I share WishList "Wishes"
 	which means
-		Given the screen "Share wishlist" is displayed
+		Given the Screen "Share wishlist" is displayed
 		When I click "Share this list"
 		Then the TextField "URL" is copied
 Then the contents of the WishList "Wishes" is shared
 	which means
-		Given the screen "Wishlist" is displayed
+		Given the Screen "Wishlist" is displayed
 		When I click on the Button "Share"
 		Then the value for the TextField "Shared" is "This list has been shared"
 	
