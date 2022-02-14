@@ -1,30 +1,24 @@
 model mobile using widgets
 
-entity homeScreen {
-	actions: open wishlist, create a wishlist
+entity screen {
+	actions: open wishlist, create wishlist 
 	states: void
-	properties: wishlists
-}
-
-entity wishlist {
-	actions: create, edit, delete, share, view
-	states: shared, nonshared
-	properties: name, wish
+	properties: List
 }
 
 Scenario: Creating a wishlist - creation succeeded
-Given the wishlists for the homeScreen "Home" is void
+Given the List for the screen "Home" is void
 	which means
-		Given the BrowserWindow "Home" is displayed
-		When I click on "See wishlists" 
-		Then the WishlistCard "Your wishlists" is empty
-When I 
+		Given the BrowserWindow "Home" is displayed 
+		When I refresh the List "Your wishlists"
+		Then the List "Your wishlists" is empty
+When I create wishlist "Wishes" on the screen "Home"
 	which means
 		Given the BrowserWindow "Create wishlist" is displayed
-		When I type "New wishlist" into the field "Wishlist name"
-		Then the Notification "Your wishlist has been successfully processed" is displayed
-Then the wishlists on the homeScreen is not void
+		When I type "Wishes" into the field "Wishlist name" And I click the Button "Add"
+		Then the WishListCard "Wishes" is displayed
+Then the List for the screen "Home" is not void
 	which means
 		Given the BrowserWindow "Home" is displayed
 		When I click on "See wishlists"
-		Then wishlists are not empty
+		Then the List "Your wishlists" is not empty
