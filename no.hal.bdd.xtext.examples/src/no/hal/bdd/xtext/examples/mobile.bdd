@@ -1,85 +1,71 @@
 model mobile using widgets
 
-entity Screen is widget {
-	actions: open, create 
-	states: void
-	properties: List, WishList
+entity Celebrant {
+	properties: birthday, wishlist
 }
 
-entity List is widget {
-	actions: refresh
-	properties: contents
+entity WishList {
+	actions: create, share
+	states: void, empty, shared
 }
 
-entity WishList is List {
-	actions: share
-	states: shared
+entity Wish {
+	actions: add
 }
-
-entity WishListCard is widget {
-	actions: open
-	states: empty
-	properties: name, images
-}
-
-entity WishCard is widget {
-	actions: open
-	states: empty
-	properties: name, image
-}
-
 
 Scenario: Creating a wishlist - creation succeeded
-Given the List on the Screen "Home" is empty
+Given the birthday of the Celebrant "Rasmus" is "25th of February"
 	which means
-		Given the Screen "Home" is displayed 
-		When I refresh the List "Your wishlists"
-		Then the List "Your wishlists" is empty
-When I create wishlist "Wishes" on the Screen "Home"
+		Given the BrowserWindow "Home" is displayed 
+		When I click on "See birthday"
+		Then the value for the TextField "Birthday" is "25th of February"
+When I create wishlist "Rasmus' wishlist" for the Celebrant "Rasmus"
 	which means
-		Given the Screen "Create wishlist" is displayed
-		When I type "Wishes" into the field "Wishlist name" And I click the Button "Add"
-		Then the WishListCard "Wishes" is displayed
-Then the List on the Screen "Home" is not empty
+		Given the BrowserWindow "Create wishlist" is displayed
+		When I type "Rasmus' wishlist" into the field "Wishlist name"
+			And I click the Button "Add"
+		Then the Notification "Rasmus' wishlist has been added" is displayed
+Then the  WishList "Rasmus' wishlist" is not void
 	which means
-		Given the Screen "Home" is displayed
+		Given the BrowserWindow "Home" is displayed
 		When I click on "See wishlists"
-		Then the List "Your wishlists" is not empty
-		
-	
+		Then the option "Rasmus' wishlist" for the ListBox "Your wishlists" is displayed
+
+
 Scenario: Adding a wish - adding succeeded
-Given the List on the Screen "Wishlist" is empty
+Given the WishList "Rasmus' wishlist" is empty
 	which means
-		Given the Screen "Wishlist" is displayed
-		When I refresh the List "Wishes"
-		Then the List "Wishes" is empty
-When I create wish "Dog" on the Screen "Wishlist"
+		Given the BrowserWindow "Your wishlists" is displayed
+		When I click the ListBox "Rasmus' wishlist"
+		Then the ListBox "Wishes" is empty
+When I add Wish "Dog" to the WishList "Rasmus' wishlist"
 	which means
-		Given the Screen "Add wish" is displayed
+		Given the BrowserWindow "Add wish" is displayed
 		When I type "Dog" into the TextField "Wish Title"
 			And I paste "http://amazon.de/myDog" into the TextField "Link"
 			And I click the Button "Add wish to wishlist"
-		Then the WishCard "Dog" is displayed
-Then the List on the Screen "Wishlist" is not empty
+		Then the Notification "The wish dog has been added to the wishlist" is displayed
+Then the WishList "Rasmus' birthday" is not empty
 	which means
-		Given the Screen "Wishlist" is displayed
-		When I refresh the List "Wishes"
-		Then the List "Wishes" is not empty
-		
+		Given the BrowserWindow "Your wishlists" is displayed
+		When I click the ListBox "Rasmus' wishlist"
+		Then the option "Dog" for the ListBox "Rasmus' wishlist" is displayed
+
+	
 Scenario: Sharing a wishlist - sharing succeeded
-Given the contents of the WishList "Wishes" is not shared
+Given the WishList "Rasmus' wishlist" is not shared
 	which means
-		Given the Screen "Wishlist" is displayed
+		Given the BrowserWindow "Rasmus' wishlist" is displayed
 		When I click on the Button "Share"
 		Then the value for the TextField "Shared" is "Not shared yet"
-When I share WishList "Wishes"
+When I share WishList "Rasmus' wishlist"
 	which means
-		Given the Screen "Share wishlist" is displayed
+		Given the BrowserWindow "Share wishlist" is displayed
 		When I click "Share this list"
-		Then the TextField "URL" is copied
-Then the contents of the WishList "Wishes" is shared
+		Then the Link "wishwell.dk/Rasmus'%20Wishlist" is selected
+Then the WishList "Rasmus' wishlist" is shared
 	which means
-		Given the Screen "Wishlist" is displayed
+		Given the BrowserWindow "Wishlist" is displayed
 		When I click on the Button "Share"
 		Then the value for the TextField "Shared" is "This list has been shared"
 	

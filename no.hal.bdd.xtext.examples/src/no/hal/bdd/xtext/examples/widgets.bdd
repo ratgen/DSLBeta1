@@ -227,25 +227,3 @@ entity VideoPlayer is widget {
 	states: played, paused, fast forwarded, rewound, toggled, exited, turned up, turned down
 	properties: full screen, volume, video 
 }
-
-entity List is widget {
-	actions: refresh
-	properties: contents
-}
-
-entity WishList is List {
-	actions: share
-	states: shared
-}
-
-entity WishListCard is widget {
-	actions: open
-	states: empty
-	properties: name, images
-}
-
-entity WishCard is widget {
-	actions: open
-	states: empty
-	properties: name, image
-}
