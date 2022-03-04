@@ -37,12 +37,12 @@ Given the WishList "Rasmus' wishlist" is empty
 	which means
 		Given the BrowserWindow "Your wishlists" is displayed
 		When I click the ListBox "Rasmus' wishlist"
-		Then the ListBox "Wishes" is empty
+		Then the ListBox "Wishes" is not shown
 When I add Wish "Dog" to the WishList "Rasmus' wishlist"
 	which means
 		Given the BrowserWindow "Add wish" is displayed
 		When I type "Dog" into the TextField "Wish Title"
-			And I paste "http://amazon.de/myDog" into the TextField "Link"
+			And I type "http://amazon.de/myDog" into the TextField "Link"
 			And I click the Button "Add wish to wishlist"
 		Then the Notification "The wish dog has been added to the wishlist" is displayed
 Then the WishList "Rasmus' birthday" is not empty
