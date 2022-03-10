@@ -5,7 +5,7 @@ entity account {
 	states: void
 	properties: balance
 }
-
+ 
 Scenario: Withdrawing money - transaction succeeded
 Given the balance for the account "1787461" is 1000
 	which means
@@ -15,7 +15,7 @@ Given the balance for the account "1787461" is 1000
 When I transfer 1000 from the account "1787461"
 	which means
 		Given the BrowserWindow "SEPA Transfer" is displayed
-		When I type "1000" into the field "Amount"
+		When I type "1000" into the TextField "Amount"
 		Then the Notification "Your transfer has been successfully processed" is displayed
 Then the account "1787461" is void
 	which means

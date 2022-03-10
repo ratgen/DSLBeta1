@@ -6,7 +6,7 @@ entity Celebrant {
 
 entity WishList {
 	actions: create, share
-	states: void, empty, shared
+	states: void, empty, shared, created
 }
 
 entity Wish {
@@ -19,13 +19,13 @@ Given the birthday of the Celebrant "" is ""
 		Given the BrowserWindow "Home" is displayed 
 		When I click on "See birthday"
 		Then the value for the TextField "Birthday" is "25th of February"
-When I create wishlist "Rasmus' wishlist" for the Celebrant "Rasmus"
-	which means
+When I create WishList "Rasmus' wishlist" for the Celebrant "Rasmus"
+	which means 
 		Given the BrowserWindow "Create wishlist" is displayed
 		When I type "Rasmus' wishlist" into the field "Wishlist name"
 			And I click the Button "Add"
-		Then the Notification "Rasmus' wishlist has been added" is displayed
-Then the  WishList "Rasmus' wishlist" is not void
+		Then the Notification "Rasmus' wishlist has been added" is displayed 
+Then the  WishList "Rasmus' wishlist" is created
 	which means
 		Given the BrowserWindow "Home" is displayed
 		When I click on "See wishlists"
@@ -33,10 +33,10 @@ Then the  WishList "Rasmus' wishlist" is not void
 
 
 Scenario: Adding a wish - adding succeeded
-Given the WishList "Rasmus' wishlist" is empty 
+Given the WishList "Rasmus' wishlist" is empty
 	which means
 		Given the BrowserWindow "Your wishlists" is displayed
-		When I click the ListBox "Rasmus' wishlist"
+		When I select the ListBox "Rasmus' wishlist"
 		Then the ListBox "Wishes" is not shown
 When I add Wish "Dog" to the WishList "Rasmus' wishlist"
 	which means
@@ -58,7 +58,7 @@ Given the WishList "Rasmus' wishlist" is not shared
 		Given the BrowserWindow "Rasmus' wishlist" is displayed
 		When I click on the Button "Share"
 		Then the value for the TextField "Shared" is "Not shared yet"
-When I share WishList "Rasmus' wishlist"
+When I share the WishList "Rasmus' wishlist"
 	which means
 		Given the BrowserWindow "Share wishlist" is displayed
 		When I click "Share this list"

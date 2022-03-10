@@ -46,35 +46,37 @@ ID_OR_STRING: (ID | STRING);
 
 Scenario:
        'Scenario:' name = ID_OR_STRING WORD? ('out'|'off'|'on'|'in'|'-'|'the'|'to' 'the'|'to')? WORD? ('off'|'on'|'in'|'-'|'the')? WORD? ('on'|'in'|'-'|'the')? WORD? ('in'|'-'|'the')? WORD?
-       (('Given''the' preStateE = ScenarioState)
-       'which' 'means')
-       (
-       'Given' ('the'|'all' 'the')? preState = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in'? WORD?)) WORD?
-       (('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I')) action = ScenarioAction 
-       'Then' ('the'|'all' 'the')? (STRING)? postState = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in' WORD?)) WORD?
-       )
-       (
-       	((('When' 'I'|'When' 'the'|'When'|'And''I') ('do' 'not')? ((OPTION))) | ((('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I')) actionE = ScenarioAction ))
-       'which' 'means')
-      ( 'Given' ('the'|'all' 'the')? preState1 = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in'? WORD?)) WORD?
-       (('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I')) action1 = ScenarioAction )
-       'Then' ('the'|'all' 'the')? (STRING)? postState1 = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in' WORD?)) WORD?
        
-       (((('Then''the'|'Then''I'|'Then') ('do' 'not')? ((OPTION)) | ('Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = ScenarioState))
-       'which' 'means')
-       ('Given' ('the'|'all' 'the')? preState2 = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in'? WORD?)) WORD?
-       (('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I')) action2 = ScenarioAction )
-       'Then' ('the'|'all' 'the')? (STRING)? postState2 = ScenarioState ('out'|'off'|'on'|'in'|'to' 'the'|'to')? (WORD? | WORD?('-'|'the')?WORD? | (WORD? 'in' WORD?)) WORD? 
-       )
+       ('Given'('the'|'all' 'the') preStateE = ScenarioState
+       'which' 'means'
+       
+       'Given' ('the'|'all' 'the')? preState = ScenarioState
+       'When' 'I' ('do' 'not')? action = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState = ScenarioState
+      	
+       'When''I' ('do' 'not')? actionE = ScenarioAction
+       'which' 'means'
+       
+       'Given' ('the'|'all' 'the')? preState1 = ScenarioState
+       'When' 'I' ('do' 'not')? action1 = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState1 = ScenarioState
+       
+       'Then''the' ('do' 'not')?  preStateE1 = ScenarioState
+       'which' 'means'
+       
+       'Given' ('the'|'all' 'the')? preState2 = ScenarioState
+       'When' 'I' ('do' 'not')? action2 = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState2 = ScenarioState)
+       
 ;
 
 
 ScenarioState:
-	states += StatePhrase (('And'|'And' 'the') states += StatePhrase)*
+	states += StatePhrase (('And' 'the') states += StatePhrase)*
 ;
 
 ScenarioAction:
-	actions += ActionPhrase (('And' 'I'|'And') actions += ActionPhrase)*
+	actions += ActionPhrase (('And' 'I') actions += ActionPhrase)*
 ;
 
 StatePhrase: EntityPropertyStatePhrase | EntityStatePhrase;
@@ -133,17 +135,10 @@ BooleanValue:
 	value = (TRUE | FALSE)
 ;
 
-ActionPhrase: VerbAction | VerifyAction;
+ActionPhrase: VerbAction;
 
 VerbAction:
-	action = ActionRef 'and'? WORD? 'on'? (WORD'-'WORD)? ('for' 'the'| 'the'|'on'|'on' 'the'|'to' 'the'|'to')?
-	(entity = EntityDef)? ('on'|'off'|'in')? entity = EntityRef ('on'|'off'|'in'|'of'|'for'|'for' 'the'|'of' 'the'|'on' 'the'|'to'|'to' 'the')? PREP? entity = EntityRef?
-;
-
-ActionRef:
-	verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = EntityDef))?
-;
-
-VerifyAction:
-	'assure' state = StatePhrase
+	verb = [ActionDef | WORD] OPTION? ('on'|'off'|'in'|'of'|'for'|'for' 'the'|'of' 'the'|'on' 'the'|'to'|'to' 'the')? PREP?
+	('the' entity = EntityRef OPTION? | entity1 = EntityRef OPTION? ((('on'|'off'|'in'|'of'|'for'|'for' 'the'|'of' 'the'|'on' 'the'|'to'|'to' 'the'))
+	  entity2 = EntityRef OPTION?)?)? 
 ;
