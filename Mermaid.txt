@@ -1,0 +1,58 @@
+flowchart TD
+    StartOfScenario --> Given
+    StartOfScenario --> GivenAction1
+    Given --> A(which means)
+    A --> GivenAction1
+    GivenAction1 --> WhenAction1
+    WhenAction1 --> ThenAction1
+    ThenAction1 --> When
+    ThenAction1 --> GivenAction2
+    When --> B(which means)
+    B --> GivenAction2
+    GivenAction2 --> WhenAction2
+    WhenAction2 --> ThenAction2
+    ThenAction2 --> Then
+    ThenAction2 --> EndOfScenario
+    StartOfScenario --> Then
+    ThenAction2 --> GivenAction3
+    Then --> C(which means)
+    C --> GivenAction3
+    GivenAction3 --> WhenAction3
+    WhenAction3 --> ThenAction3
+    ThenAction3 --> EndOfScenario
+ 
+GivenSoFar
+flowchart TD
+    Given --> the
+    the --> Entity
+    the --> EntityProperty
+    EntityProperty --> of
+    EntityProperty --> for
+    EntityProperty --> on
+    EntityProperty --> in
+    for --> A
+    on --> A
+    of --> A(the)
+    in --> A
+    
+    A --> B(Entity)
+    B --> C(NameForEntity)
+    C --> D(is)
+    D --> E(EntityState)
+    C --> d(are)
+    
+    D --> NameForProperty
+    d --> NameForProperty
+    D --> F(not)
+    F --> E
+    d --> F
+    d --> E
+    
+    Entity --> NameForEntity
+    NameForEntity --> is
+    NameForEntity --> are
+    is --> EntityState
+    are --> not
+    are --> EntityState
+    is --> not
+    not --> EntityState

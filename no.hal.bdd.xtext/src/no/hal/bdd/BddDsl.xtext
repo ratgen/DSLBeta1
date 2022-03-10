@@ -95,13 +95,13 @@ EntityRef:
 ;
 
 EntityStatePhrase:
-	(property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for'|'for' 'the'|'on'|'on' 'the'))? 
-	entity = EntityRef ('is'|'are') 'not'? (state += [StateName] 'and')* WORD?
+	(property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for'|'for' 'the'|'on'|'on' 'the'|'in' 'the'|'in'))? 
+	entity = EntityRef ('is'|'are') 'not'? state += [StateName] WORD?
 ;
 
 EntityPropertyStatePhrase:
-	  property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for' |'from'|'for' 'the'|'on'|'on' 'the') entity = EntityRef
-	((('is'|'is' 'not') value = PropertyValue WORD?) WORD? | ('is'|'is' 'not'|'are'|'are' 'not') values += PropertyValue WORD? WORD?) 
+	  property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for' |'from'|'for' 'the'|'on'|'on' 'the''in' 'the'|'in') entity = EntityRef
+	('is' OPTION = PropertyValue)
 ;
 
 //terminal UNCLOSED_STRING : '"' (!'"')* EOF;

@@ -14,7 +14,7 @@ entity Wish {
 }
 
 Scenario: Creating a wishlist - creation succeeded
-Given the birthday of the Celebrant "Rasmus" is "25th of February"
+Given the birthday of the Celebrant "" is "" 
 	which means
 		Given the BrowserWindow "Home" is displayed 
 		When I click on "See birthday"
@@ -33,7 +33,7 @@ Then the  WishList "Rasmus' wishlist" is not void
 
 
 Scenario: Adding a wish - adding succeeded
-Given the WishList "Rasmus' wishlist" is empty
+Given the WishList "Rasmus' wishlist" is empty 
 	which means
 		Given the BrowserWindow "Your wishlists" is displayed
 		When I click the ListBox "Rasmus' wishlist"
