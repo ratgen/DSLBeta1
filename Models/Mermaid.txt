@@ -21,7 +21,7 @@ flowchart TD
     WhenAction3 --> ThenAction3
     ThenAction3 --> EndOfScenario
  
-Given
+GivenSoFar
 flowchart TD
     Given --> the
     the --> Entity

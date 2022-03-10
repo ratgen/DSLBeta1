@@ -30,7 +30,7 @@ ActionDef:
 	
 ;
 
-PREP: ('on' | 'in' | 'from' | 'to' | 'into'|'for');
+PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for');
 WORD: ID;
 
 
@@ -138,7 +138,7 @@ BooleanValue:
 ActionPhrase: VerbAction;
 
 VerbAction:
-	verb = [ActionDef | WORD] OPTION? ('on'|'off'|'in'|'of'|'for'|'for' 'the'|'of' 'the'|'on' 'the'|'to'|'to' 'the')? PREP?
-	('the' entity = EntityRef OPTION? | entity1 = EntityRef OPTION? ((('on'|'off'|'in'|'of'|'for'|'for' 'the'|'of' 'the'|'on' 'the'|'to'|'to' 'the'))
+	verb = [ActionDef | WORD] OPTION? (PREP 'the'|PREP)? 
+	('the' entity = EntityRef OPTION? | entity1 = EntityRef OPTION? ((PREP 'the'|PREP?) 
 	  entity2 = EntityRef OPTION?)?)? 
 ;

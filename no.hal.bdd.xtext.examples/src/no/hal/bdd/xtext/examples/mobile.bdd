@@ -17,12 +17,12 @@ Scenario: Creating a wishlist - creation succeeded
 Given the birthday of the Celebrant "" is "" 
 	which means
 		Given the BrowserWindow "Home" is displayed 
-		When I click on "See birthday"
+		When I click on "See birthday" 
 		Then the value for the TextField "Birthday" is "25th of February"
 When I create WishList "Rasmus' wishlist" for the Celebrant "Rasmus"
 	which means 
 		Given the BrowserWindow "Create wishlist" is displayed
-		When I type "Rasmus' wishlist" into the field "Wishlist name"
+		When I type "Rasmus' wishlist" into the TextField "Wishlist name"
 			And I click the Button "Add"
 		Then the Notification "Rasmus' wishlist has been added" is displayed 
 Then the  WishList "Rasmus' wishlist" is created
@@ -48,7 +48,7 @@ When I add Wish "Dog" to the WishList "Rasmus' wishlist"
 Then the WishList "Rasmus' birthday" is not empty
 	which means
 		Given the BrowserWindow "Your wishlists" is displayed
-		When I click the ListBox "Rasmus' wishlist"
+		When I select the ListBox "Rasmus' wishlist"
 		Then the option "Dog" for the ListBox "Rasmus' wishlist" is displayed
 
 	
