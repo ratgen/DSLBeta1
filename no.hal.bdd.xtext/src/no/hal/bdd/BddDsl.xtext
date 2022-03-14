@@ -30,12 +30,12 @@ ActionDef:
 	
 ;
 
-PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for');
+PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'of');
 WORD: ID;
 
 
 
-StateDef: postive = StateName PREP? ('/' negative = StateName)?;
+StateDef: positive = StateName PREP? ('/' negative = StateName)?;
 StateName: name = (WORD) ('and'|'off')?  (WORD)?;
 
 PropertyDef: name = WORD (plural ?= '*')?;
@@ -97,12 +97,12 @@ EntityRef:
 ;
 
 EntityStatePhrase:
-	(property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for'|'for' 'the'|'on'|'on' 'the'|'in' 'the'|'in'))? 
+	(property = [PropertyDef|WORD]? OPTION? (PREP|PREP 'the'))? 
 	entity = EntityRef ('is'|'are') 'not'? state += [StateName] WORD?
 ;
 
 EntityPropertyStatePhrase:
-	  property = [PropertyDef|WORD]? OPTION? ('of'|'of' 'the'|'for' |'from'|'for' 'the'|'on'|'on' 'the''in' 'the'|'in') entity = EntityRef
+	  property = [PropertyDef|WORD]? OPTION? (PREP|PREP 'the') entity = EntityRef
 	('is' OPTION = PropertyValue)
 ;
 
@@ -138,7 +138,7 @@ BooleanValue:
 ActionPhrase: VerbAction;
 
 VerbAction:
-	verb = [ActionDef | WORD] OPTION? (PREP 'the'|PREP)? 
+	verb = [ActionDef | WORD] (OPTION? (PREP 'the'|PREP))? 
 	('the' entity = EntityRef OPTION? | entity1 = EntityRef OPTION? ((PREP 'the'|PREP?) 
 	  entity2 = EntityRef OPTION?)?)? 
 ;

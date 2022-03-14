@@ -21,19 +21,13 @@ flowchart TD
     WhenAction3 --> ThenAction3
     ThenAction3 --> EndOfScenario
  
-GivenSoFar
-flowchart TD
-    Given --> the
+Given
+Flowchart TD
+Given --> the
     the --> Entity
     the --> EntityProperty
-    EntityProperty --> of
-    EntityProperty --> for
-    EntityProperty --> on
-    EntityProperty --> in
-    for --> A
-    on --> A
-    of --> A(the)
-    in --> A
+    EntityProperty --> P(on/from/in/to/into/for/of)
+    P --> A(the)
     
     A --> B(Entity)
     B --> C(NameForEntity)
@@ -59,46 +53,30 @@ flowchart TD
 
 
 When
-flowchart TD
-    When --> I
+    flowchart TD
+When --> I
     I --> EntityAction
     I --> do
     do --> not
     not --> EntityAction
 
-    EntityAction --> OPTION
-    EntityAction --> on
-    EntityAction --> from
-    EntityAction --> in
-    EntityAction --> to
-    EntityAction --> into
-    EntityAction --> for
-    on --> the
-    from--> the
-    in--> the
-    to --> the
-    into --> the
-    for --> the
+    EntityAction --> word
+    EntityAction --> number
+    word --> P
+    number --> P
+    EntityAction --> P(on/from/in/to/into/for/of)
 
-    the --> A(Entity)
+    P --> j(the) --> A(Entity)
     A --> a(NameForEntity)
 
-    the --> B(Entity1)
+    j --> B(Entity1)
     B --> b(NameForEntity1)
 
-    b --> C(on)
-    b --> D(from)
-    b --> E(in)
-    b --> F(to)
-    b --> G(into)
-    b --> H(for)
+    b --> p(on/from/in/to/into/for/of)
 
-    C --> J(the)
-    D --> J
-    E --> J
-    F --> J
-    G --> J
-    H --> J
+
+    p --> J(the)
+    
 
     J --> c(Entity2)
     c --> d(NameForEntity2)
