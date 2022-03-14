@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package
+			uri = "http://www.pejo.dk/xtext/bdd_dsl/BddDsl"
+			class = "dk.pejo.xtext.bdd_dsl.bddDsl.BddDslPackage"
+			genModel = "model/generated/BddDsl.genmodel" />
+	</extension>
+</plugin>
