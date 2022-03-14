@@ -1,0 +1,77 @@
+model mobile using widgets
+
+entity Celebrant {
+	properties: birthday, wishlist
+}
+
+entity WishList {
+	actions: create, share
+	states: void, empty, shared, created
+}
+
+entity Wish {
+	actions: add
+}
+
+Scenario: Creating a wishlist - creation succeeded
+Given the birthday of the Celebrant "" is "" 
+	which means
+		Given the BrowserWindow "Home" is displayed 
+		When I click on "See birthday" 
+		Then the value for the TextField "Birthday" is "25th of February"
+When I create WishList "Rasmus' wishlist" for the Celebrant "Rasmus"
+	which means 
+		Given the BrowserWindow "Create wishlist" is displayed
+		When I type "Rasmus' wishlist" into the TextField "Wishlist name"
+			And I click the Button "Add"
+		Then the Notification "Rasmus' wishlist has been added" is displayed 
+Then the  WishList "Rasmus' wishlist" is created
+	which means
+		Given the BrowserWindow "Home" is displayed
+		When I click on "See wishlists"
+		Then the option "Rasmus' wishlist" for the ListBox "Your wishlists" is displayed
+
+
+Scenario: Adding a wish - adding succeeded
+Given the WishList "Rasmus' wishlist" is empty
+	which means
+		Given the BrowserWindow "Your wishlists" is displayed
+		When I select the ListBox "Rasmus' wishlist"
+		Then the ListBox "Wishes" is not shown
+When I add Wish "Dog" to the WishList "Rasmus' wishlist"
+	which means
+		Given the BrowserWindow "Add wish" is displayed
+		When I type "Dog" into the TextField "Wish Title"
+			And I type "http://amazon.de/myDog" into the TextField "Link"
+			And I click the Button "Add wish to wishlist"
+		Then the Notification "The wish dog has been added to the wishlist" is displayed
+Then the WishList "Rasmus' birthday" is not empty
+	which means
+		Given the BrowserWindow "Your wishlists" is displayed
+		When I select the ListBox "Rasmus' wishlist"
+		Then the option "Dog" for the ListBox "Rasmus' wishlist" is displayed
+
+	
+Scenario: Sharing a wishlist - sharing succeeded
+Given the WishList "Rasmus' wishlist" is not shared
+	which means
+		Given the BrowserWindow "Rasmus' wishlist" is displayed
+		When I click on the Button "Share"
+		Then the value for the TextField "Shared" is "Not shared yet"
+When I share the WishList "Rasmus' wishlist"
+	which means
+		Given the BrowserWindow "Share wishlist" is displayed
+		When I click "Share this list"
+		Then the Link "wishwell.dk/Rasmus'%20Wishlist" is selected
+Then the WishList "Rasmus' wishlist" is shared
+	which means
+		Given the BrowserWindow "Wishlist" is displayed
+		When I click on the Button "Share"
+		Then the value for the TextField "Shared" is "This list has been shared"
+	
+	
+	
+	
+	
+		
+		
