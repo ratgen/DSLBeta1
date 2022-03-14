@@ -1,0 +1,9 @@
+grammar dk.pejo.text.webdsl.BddDsl with org.eclipse.xtext.common.Terminals
+
+generate bddDsl "http://www.pejo.dk/text/webdsl/BddDsl"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';

@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: dk.pejo.xtext.webdsl
+Bundle-ManifestVersion: 2
+Bundle-Name: dk.pejo.xtext.webdsl
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: dk.pejo.xtext.webdsl; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: dk.pejo.text.webdsl.serializer,
+ dk.pejo.text.webdsl.generator,
+ dk.pejo.text.webdsl.services,
+ dk.pejo.text.webdsl.validation,
+ dk.pejo.text.webdsl.parser.antlr.internal,
+ dk.pejo.text.webdsl,
+ dk.pejo.text.webdsl.bddDsl,
+ dk.pejo.text.webdsl.bddDsl.impl,
+ dk.pejo.text.webdsl.bddDsl.util,
+ dk.pejo.text.webdsl.parser.antlr,
+ dk.pejo.text.webdsl.scoping
+Import-Package: org.apache.log4j
