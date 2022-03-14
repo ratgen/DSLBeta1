@@ -2,7 +2,7 @@ model widgets
 
 entity widget {
 	actions: move
-	states: displayed, shown, available, enabled/disabled, empty
+	states: displayed, shown, available, enabled/disabled
 }
 
 entity field is widget {
@@ -90,13 +90,13 @@ entity Grid is widget {
 }
 
 entity TextField is widget {
-	actions: type, set, fill [in], paste
-	states: typed, set, filled, copied
+	actions: type, set, fill [in]
+	states: typed, set, filled
 	properties: value
 }
 
 entity TextArea is widget {
-	actions: type, set, fill [in], paste
+	actions: type, set, fill [in]
 	states: typed, set, filled
 	properties: text
 	
