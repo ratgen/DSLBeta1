@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: dk.pejo.xtext.bdd_dsl.ide
+Bundle-ManifestVersion: 2
+Bundle-Name: dk.pejo.xtext.bdd_dsl.ide
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: dk.pejo.xtext.bdd_dsl.ide; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: dk.pejo.xtext.bdd_dsl,
+ org.eclipse.xtext.ide,
+ org.eclipse.xtext.xbase.ide
+Bundle-RequiredExecutionEnvironment: JavaSE-11
