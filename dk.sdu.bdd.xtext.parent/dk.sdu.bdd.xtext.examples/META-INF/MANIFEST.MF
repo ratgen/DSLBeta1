@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Examples
+Bundle-SymbolicName: dk.sdu.bdd.xtext.examples
+Bundle-Name: dk.sdu.bdd.xtext.examples
+Bundle-Version: 1.0.0.qualifier
+Automatic-Module-Name: dk.sdu.bdd.xtext.examples
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+

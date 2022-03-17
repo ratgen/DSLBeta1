@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Automatic-Module-Name: dk.sdu.bdd.xtext
+Bundle-ManifestVersion: 2
+Bundle-Name: dk.sdu.bdd.xtext
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: dk.sdu.bdd.xtext; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.14.0",
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.antlr.runtime;bundle-version="[3.2.0,3.2.1)"
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Export-Package: dk.sdu.bdd.xtext.parser.antlr.internal,
+ dk.sdu.bdd.xtext.scoping,
+ dk.sdu.bdd.xtext,
+ dk.sdu.bdd.xtext.serializer,
+ dk.sdu.bdd.xtext.bddDsl.util,
+ dk.sdu.bdd.xtext.bddDsl,
+ dk.sdu.bdd.xtext.bddDsl.impl,
+ dk.sdu.bdd.xtext.parser.antlr,
+ dk.sdu.bdd.xtext.validation,
+ dk.sdu.bdd.xtext.services,
+ dk.sdu.bdd.xtext.generator
+Import-Package: org.apache.log4j

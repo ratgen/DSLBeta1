@@ -2,11 +2,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>dk.pejo.xtext.bdd_dsl</groupId>
-		<artifactId>dk.pejo.xtext.bdd_dsl.parent</artifactId>
+		<groupId>dk.sdu.bdd.xtext</groupId>
+		<artifactId>dk.sdu.bdd.xtext.parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
-	<artifactId>dk.pejo.xtext.bdd_dsl.web</artifactId>
+	<artifactId>dk.sdu.bdd.xtext.web</artifactId>
 	<packaging>war</packaging>
 
 	<build>
@@ -14,9 +14,9 @@
 		<resources>
 			<resource>
 				<directory>src</directory>
-					<exclude>**/*.xtend</exclude>
 				<excludes>
 					<exclude>**/*.java</exclude>
+					<exclude>**/*.xtend</exclude>
 				</excludes>
 			</resource>
 		</resources>
@@ -75,12 +75,12 @@
 	<dependencies>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>dk.pejo.xtext.bdd_dsl</artifactId>
+			<artifactId>dk.sdu.bdd.xtext</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>${project.groupId}</groupId>
-			<artifactId>dk.pejo.xtext.bdd_dsl.ide</artifactId>
+			<artifactId>dk.sdu.bdd.xtext.ide</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

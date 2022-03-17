@@ -11,3 +11,5 @@ target/
 **/generated/
 **/.DS_Store
 **/*.xml_gen
+
+**/.settings
