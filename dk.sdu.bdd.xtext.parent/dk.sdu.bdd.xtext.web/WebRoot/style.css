@@ -25,8 +25,6 @@ a:hover {
 }
 
 .header {
-	display: block;
-	position: absolute;
 	background-color: #e8e8e8;
 	top: 0;
 	left: 0;
@@ -36,21 +34,30 @@ a:hover {
 }
 
 .content {
-	display: block;
-	position: absolute;
+	display: flex;
+	flex-direction: row;
+}
+
+.xtext-wrapper {
 	top: 90px;
 	bottom: 0;
 	left: 0;
-	width: 640px;
+	flex: 1;
+	height: 480px;
 }
 
 #xtext-editor {
 	display: block;
-	position: absolute;
 	top: 0;
 	bottom: 0;
 	left: 0;
 	right: 0;
 	padding: 4px;
 	border: 1px solid #aaa;
+	height: 480px;
+}
+
+#blockly-editor {
+	flex: 1;
+	height: 480px;
 }

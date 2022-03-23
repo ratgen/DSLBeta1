@@ -5,6 +5,7 @@
 	<title>Example Web Editor</title>
 	<link rel="stylesheet" type="text/css" href="xtext/2.25.0/xtext-ace.css"/>
 	<link rel="stylesheet" type="text/css" href="style.css"/>
+	<script src="https://unpkg.com/blockly/blockly.min.js"></script>
 	<script src="webjars/requirejs/2.3.6/require.min.js"></script>
 	<script type="text/javascript">
 		var baseUrl = window.location.pathname;
@@ -28,6 +29,7 @@
 			});
 		});
 	</script>
+	
 </head>
 <body>
 
@@ -36,9 +38,49 @@
 		<h1>Example BddDsl Web Editor</h1>
 	</div>
 	<div class="content">
-		<div id="xtext-editor" data-editor-xtext-lang="bdd"></div>
+		<div class="xtext-wrapper">
+			<div id="xtext-editor" data-editor-xtext-lang="bdd"></div>
+		</div>
+		<div id="blockly-editor"></div>
 	</div>
 </div>
 
 </body>
+<script>
+		var toolbox = {
+	  "kind": "flyoutToolbox",
+	  "contents": [
+	    {
+	      "kind": "block",
+	      "type": "controls_if"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "controls_repeat_ext"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "logic_compare"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "math_number"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "math_arithmetic"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "text"
+	    },
+	    {
+	      "kind": "block",
+	      "type": "text_print"
+	    },
+	  ]
+	}
+	var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
+		
+	</script>
 </html>
