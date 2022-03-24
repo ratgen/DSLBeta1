@@ -9,8 +9,7 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-		"nextStatement": "",
-        "nextConnection": "givenblock",
+        "nextStatement": "given",
         "colour": 0,
         "tooltip": "",
         "helpUrl": ""
@@ -25,9 +24,8 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousStatement: "",
-        "previousConnection": "scenarioblock",
-        "nextStatement": null,
+        "previousStatement": "given",
+        "nextStatement": ["whichmean", "when"],
         "colour": 45,
         "tooltip": "",
         "helpUrl": ""
@@ -56,8 +54,8 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousConnection": "scenarioblock",
-        "nextStatement": null,
+        "previousStatement": "when",
+        "nextStatement": ["then", "whichmean"],
         "colour": 90,
         "tooltip": "",
         "helpUrl": ""
@@ -72,8 +70,8 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousStatement": "scenarioblock",
-        "nextStatement": null,
+        "previousStatement": "then",
+        "nextStatement": "whichmean",
         "colour": 135,
         "tooltip": "",
         "helpUrl": ""
@@ -87,12 +85,13 @@ Blockly.defineBlocksWithJsonArray([
           },
           {
             "type": "input_statement",
-            "name": "NAME"
+            "name": "NAME",
+            "check": "given"
           }
         ],
         "inputsInline": true,
-        "previousStatement": null,
-        "nextStatement": null,
+        "previousStatement": "whichmean",
+        "nextStatement": ["when", "then"],
         "colour": 345,
         "tooltip": "",
         "helpUrl": ""
@@ -129,16 +128,16 @@ var toolbox = {
         },
         {
           "kind": "block",
-          "type": "whichmeansblock"
-        },
-        {
-          "kind": "block",
           "type": "whenblock"
         },
         {
           "kind": "block",
           "type": "thenblock"
-        }
+        },
+        {
+          "kind": "block",
+          "type": "whichmeansblock"
+        },
       ]
     },
     {

@@ -45,7 +45,7 @@ ID_OR_STRING: (ID | STRING);
 
 
 Scenario:
-       'Scenario:' name = ID_OR_STRING WORD? ('out'|'off'|'on'|'in'|'-'|'the'|'to' 'the'|'to')? WORD? ('off'|'on'|'in'|'-'|'the')? WORD? ('on'|'in'|'-'|'the')? WORD? ('in'|'-'|'the')? WORD?
+       'Scenario:' name = ID_OR_STRING (WORD)*
        
        ('Given'('the'|'all' 'the') preStateE = ScenarioState
        'which' 'means'
