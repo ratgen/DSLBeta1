@@ -5,12 +5,12 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "input_value",
-            "name": "NAME",
-            "check": "String"
+            "name": "NAME"
           }
         ],
         "inputsInline": true,
-        "nextStatement": null,
+		"nextStatement": "",
+        "nextConnection": "givenblock",
         "colour": 0,
         "tooltip": "",
         "helpUrl": ""
@@ -25,7 +25,8 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousStatement": null,
+        "previousStatement: "",
+        "previousConnection": "scenarioblock",
         "nextStatement": null,
         "colour": 45,
         "tooltip": "",
@@ -37,7 +38,7 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "field_dropdown",
-            "name": "whenwhat",
+            "name": "whenScen",
             "options": [
               [
                 "I",
@@ -55,7 +56,7 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousStatement": null,
+        "previousConnection": "scenarioblock",
         "nextStatement": null,
         "colour": 90,
         "tooltip": "",
@@ -71,7 +72,8 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
-        "previousStatement": null,
+        "previousStatement": "scenarioblock",
+        "nextStatement": null,
         "colour": 135,
         "tooltip": "",
         "helpUrl": ""
