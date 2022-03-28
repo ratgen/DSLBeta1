@@ -1,5 +1,90 @@
 Blockly.defineBlocksWithJsonArray([
-    {
+    	{
+		  "type": "modelblock",
+		  "message0": "Model %1",
+		  "args0": [
+		    {
+		      "type": "input_value",
+		      "name": "NAME"
+		    }
+		  ],
+		  "inputsInline": true,
+		  "nextStatement": null,
+		  "colour": 230,
+		  "tooltip": "",
+		  "helpUrl": ""
+		},
+    	{
+		  "type": "entityblock",
+		  "message0": "Entity %1",
+		  "args0": [
+		    {
+		      "type": "input_value",
+		      "name": "NAME"
+		    }
+		  ],
+		  "inputsInline": true,
+		  "previousStatement": null,
+		  "nextStatement": null,
+		  "colour": 230,
+		  "tooltip": "",
+		  "helpUrl": ""
+		},
+    	{
+		  "type": "entityactionsblock",
+		  "message0": "actions %1 %2",
+		  "args0": [
+		    {
+		      "type": "input_dummy"
+		    },
+		    {
+		      "type": "input_statement",
+		      "name": "NAME"
+		    }
+		  ],
+		  "previousStatement": null,
+		  "nextStatement": null,
+		  "colour": 230,
+		  "tooltip": "",
+		  "helpUrl": ""
+		},
+    	{
+		  "type": "entitystatesblock",
+		  "message0": "states %1 %2",
+		  "args0": [
+		    {
+		      "type": "input_dummy"
+		    },
+		    {
+		      "type": "input_statement",
+		      "name": "NAME"
+		    }
+		  ],
+		  "previousStatement": null,
+		  "nextStatement": null,
+		  "colour": 230,
+		  "tooltip": "",
+		  "helpUrl": ""
+		},
+    	{
+		  "type": "entitypropertiesblock",
+		  "message0": "properties %1 %2",
+		  "args0": [
+		    {
+		      "type": "input_dummy"
+		    },
+		    {
+		      "type": "input_statement",
+		      "name": "NAME"
+		    }
+		  ],
+		  "previousStatement": null,
+		  "nextStatement": null,
+		  "colour": 230,
+		  "tooltip": "",
+		  "helpUrl": ""
+		},
+    	{
         "type": "scenarioblock",
         "message0": "Scenario %1",
         "args0": [
@@ -115,6 +200,38 @@ var toolbox = {
   "kind": "categoryToolbox",
   "contents": [
     {
+		"kind": "category",
+		"name": "Model",
+		"contents":[
+			{
+				"kind": "block",
+				"type": "modelblock"
+			}
+		]	
+	},
+	{
+		"kind": "category",
+		"name": "Entity",
+		"contents":[
+			{
+				"kind": "block",
+				"type": "entityblock"
+			},
+			{
+				"kind": "block",
+				"type": "entityactionsblock"
+			},
+			{
+				"kind": "block",
+				"type": "entitystatesblock"
+			},
+			{
+				"kind": "block",
+				"type": "entitypropertiesblock"
+			},
+		]	
+	},
+    {
       "kind": "category",
       "name": "Bdd blocks",
       "contents": [
@@ -122,6 +239,10 @@ var toolbox = {
           "kind": "block",
           "type": "scenarioblock"
         },
+        {
+				"kind": "block",
+				"type": "modelblock"
+		},
         {
           "kind": "block",
           "type": "givenblock"
@@ -151,7 +272,7 @@ var toolbox = {
       ]
     }
   ]
- }
+}
   
 var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
