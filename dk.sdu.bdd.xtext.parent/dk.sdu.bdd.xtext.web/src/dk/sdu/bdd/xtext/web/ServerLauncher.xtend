@@ -4,6 +4,7 @@
 package dk.sdu.bdd.xtext.web
 
 import java.net.InetSocketAddress
+
 import org.eclipse.jetty.annotations.AnnotationConfiguration
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.util.log.Slf4jLog
@@ -11,6 +12,8 @@ import org.eclipse.jetty.webapp.MetaInfConfiguration
 import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
+
+import org.eclipse.xtext.web.server.persistence.FileResourceHandler
 
 /**
  * This program starts an HTTP server for testing the web integration of your DSL.

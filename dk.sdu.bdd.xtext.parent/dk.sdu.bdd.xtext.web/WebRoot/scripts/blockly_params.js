@@ -161,6 +161,10 @@ window.onload = () => {
   document.insert(0, "model tjd\n\nScenario:")
   document.on('change', (e) => {
     console.log("document has changed " +  JSON.stringify(e) )
+    block = workspace.newBlock("scenarioblock")
+    block.initSvg()
+    workspace.addTopBlock(block)
+    workspace.render()
   })
 }
 
