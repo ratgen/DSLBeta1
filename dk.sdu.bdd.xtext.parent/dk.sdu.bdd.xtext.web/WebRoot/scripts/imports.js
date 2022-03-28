@@ -10,9 +10,10 @@ require.config({
     "xtext/xtext-ace": "xtext/2.25.0/xtext-ace"
   }
 });
+let editor;
 require(["webjars/ace/1.3.3/src/ace"], function() {
   require(["xtext/xtext-ace"], function(xtext) {
-    xtext.createEditor({
+    editor = xtext.createEditor({
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd"
     });
