@@ -9,8 +9,8 @@ Blockly.defineBlocksWithJsonArray([
 		    }
 		  ],
 		  "inputsInline": true,
-		  "nextStatement": null,
-		  "colour": 230,
+		  "nextStatement": "model",
+		  "colour": 0,
 		  "tooltip": "",
 		  "helpUrl": ""
 		},
@@ -24,9 +24,9 @@ Blockly.defineBlocksWithJsonArray([
 		    }
 		  ],
 		  "inputsInline": true,
-		  "previousStatement": null,
-		  "nextStatement": null,
-		  "colour": 230,
+		  "previousStatement": ["model", "entity"],
+		  "nextStatement": "entity",
+		  "colour": 45,
 		  "tooltip": "",
 		  "helpUrl": ""
 		},
@@ -39,12 +39,13 @@ Blockly.defineBlocksWithJsonArray([
 		    },
 		    {
 		      "type": "input_statement",
-		      "name": "NAME"
+		      "name": "NAME",
+		      "check": "text2"
 		    }
 		  ],
-		  "previousStatement": null,
-		  "nextStatement": null,
-		  "colour": 230,
+		  "previousStatement": "entity",
+		  "nextStatement": ["entity", "action"],
+		  "colour": 90,
 		  "tooltip": "",
 		  "helpUrl": ""
 		},
@@ -60,9 +61,9 @@ Blockly.defineBlocksWithJsonArray([
 		      "name": "NAME"
 		    }
 		  ],
-		  "previousStatement": null,
-		  "nextStatement": null,
-		  "colour": 230,
+		  "previousStatement": ["entity", "action"],
+		  "nextStatement": ["entity", "state"],
+		  "colour": 135,
 		  "tooltip": "",
 		  "helpUrl": ""
 		},
@@ -78,9 +79,9 @@ Blockly.defineBlocksWithJsonArray([
 		      "name": "NAME"
 		    }
 		  ],
-		  "previousStatement": null,
-		  "nextStatement": null,
-		  "colour": 230,
+		  "previousStatement": ["entity", "action", "state"],
+		  "nextStatement": ["entity", "property"],
+		  "colour": 180,
 		  "tooltip": "",
 		  "helpUrl": ""
 		},
@@ -94,6 +95,7 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
+        "previousStatement": "entity",
         "nextStatement": "given",
         "colour": 0,
         "tooltip": "",
@@ -192,6 +194,31 @@ Blockly.defineBlocksWithJsonArray([
       ],
         "output": "String",
         "style": "text_blocks",
+      },
+      {
+        "type": "textblock",
+        "message0": "%1",
+        "args0": [
+          {
+          "type": "field_input",
+          "name": "TEXT",
+        }
+      ],
+        "output": "String",
+        "style": "text_blocks",
+      },
+      {
+        "type": "textblock2",
+        "message0": "%1",
+        "args0": [
+          {
+          "type": "field_input",
+          "name": "TEXT",
+        }
+      ],
+        "previousStatement": "text2",
+        "nextStatement": "text2",
+        "colour": 345,
       }
   ]);
  
@@ -200,36 +227,36 @@ var toolbox = {
   "kind": "categoryToolbox",
   "contents": [
     {
-		"kind": "category",
-		"name": "Model",
-		"contents":[
-			{
-				"kind": "block",
-				"type": "modelblock"
-			}
-		]	
+	"kind": "category",
+	"name": "Model",
+	"contents":[
+		{
+			"kind": "block",
+			"type": "modelblock"
+		}
+	]	
 	},
 	{
-		"kind": "category",
-		"name": "Entity",
-		"contents":[
-			{
-				"kind": "block",
-				"type": "entityblock"
-			},
-			{
-				"kind": "block",
-				"type": "entityactionsblock"
-			},
-			{
-				"kind": "block",
-				"type": "entitystatesblock"
-			},
-			{
-				"kind": "block",
-				"type": "entitypropertiesblock"
-			},
-		]	
+	"kind": "category",
+	"name": "Entity",
+	"contents":[
+		{
+			"kind": "block",
+			"type": "entityblock"
+		},
+		{
+			"kind": "block",
+			"type": "entityactionsblock"
+		},
+		{
+			"kind": "block",
+			"type": "entitystatesblock"
+		},
+		{
+			"kind": "block",
+			"type": "entitypropertiesblock"
+		},
+	]	
 	},
     {
       "kind": "category",
@@ -239,10 +266,6 @@ var toolbox = {
           "kind": "block",
           "type": "scenarioblock"
         },
-        {
-				"kind": "block",
-				"type": "modelblock"
-		},
         {
           "kind": "block",
           "type": "givenblock"
@@ -268,7 +291,11 @@ var toolbox = {
         {
           "kind": "block",
           "type": "textblock"
-        }
+        },
+        {
+		  "kind": "block",
+          "type": "textblock2"
+		}
       ]
     }
   ]
