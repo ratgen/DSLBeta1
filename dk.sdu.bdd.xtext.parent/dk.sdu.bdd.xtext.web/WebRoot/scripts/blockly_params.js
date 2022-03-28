@@ -156,6 +156,12 @@ var toolbox = {
 var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
 window.onload = () => {
-  editor.env.document.doc.insert(0, "model tjd\n\nScenario:")
+  console.log(editor)
+  let document = editor.env.document.doc
+  document.insert(0, "model tjd\n\nScenario:")
+  document.on('change', (e) => {
+    console.log("document has changed " +  JSON.stringify(e) )
+  })
 }
 
+console.log(workspace)
