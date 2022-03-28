@@ -151,6 +151,7 @@ var toolbox = {
       ]
     }
   ]
+ }
   
 var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
