@@ -3,9 +3,29 @@
  */
 package dk.sdu.bdd.xtext.web
 
+import org.eclipse.xtext.web.server.persistence.IServerResourceHandler
+import org.eclipse.xtext.web.server.persistence.IResourceBaseProvider
+
+import org.eclipse.xtext.web.server.persistence.FileResourceHandler
+import com.google.inject.Binder
 
 /**
  * Use this class to register additional components to be used within the web application.
  */
 class BddDslWebModule extends AbstractBddDslWebModule {
+	IResourceBaseProvider resourceBaseProvider
+	
+	def void configureResourceBaseProvider(Binder binder) {
+		if (resourceBaseProvider !== null) {
+			binder.bind(IResourceBaseProvider).toInstance(resourceBaseProvider);
+		}
+	}
+	
+	def Class<? extends IServerResourceHandler> bindIServerResourceHandler() {
+		return FileResourceHandler;
+	}
+
+	def AbstractBddDslWebModule(IResourceBaseProvider resourceBaseProvider) {
+		this.resourceBaseProvider = resourceBaseProvider;
+	}
 }
