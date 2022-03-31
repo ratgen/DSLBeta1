@@ -13,8 +13,6 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.eclipse.jetty.webapp.WebInfConfiguration
 import org.eclipse.jetty.webapp.WebXmlConfiguration
 
-import org.eclipse.xtext.web.server.persistence.FileResourceHandler
-
 /**
  * This program starts an HTTP server for testing the web integration of your DSL.
  * Just execute it and point a web browser to http://localhost:8080/

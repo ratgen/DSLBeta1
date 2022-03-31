@@ -9,14 +9,22 @@ import dk.sdu.bdd.xtext.BddDslRuntimeModule
 import dk.sdu.bdd.xtext.BddDslStandaloneSetup
 import dk.sdu.bdd.xtext.ide.BddDslIdeModule
 import org.eclipse.xtext.util.Modules2
+import org.eclipse.xtext.web.server.persistence.IResourceBaseProvider
 
 /**
  * Initialization support for running Xtext languages in web applications.
  */
 class BddDslWebSetup extends BddDslStandaloneSetup {
 	
+	IResourceBaseProvider resourceBaseProvider;
+		
+	new(IResourceBaseProvider resourceBaseProvider) {
+		this.resourceBaseProvider = resourceBaseProvider;
+	}
+	
 	override Injector createInjector() {
-		return Guice.createInjector(Modules2.mixin(new BddDslRuntimeModule, new BddDslIdeModule, new BddDslWebModule))
+		var webModule = new BddDslWebModule(resourceBaseProvider);
+		return Guice.createInjector(Modules2.mixin(new BddDslRuntimeModule, new BddDslIdeModule, webModule))
 	}
 	
 }
