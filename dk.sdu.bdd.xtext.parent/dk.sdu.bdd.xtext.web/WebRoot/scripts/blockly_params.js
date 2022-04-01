@@ -303,17 +303,50 @@ var toolbox = {
   
 var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
+let d;
+
 window.onload = () => {
-  console.log(editor)
-  let document = editor.env.document.doc
-  document.insert(0, "model tjd\n\nScenario:")
-  document.on('change', (e) => {
-    console.log("document has changed " +  JSON.stringify(e) )
-    block = workspace.newBlock("scenarioblock")
-    block.initSvg()
-    workspace.addTopBlock(block)
-    workspace.render()
-  })
+  setTimeout(() => {  d = editor.env.document.doc }, 1000);
 }
 
-console.log(workspace)
+function printChildren(a){
+	let s = "";
+	a.forEach((element) => {
+		s = s + element.getFieldValue("TEXT");
+	})
+	return s;
+}
+
+function onchange(event){
+	console.log(event.type);
+	if (event.type == "click")  {
+	let blockArray = workspace.getAllBlocks();
+	let typeArray = [];
+	d.removeFullLines(0, d.getLength());
+	
+    blockArray.forEach((element) => {
+	console.log(element.type);
+		switch (element.type){
+			case "modelblock":
+				typeArray.push("model " + printChildren(element.getChildren()));
+				break;
+				
+			case "entityblock":
+				typeArray.push("entity " + printChildren(element.getChildren()));
+				break;
+				
+			/*case "textblock":
+				typeArray.push(element.getFieldValue("TEXT"));
+				break;
+			*/	
+			default:
+				console.log("No blocks found");
+		}
+	});
+	d.insertFullLines(0, typeArray);
+}
+}
+
+workspace.addChangeListener(onchange);
+
+onchange();
