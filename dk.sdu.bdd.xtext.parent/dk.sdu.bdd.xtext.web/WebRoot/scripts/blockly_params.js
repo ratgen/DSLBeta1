@@ -303,7 +303,7 @@ var toolbox = {
   
 var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
-window.onload = () => {
+setTimeout(() => {
   let document = editor.env.document.doc
   document.insert(0, "model tjd\n\nScenario:")
   document.on('change', (e) => {
@@ -313,6 +313,6 @@ window.onload = () => {
     workspace.addTopBlock(block)
     workspace.render()
   })
-}
+}, 1000)
 
 console.log(workspace)

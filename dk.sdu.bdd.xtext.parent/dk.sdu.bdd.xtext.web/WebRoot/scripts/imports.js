@@ -27,7 +27,6 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
 		}
       jQuery.post('http://localhost:8080/xtext-service/save', postData, function(result){
         console.log("saved");
-        console.log("with result " + JSON.stringify(result))
       }); 
       e.preventDefault();
     });
@@ -39,5 +38,5 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
         console.log("loaded "+ result.fullText);
       })
     });
-    })
+  })
 });
