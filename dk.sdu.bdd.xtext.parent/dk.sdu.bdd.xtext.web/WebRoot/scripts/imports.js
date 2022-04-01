@@ -18,11 +18,26 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       syntaxDefinition: "xtext-resources/generated/mode-bdd"
     });
     let data = {
-		resource: "mobile.bdd",
-	}
-    jQuery.get('http://localhost:8080/xtext-service/load', data, function(result){
-		editor.setValue(result.fullText);
-		console.log("loaded "+ result.fullText);
-		})
-  });
+      resource: "mobile.bdd",
+    }
+    jQuery('#save-button').bind("click", function(e){
+		let postData = {
+			resource: data.resource,
+			fullText: editor.getValue()
+		}
+      jQuery.post('http://localhost:8080/xtext-service/save', postData, function(result){
+        console.log("saved");
+        console.log("with result " + JSON.stringify(result))
+      }); 
+      e.preventDefault();
+    });
+
+    jQuery('#load-button').bind("click", function(e){
+      console.log(data);
+      jQuery.get('http://localhost:8080/xtext-service/load', data, function(result){
+        editor.setValue(result.fullText);
+        console.log("loaded "+ result.fullText);
+      })
+    });
+    })
 });
