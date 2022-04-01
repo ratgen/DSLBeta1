@@ -320,31 +320,31 @@ function printChildren(a){
 function onchange(event){
 	console.log(event.type);
 	if (event.type == "click")  {
-	let blockArray = workspace.getAllBlocks();
-	let typeArray = [];
-	d.removeFullLines(0, d.getLength());
-	
-    blockArray.forEach((element) => {
-	console.log(element.type);
-		switch (element.type){
-			case "modelblock":
-				typeArray.push("model " + printChildren(element.getChildren()));
-				break;
-				
-			case "entityblock":
-				typeArray.push("entity " + printChildren(element.getChildren()));
-				break;
-				
-			/*case "textblock":
-				typeArray.push(element.getFieldValue("TEXT"));
-				break;
-			*/	
-			default:
-				console.log("No blocks found");
-		}
-	});
-	d.insertFullLines(0, typeArray);
-}
+		let blockArray = workspace.getAllBlocks();
+		let typeArray = [];
+		//d.removeFullLines(0, d.getLength());
+		
+	    blockArray.forEach((element) => {
+			console.log(element.type);
+			switch (element.type){
+				case "modelblock":
+					typeArray.push("model " + printChildren(element.getChildren()));
+					break;
+					
+				case "entityblock":
+					typeArray.push("entity " + printChildren(element.getChildren()));
+					break;
+					
+				/*case "textblock":
+					typeArray.push(element.getFieldValue("TEXT"));
+					break;
+				*/	
+				default:
+					console.log("No blocks found");
+			}
+		});
+		d.insertFullLines(0, typeArray);
+	}
 }
 
 workspace.addChangeListener(onchange);
