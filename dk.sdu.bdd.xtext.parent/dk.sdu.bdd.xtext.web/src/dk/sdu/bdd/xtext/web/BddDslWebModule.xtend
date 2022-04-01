@@ -8,33 +8,26 @@ import org.eclipse.xtext.web.server.persistence.IResourceBaseProvider
 
 import org.eclipse.xtext.web.server.persistence.FileResourceHandler
 import com.google.inject.Binder
-
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import org.eclipse.xtext.web.server.model.IWebResourceSetProvider
+import dk.sdu.bdd.xtext.web.resources.BddDslResourceSetProvider
 
 /**
  * Use this class to register additional components to be used within the web application.
  */
+@FinalFieldsConstructor
 class BddDslWebModule extends AbstractBddDslWebModule {
-	IResourceBaseProvider resourceBaseProvider
+	val IResourceBaseProvider resourceBaseProvider
 	
-	new (IResourceBaseProvider resourceBaseProvider) {
-		this.resourceBaseProvider = resourceBaseProvider;
+	def Class<? extends IWebResourceSetProvider> bindIWebResourceSetProvider() {
+		return BddDslResourceSetProvider
 	}
 	
-	def void configureResourceBaseProvider(Binder binder) {
-		if (resourceBaseProvider !== null) {
-			binder.bind(IResourceBaseProvider).toInstance(resourceBaseProvider);
-		}
+	def void configureIResourceBaseProvider(Binder binder) {
+		if (resourceBaseProvider !== null) binder.bind(IResourceBaseProvider).toInstance(resourceBaseProvider);
 	}
 		
 	def Class<? extends IServerResourceHandler> bindIServerResourceHandler() {
 		return FileResourceHandler;
-	}
-	
-	def IResourceBaseProvider getResourceBaseProvider(){
-		return resourceBaseProvider
-	}
-	
-	def void setResourceBaseProvider(IResourceBaseProvider resourceBaseProvider) {
-		this.resourceBaseProvider = resourceBaseProvider
 	}
 }

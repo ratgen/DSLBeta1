@@ -17,5 +17,12 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd"
     });
+    let data = {
+		resource: "mobile.bdd",
+	}
+    jQuery.get('http://localhost:8080/xtext-service/load', data, function(result){
+		editor.setValue(result.fullText);
+		console.log("loaded "+ result.fullText);
+		})
   });
 });
