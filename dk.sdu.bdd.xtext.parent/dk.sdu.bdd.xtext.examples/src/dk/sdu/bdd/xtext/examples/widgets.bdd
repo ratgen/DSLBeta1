@@ -1,19 +1,19 @@
 model widgets
 
 entity robot {
-	actions: linearly moves, follows path, moves, connect, disconnect
+	actions: linearly moves, follows path, moves, connects, disconnects
 	states: connected, disconnected, running, ready, available
 	properties: IP, pose, speed, path
 }
 
 entity gripper {
-	actions: close, open, connect, disconnect, moves, activate
+	actions: closes, opens, connects, disconnects, moves, activates, grabs
 	states: connected, disconnected, moving, position, closed, open, active	
 	properties: IP, force, speed, range
 }  // Grab, release
 
-entity digitalinput {
-	actions: connects
+entity digitaloutput {
+	actions: connects, turns ON, turns OFF
 	states: ON/OFF, connected 
 	properties: port
 }

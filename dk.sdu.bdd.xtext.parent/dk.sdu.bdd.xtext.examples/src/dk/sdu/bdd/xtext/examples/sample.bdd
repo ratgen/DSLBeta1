@@ -1,18 +1,5 @@
 model sample using widgets
 
-
-entity song {
-	actions: play, pause, add, edit, delete, like
-	states: modified, available, removed, playing, liked
-	properties: metadata, length, category, title
-}
-
-entity playlist {
-	actions: play, pause, add to, remove from, shuffle
-	states: playing, paused, available
-	properties: size, title, song*
-}
-
 entity product {
 	actions: pickup, move
 	states: present, lifted
@@ -22,30 +9,64 @@ entity conveyor {
 	states: clear/loaded
 }
 
+entity packager {
+	actions: pickup
+	states: playing, paused, available
+	properties: size, title, song*
+}
 
+// Example 1
 Scenario: "Robot move to a specific position"
 Given the product "Box" is present
 	which means
 		Given the robot "1.23.42.22" is connected
-		And the digitalinput #1 is available
-		When the digitalinput #1 turns ON
+		And the digitaloutput #1 is connected
+		When the digitaloutput #1 turns ON
 		Then the object "object" is available
-When the robot "Packager" pick up the product "Box"
+When the packager #1 pick up the product "Box"
 	which means
 		Given the position of the object "Box" is [3,5,1]
-		And the gripper #1 is opened
+		And the gripper "1.23.42.22" is connected
+		And the gripper "1.23.42.22" is active
 		When the robot "1.23.42.22" moves to pose [1,2.3,1,7.0323,9,1] with "moderate" speed 
 		And the robot "1.23.42.22" linearly moves to pose [1,2,3,4,5,6]
-		And the gripper #1 close
+		And the gripper "1.23.42.22" close
 		And the robot "1.23.42.22" moves to pose [0.9,2,1.7,1.0323,3,1] with "high" speed
 		Then the robot "1.23.42.22" is ready
 Then the conveyor #1 is clear
 	which means
-		Given the digitalinput #1 is available
-		When the digitalinput #1 turns OFF
-		Then the object "Box" is removed
+		Given the digitaloutput #1 is connected
+		When the digitaloutput #1 turns OFF
+		Then the object "Box" is not detected
 
 
+// Example 2
+Scenario: "Robot move to a specific position"
+Given the product "Box" is present
+	which means
+		Given the robot "1.23.42.22" is not connected
+		And the digitaloutput #1 is not connected
+		When the robot "1.23.42.22" connects
+		And the digitaloutput #1 connects
+		And the digitaloutput #1 turns ON
+		Then the object "object" is available
+		And the robot "1.23.42.22" is connected
+When the packager #1 pick up the product "Box"
+	which means
+		Given the gripper "1.23.42.22" is connected
+		When the robot "1.23.42.22" moves to pose [1,2.3,1,7.0323,9,1] with "moderate" speed 
+		And the robot "1.23.42.22" linearly moves to pose [1,2,3,4,5,6]
+		And the gripper "1.23.42.22" close
+		And the robot "1.23.42.22" moves to pose [0.9,2,1.7,1.03,3,1] with "high" speed
+		Then the robot "1.23.42.22" is ready
+Then the conveyor #1 is clear
+	which means
+		Given the digitaloutput #1 is connected
+		When the digitaloutput #1 turns OFF
+		Then the object "Box" is not detected
+
+
+/*
 Scenario: "Liked songs should appear in the liked-playlist"
 Given the song "Solskin" is not liked And the playlist "Liked songs" is available   // "and" has to be caps
 	which means
@@ -82,7 +103,7 @@ Then the song "Billie Jean" is removed
 		Given the BrowserWindow "Playlist" is displayed
 		When I type "Billie Jean" into the SearchBox "Song search"
 		Then the Notification "No results found" is displayed
-		
+	 */	
 //_________________________________________________________________
 
 entity account {
