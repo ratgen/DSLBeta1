@@ -24,8 +24,12 @@ a:hover {
 	right: 0;
 }
 
+.container h1 {
+  display: inline-block;
+}
+
+
 .header {
-	background-color: #e8e8e8;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -37,6 +41,10 @@ a:hover {
 	display: flex;
 	flex-direction: row;
   height: 80vh;
+}
+
+.file-name{
+  margin-left: 20vw;
 }
 
 .xtext-wrapper {

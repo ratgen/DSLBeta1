@@ -305,25 +305,29 @@ var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
 let d;
 
+function readFile(e) {
+  let input = document.getElementById('file-input')
+  let file = input.files[0]
+  let reader = new FileReader()
+  reader.readAsText(file, 'UTF-8')
+  reader.onload = () => {
+    var fileContent = reader.result
+    if (d !== null || d !== undefined) {
+      d.setValue(fileContent)
+      let fileName = document.getElementById('fileName');
+      fileName.value = file.name
+      localStorage.setItem("fileName", file.name)
+    }
+  }
+}
+
 window.onload = () => {
   setTimeout(() => {  
     d = editor.env.document.doc
     getSavedDocument()
     d.on('change', onDocumentChange)
     let input = document.getElementById('file-input')
-    input.addEventListener('change', (e) => {
-      console.log(e)
-      console.log(input.files)
-      let file = input.files[0]
-      let reader = new FileReader()
-      reader.readAsText(file, 'UTF-8')
-      reader.onload = () => {
-        var fileContent = reader.result
-        if (d !== null || d !== undefined) {
-          d.setValue(fileContent)
-        }
-      }
-    })
+    input.addEventListener('change', readFile) 
   }, 200);
 }
 
@@ -335,11 +339,9 @@ function printChildren(a){
   return s;
 }
 
-function onDocumentChange(e) {
-  console.log("document changed")
-  console.log("event " + e)
+
+function onDocumentChange() {
   let fileContent = d.getValue()
-  console.log(fileContent)
   localStorage.setItem("fileContent", fileContent)
 }
 
@@ -347,6 +349,11 @@ function getSavedDocument() {
   let fileContent = localStorage.getItem("fileContent");
   if (fileContent !== null) {
     d.insert({row: 0, column: 0}, fileContent)
+  }
+  let fileName = localStorage.getItem("fileName")
+  if (fileContent !== null) {
+      let fileNameElement = document.getElementById('fileName');
+      fileNameElement.value = fileName
   }
 }
 
