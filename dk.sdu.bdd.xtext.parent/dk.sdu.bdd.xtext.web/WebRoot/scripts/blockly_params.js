@@ -305,7 +305,7 @@ var workspace = Blockly.inject('blockly-editor', {toolbox: toolbox});
 
 let d;
 
-function readFile(e) {
+function readFile() {
   let input = document.getElementById('file-input')
   let file = input.files[0]
   let reader = new FileReader()

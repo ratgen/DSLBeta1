@@ -22,7 +22,17 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       let blob = new Blob([editor.getValue()], {type: 'text/plain'})
       const url = window.URL.createObjectURL(blob) 
       a.href = url
-      a.download = "sample.bdd"
+      let fileNameElement = document.getElementById("fileName")
+      if (fileNameElement != undefined) {
+        console.log("element not undefined")
+        console.log("value " + fileNameElement.value)
+        if (fileNameElement.value != undefined && fileNameElement.value.length > 0) {
+          a.download = fileName.value
+        }
+        else {
+          a.download = "sample.bdd"
+        }
+      }
       a.click();
       a.remove()
       e.preventDefault();
