@@ -22,7 +22,6 @@ a:hover {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	margin: 20px;
 }
 
 .header {
@@ -37,6 +36,7 @@ a:hover {
 .content {
 	display: flex;
 	flex-direction: row;
+  height: 80vh;
 }
 
 .xtext-wrapper {
@@ -44,7 +44,7 @@ a:hover {
 	bottom: 0;
 	left: 0;
 	flex: 1;
-	height: 480px;
+	height: 100%;
 }
 
 #xtext-editor {
@@ -54,11 +54,12 @@ a:hover {
 	left: 0;
 	right: 0;
 	padding: 4px;
+  box-sizing: border-box;
 	border: 1px solid #aaa;
-	height: 480px;
+	height: 100%;
 }
 
 #blockly-editor {
 	flex: 1;
-	height: 480px;
+	height: 100%;
 }
