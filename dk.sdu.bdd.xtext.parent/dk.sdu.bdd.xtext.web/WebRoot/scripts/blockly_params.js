@@ -390,17 +390,50 @@ function onchange(event){
   }
 }
 
-function switchEditor() {
-  let entities = document.getElementById('xtext-editor-entities')
-  let scenario = document.getElementById('xtext-editor-scenarios')
+let entities = document.getElementById('xtext-editor-entities')
+let entitiesTab = document.getElementById('entity-tab')
+let scenario = document.getElementById('xtext-editor-scenarios')
+let scenarioTab = document.getElementById('scenario-tab')
+
+let currentEditor;
+function displayEditor(element) {
+  currentEditor.style.display = "none"
+  currentEditor = element
+  currentEditor.style.display = "block"
 }
 
-let entities = document.getElementById('entity-tab')
-if (entities != undefined)
-  entities.onclick = switchEditor
-let scenario = document.getElementById('scenario-tab')
-if (scenario != undefined)
-  scenario.onclick = switchEditor
+function switchEditor() {
+  let entities = document.getElementById('xtext-editor-entities')
+  let entitiesTab = document.getElementById('entity-tab')
+  let scenario = document.getElementById('xtext-editor-scenarios')
+  let scenarioTab = document.getElementById('scenario-tab')
+
+  if (currentEditor == entities) {
+    removeSelectionBorder(entitiesTab)
+    displayEditor(scenario)
+    setSelectionBorder(scenarioTab)
+  }
+  else {
+    removeSelectionBorder(scenarioTab)
+    displayEditor(entities)
+    setSelectionBorder(entitiesTab)
+  }
+}
+
+function setSelectionBorder(element) {
+  element.style.border = "2px black solid";
+}
+
+function removeSelectionBorder(element) {
+  element.style.border = "2px white solid"
+}
+
+if (entitiesTab != undefined)
+  entitiesTab.onclick = switchEditor
+if (scenarioTab != undefined)
+  scenarioTab.onclick = switchEditor
+currentEditor = entities;
+setSelectionBorder(entitiesTab)
 
 
 workspace.addChangeListener(onchange);
