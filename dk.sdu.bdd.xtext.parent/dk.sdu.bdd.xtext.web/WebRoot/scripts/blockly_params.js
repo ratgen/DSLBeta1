@@ -395,28 +395,28 @@ let entitiesTab = document.getElementById('entity-tab')
 let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
 
-let currentEditor;
-function displayEditor(element) {
+
+function displayEditor(currentEditor, newEditor) {
   currentEditor.style.display = "none"
-  currentEditor = element
-  currentEditor.style.display = "block"
+  newEditor.style.display = "block"
 }
 
-function switchEditor() {
-  let entities = document.getElementById('xtext-editor-entities')
-  let entitiesTab = document.getElementById('entity-tab')
-  let scenario = document.getElementById('xtext-editor-scenarios')
-  let scenarioTab = document.getElementById('scenario-tab')
-
-  if (currentEditor == entities) {
-    removeSelectionBorder(entitiesTab)
-    displayEditor(scenario)
-    setSelectionBorder(scenarioTab)
-  }
-  else {
-    removeSelectionBorder(scenarioTab)
-    displayEditor(entities)
-    setSelectionBorder(entitiesTab)
+let currentEditor;
+let currentTab;
+function switchEditor(e) {
+  console.log("currentEditor " ) 
+  console.log(currentEditor)
+  console.log("currentTab ")
+  console.log(currentTab)
+  console.log(e)
+  if (e.target != currentTab ) {
+    removeSelectionBorder(currentTab)
+    let editorId = e.target.dataset.editorId
+    let editor = document.getElementById(editorId)
+    displayEditor(currentEditor, editor)
+    currentEditor = editor
+    currentTab = e.target
+    setSelectionBorder(currentTab)
   }
 }
 
@@ -432,8 +432,9 @@ if (entitiesTab != undefined)
   entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
-currentEditor = entities;
-setSelectionBorder(entitiesTab)
+currentEditor = scenario;
+currentTab = scenarioTab
+setSelectionBorder(scenarioTab)
 
 
 workspace.addChangeListener(onchange);
