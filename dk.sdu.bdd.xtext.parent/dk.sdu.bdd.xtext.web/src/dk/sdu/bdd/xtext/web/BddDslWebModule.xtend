@@ -20,7 +20,7 @@ class BddDslWebModule extends AbstractBddDslWebModule {
 	val IResourceBaseProvider resourceBaseProvider
 	
 	def Class<? extends IWebResourceSetProvider> bindIWebResourceSetProvider() {
-		return BddDslResourceSetProvider
+	 	return BddDslResourceSetProvider
 	}
 	
 	def void configureIResourceBaseProvider(Binder binder) {

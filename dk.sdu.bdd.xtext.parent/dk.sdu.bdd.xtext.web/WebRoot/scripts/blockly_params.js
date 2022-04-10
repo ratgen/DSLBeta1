@@ -390,6 +390,19 @@ function onchange(event){
   }
 }
 
+function switchEditor() {
+  let entities = document.getElementById('xtext-editor-entities')
+  let scenario = document.getElementById('xtext-editor-scenarios')
+}
+
+let entities = document.getElementById('entity-tab')
+if (entities != undefined)
+  entities.onclick = switchEditor
+let scenario = document.getElementById('scenario-tab')
+if (scenario != undefined)
+  scenario.onclick = switchEditor
+
+
 workspace.addChangeListener(onchange);
 
 onchange();

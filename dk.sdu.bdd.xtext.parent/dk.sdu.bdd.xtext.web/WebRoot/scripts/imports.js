@@ -11,11 +11,18 @@ require.config({
   }
 });
 let editor;
+let entityEditor;
 require(["webjars/ace/1.3.3/src/ace"], function() {
   require(["xtext/xtext-ace"], function(xtext) {
     editor = xtext.createEditor({
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd",
+      parent: "xtext-editor-scenarios"
+    });
+    entityEditor = xtext.createEditor({
+      baseUrl: baseUrl,
+      syntaxDefinition: "xtext-resources/generated/mode-bdd",
+      parent: "xtext-editor-entities"
     });
     jQuery('#save-button').bind("click", function(e){
       const a = document.createElement("a")
