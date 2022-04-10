@@ -40,7 +40,8 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
     });
     jQuery('#save-button').bind("click", function(e){
       const a = document.createElement("a")
-      let blob = new Blob([getCurrentAceEditor()], {type: 'text/plain'})
+      let textValue = getCurrentAceEditor().env.document.doc.getValue()
+      let blob = new Blob([textValue], {type: 'text/plain'})
       const url = window.URL.createObjectURL(blob) 
       a.href = url
       let fileNameElement = document.getElementById("fileName")
