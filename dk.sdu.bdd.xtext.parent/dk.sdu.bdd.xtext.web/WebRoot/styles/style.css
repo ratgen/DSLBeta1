@@ -64,7 +64,7 @@ a:hover {
 }
 
 #xtext-editor-entities {
-	display: block;
+	display: none;
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -76,7 +76,7 @@ a:hover {
 }
 
 #xtext-editor-scenarios {
-	display: none;
+	display: block;
 	top: 0;
 	bottom: 0;
 	left: 0;

@@ -20,7 +20,8 @@ window.onload = () => {
   setTimeout(() => {  
     for (let editor of editors) {
       getSavedDocument(editor)
-      d.on('change', onDocumentChange)
+      let document = editor.env.document.doc
+      document.on('change', onDocumentChange)
     }
     let input = document.getElementById('file-input')
     input.addEventListener('change', readFile) 
@@ -34,24 +35,29 @@ function printChildren(a){
   })
   return s;
 }
-function onDocumentChange(editor) {
+function onDocumentChange() {
+  let editor = getCurrentAceEditor()
+  console.log(editor.container.id)
+  let document = editor.env.document.doc
   console.log(editor)
-  let editorId = currentTab.dataset.editorId
-  let fileContent = d.getValue()
-  localStorage.setItem(editorId + "fileContent", fileContent)
+  console.log(document)
+  let fileContent = document.getValue()
+  console.log(fileContent)
+  localStorage.setItem(editor.container.id + "fileContent", fileContent)
 }
 
 function getSavedDocument(editor) {
-  console.log("getting: " + currentTab.dataset.editorId)
-  let editorId = currentTab.dataset.editorId
+  let doc = editor.env.document.doc
+  let editorId = editor.container.id
   let fileContent = localStorage.getItem(editorId + "fileContent");
   if (fileContent !== null) {
-    d.insert({row: 0, column: 0}, fileContent)
+    doc.insert({row: 0, column: 0}, fileContent)
   }
   let fileName = localStorage.getItem(editorId + "fileName")
   if (fileContent !== null) {
     let fileNameElement = document.getElementById(editorId + 'fileName');
-    fileNameElement.value = fileName
+    if (fileNameElement !== null )
+      fileNameElement.value = fileName
   }
 }
 
