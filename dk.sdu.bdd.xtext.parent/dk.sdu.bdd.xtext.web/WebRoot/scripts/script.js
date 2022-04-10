@@ -1,5 +1,3 @@
-
-
 function readFile() {
   let input = document.getElementById('file-input')
   let file = input.files[0]
@@ -7,11 +5,10 @@ function readFile() {
   reader.readAsText(file, 'UTF-8')
   reader.onload = () => {
     var fileContent = reader.result
-    
-    if (d !== null || d !== undefined) {
-
-
-      d.setValue(fileContent)
+    let editor = getCurrentAceEditor()
+    let document  = editor.env.document.doc
+    if (document !== null || document !== undefined) {
+      document.setValue(fileContent)
       let fileName = document.getElementById('fileName');
       fileName.value = file.name
       localStorage.setItem("fileName", file.name)
@@ -22,11 +19,10 @@ function readFile() {
 window.onload = () => {
   setTimeout(() => {  
     for (let editor of editors) {
-      d = editor.env.document.doc
-      getSavedDocument(editors)
+      getSavedDocument(editor)
       d.on('change', onDocumentChange)
     }
-      let input = document.getElementById('file-input')
+    let input = document.getElementById('file-input')
     input.addEventListener('change', readFile) 
   }, 200);
 }
@@ -38,19 +34,23 @@ function printChildren(a){
   })
   return s;
 }
-function onDocumentChange() {
+function onDocumentChange(editor) {
+  console.log(editor)
+  let editorId = currentTab.dataset.editorId
   let fileContent = d.getValue()
-  localStorage.setItem("fileContent", fileContent)
+  localStorage.setItem(editorId + "fileContent", fileContent)
 }
 
-function getSavedDocument() {
-  let fileContent = localStorage.getItem("fileContent");
+function getSavedDocument(editor) {
+  console.log("getting: " + currentTab.dataset.editorId)
+  let editorId = currentTab.dataset.editorId
+  let fileContent = localStorage.getItem(editorId + "fileContent");
   if (fileContent !== null) {
     d.insert({row: 0, column: 0}, fileContent)
   }
-  let fileName = localStorage.getItem("fileName")
+  let fileName = localStorage.getItem(editorId + "fileName")
   if (fileContent !== null) {
-    let fileNameElement = document.getElementById('fileName');
+    let fileNameElement = document.getElementById(editorId + 'fileName');
     fileNameElement.value = fileName
   }
 }
