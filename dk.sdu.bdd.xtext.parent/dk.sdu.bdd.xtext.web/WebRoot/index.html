@@ -9,6 +9,7 @@
     <script src="webjars/requirejs/2.3.6/require.min.js"></script>
     <script src="./scripts/imports.js" defer></script>
     <script src="./scripts/blockly_params.js" defer></script>
+    <script src="./scripts/script.js" defer></script>
   </head>
   <body>
     <div class="container">
@@ -18,12 +19,12 @@
           <label for="fileName">File name</label>
           <input id="fileName" type="text" maxlength="35"/>
       </div>
+      <div class="editor-tab">
+        <span id="scenario-tab" data-editor-id="xtext-editor-scenarios" class="tab">Scenarios</span>
+        <span id="entity-tab" data-editor-id="xtext-editor-entities" class="tab">Entities</span>
+      </div>
       <div class="content">
         <div class="xtext-wrapper">
-          <div class="editor-tab">
-            <span id="scenario-tab" data-editor-id="xtext-editor-scenarios" class="tab">Scenarios</span>
-            <span id="entity-tab" data-editor-id="xtext-editor-entities" class="tab">Entities</span>
-          </div>
           <div id="xtext-editor-scenarios" data-editor-xtext-lang="bdd"></div>
           <div id="xtext-editor-entities" data-editor-xtext-lang="bdd"></div>
         </div>

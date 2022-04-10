@@ -10,23 +10,37 @@ require.config({
     "xtext/xtext-ace": "xtext/2.25.0/xtext-ace"
   }
 });
-let editor;
-let entityEditor;
+
+let editors = []
+let currentEditor;
+let currentTab;
+
+function getCurrentAceEditor() {
+  /*
+   * Returns the current editor object based on which container is marked as the
+   * current editor.
+   */
+  for (let editor of editors) {
+    if (editor.container == currentEditor) 
+      return editor
+  }
+}
+
 require(["webjars/ace/1.3.3/src/ace"], function() {
   require(["xtext/xtext-ace"], function(xtext) {
-    editor = xtext.createEditor({
+    editors[0] = xtext.createEditor({
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd",
       parent: "xtext-editor-scenarios"
     });
-    entityEditor = xtext.createEditor({
+    editors[1] = xtext.createEditor({
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd",
       parent: "xtext-editor-entities"
     });
     jQuery('#save-button').bind("click", function(e){
       const a = document.createElement("a")
-      let blob = new Blob([editor.getValue()], {type: 'text/plain'})
+      let blob = new Blob([getCurrentAceEditor()], {type: 'text/plain'})
       const url = window.URL.createObjectURL(blob) 
       a.href = url
       let fileNameElement = document.getElementById("fileName")
