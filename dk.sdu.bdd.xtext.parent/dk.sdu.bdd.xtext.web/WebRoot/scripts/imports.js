@@ -33,6 +33,16 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       syntaxDefinition: "xtext-resources/generated/mode-bdd",
       loadFromServer: false,
     });
+    var scenarioServices = editors[0].xtextServices;
+    var entityServices = editors[1].xtextServices;
+    scenarioServices.editorContext.addServerStateListener(function(params) {
+      if (!params.forceUpdate)
+        entityServices.update({forceUpdate: true});
+    });
+    entityServices.editorContext.addServerStateListener(function(params) {
+      if (!params.forceUpdate)
+        scenarioServices.update({forceUpdate: true});
+    });
     jQuery('#save-button').bind("click", function(e){
       const a = document.createElement("a")
       let textValue = getCurrentAceEditor().env.document.doc.getValue()
@@ -54,7 +64,7 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       a.remove()
       e.preventDefault();
     });
-    
+
     jQuery('#load-button').bind("click", function(e){
       $('#file-input').trigger('click')
       e.preventDefault();
