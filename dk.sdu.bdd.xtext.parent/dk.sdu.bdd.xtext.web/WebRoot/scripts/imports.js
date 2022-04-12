@@ -11,7 +11,7 @@ require.config({
   }
 });
 
-let editors = []
+let editors
 let currentEditor;
 let currentTab;
 
@@ -28,15 +28,10 @@ function getCurrentAceEditor() {
 
 require(["webjars/ace/1.3.3/src/ace"], function() {
   require(["xtext/xtext-ace"], function(xtext) {
-    editors[0] = xtext.createEditor({
+    editors = xtext.createEditor({
       baseUrl: baseUrl,
       syntaxDefinition: "xtext-resources/generated/mode-bdd",
-      parent: "xtext-editor-scenarios"
-    });
-    editors[1] = xtext.createEditor({
-      baseUrl: baseUrl,
-      syntaxDefinition: "xtext-resources/generated/mode-bdd",
-      parent: "xtext-editor-entities"
+      loadFromServer: false,
     });
     jQuery('#save-button').bind("click", function(e){
       const a = document.createElement("a")

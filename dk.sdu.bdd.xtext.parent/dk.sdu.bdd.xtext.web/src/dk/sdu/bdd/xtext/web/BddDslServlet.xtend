@@ -21,7 +21,7 @@ class BddDslServlet extends XtextServlet {
 	
 	override init() {
 		super.init()
-		val IResourceBaseProvider resourceBaseProvider = new ResourceBaseProviderImpl("/home/peter/examples/")
+		val IResourceBaseProvider resourceBaseProvider = new ResourceBaseProviderImpl("./")
 		val injector = new BddDslWebSetup(resourceBaseProvider).createInjectorAndDoEMFRegistration()
 		disposableRegistry = injector.getInstance(DisposableRegistry)
 	}
