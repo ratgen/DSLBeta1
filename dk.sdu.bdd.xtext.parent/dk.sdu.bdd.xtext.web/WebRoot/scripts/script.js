@@ -37,12 +37,8 @@ function printChildren(a){
 }
 function onDocumentChange() {
   let editor = getCurrentAceEditor()
-  console.log(editor.container.id)
   let document = editor.env.document.doc
-  console.log(editor)
-  console.log(document)
   let fileContent = document.getValue()
-  console.log(fileContent)
   localStorage.setItem(editor.container.id + "fileContent", fileContent)
 }
 

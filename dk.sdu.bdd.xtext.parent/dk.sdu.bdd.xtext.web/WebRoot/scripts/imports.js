@@ -51,8 +51,6 @@ require(["webjars/ace/1.3.3/src/ace"], function() {
       a.href = url
       let fileNameElement = document.getElementById("fileName")
       if (fileNameElement != undefined) {
-        console.log("element not undefined")
-        console.log("value " + fileNameElement.value)
         if (fileNameElement.value != undefined && fileNameElement.value.length > 0) {
           a.download = fileName.value
         }
