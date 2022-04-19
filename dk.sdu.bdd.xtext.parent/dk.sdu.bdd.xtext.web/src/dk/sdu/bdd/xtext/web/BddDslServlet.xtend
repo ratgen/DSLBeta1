@@ -8,6 +8,8 @@ import org.eclipse.xtext.util.DisposableRegistry
 import org.eclipse.xtext.web.servlet.XtextServlet
 import org.eclipse.xtext.web.server.persistence.ResourceBaseProviderImpl
 import org.eclipse.xtext.web.server.persistence.IResourceBaseProvider
+import org.eclipse.xtext.web.server.XtextServiceDispatcher
+import dk.sdu.bdd.xtext.web.services.AstServiceDispatcher
 
 /**
  * Deploy this class into a servlet container to enable DSL-specific services.
@@ -22,7 +24,8 @@ class BddDslServlet extends XtextServlet {
 	override init() {
 		super.init()
 		val IResourceBaseProvider resourceBaseProvider = new ResourceBaseProviderImpl("./")
-		val injector = new BddDslWebSetup(resourceBaseProvider).createInjectorAndDoEMFRegistration()
+		val AstServiceDispatcher astProvider = new AstServiceDispatcher();
+		val injector = new BddDslWebSetup(resourceBaseProvider, astProvider).createInjectorAndDoEMFRegistration()
 		disposableRegistry = injector.getInstance(DisposableRegistry)
 	}
 	

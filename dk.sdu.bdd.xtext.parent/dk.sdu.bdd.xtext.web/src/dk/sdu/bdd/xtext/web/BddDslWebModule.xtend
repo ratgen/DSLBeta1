@@ -11,6 +11,8 @@ import com.google.inject.Binder
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.web.server.model.IWebResourceSetProvider
 import dk.sdu.bdd.xtext.web.resources.BddDslResourceSetProvider
+import org.eclipse.xtext.web.server.XtextServiceDispatcher
+import dk.sdu.bdd.xtext.web.services.AstServiceDispatcher
 
 /**
  * Use this class to register additional components to be used within the web application.
@@ -18,6 +20,12 @@ import dk.sdu.bdd.xtext.web.resources.BddDslResourceSetProvider
 @FinalFieldsConstructor
 class BddDslWebModule extends AbstractBddDslWebModule {
 	val IResourceBaseProvider resourceBaseProvider
+	val AstServiceDispatcher astProvider
+	
+	
+	def Class<? extends XtextServiceDispatcher> bindXtextServiceDispatcher(){
+		return astProvider.class
+	}
 	
 	def Class<? extends IWebResourceSetProvider> bindIWebResourceSetProvider() {
 	 	return BddDslResourceSetProvider

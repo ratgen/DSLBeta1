@@ -11,6 +11,7 @@ import dk.sdu.bdd.xtext.ide.BddDslIdeModule
 import org.eclipse.xtext.util.Modules2
 import org.eclipse.xtext.web.server.persistence.IResourceBaseProvider
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import dk.sdu.bdd.xtext.web.services.AstServiceDispatcher
 
 /**
  * Initialization support for running Xtext languages in web applications.
@@ -18,10 +19,10 @@ import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 @FinalFieldsConstructor
 class BddDslWebSetup extends BddDslStandaloneSetup {
 	val IResourceBaseProvider resourceBaseProvider;
+	val AstServiceDispatcher astProvider
 	
 	override Injector createInjector() {
-		var webModule = new BddDslWebModule(resourceBaseProvider);
+		var webModule = new BddDslWebModule(resourceBaseProvider, astProvider);
 		return Guice.createInjector(Modules2.mixin(new BddDslRuntimeModule, new BddDslIdeModule, webModule))
 	}
-	
 }
