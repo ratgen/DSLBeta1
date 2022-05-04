@@ -16,11 +16,16 @@ entity packager {
     properties: size
 }
 
-
-Scenario: "Robot move to a specific position"
+Scenario: "Moving product from conveyor 1 to conveyor 2"
 Given the product "Box" is present
     which means
-        Given the signal of the sensor "sensor 1" is "OFF"
+    	Given the position of the robot "kiko" is "corner"
+    	When the gripper "de" closes to position " de" with "high" speed
+    	And 
+    	
+    
+    /*
+        Given the signal of the sensor "sensor 1" is OFF
         When the output "conveyor 1" turns ON
         Then the signal of the sensor "sensor 1" is "ON"
 When the packager #1 pick up the product "Box"
@@ -34,7 +39,9 @@ Then the conveyor 2 is loaded
     which means
         Given the position of the robot "John Doe" is "above conveyor 2"
         And the output "conveyor 2" is OFF
-        And the signal of the sensor "sensor 2" is OFF
+        And the signal of the sensor "sensor 2" is "OFF"
         When the robot "John Doe" linearly moves to position "conveyor 2" with "slow" speed
         And the gripper "Two-finger" opens
         Then the signal of the sensor "conveyor 2" is "ON"
+        *  */
+        */

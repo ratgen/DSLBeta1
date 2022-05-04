@@ -45,7 +45,7 @@ entity movePath is command {
 	actions: move
 	properties: wayPoint*, asynchronous
 }
-*/
+
 
 // -----------------------------------------
 
@@ -269,3 +269,4 @@ entity Map is widget {
 	states: zoomed, switched
 	properties: satelite imagery, street, map
 }
+*/
