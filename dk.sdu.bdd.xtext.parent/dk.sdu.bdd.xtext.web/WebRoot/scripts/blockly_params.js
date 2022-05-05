@@ -8,7 +8,7 @@ Blockly.defineBlocksWithJsonArray([
 	          "name": "ENTITY",
 	          }
 	          ],
-			  "output": "String",
+			  "output": "entity",
 			  "colour": 0,
         	  "extensions": ["not_editable_extension"]
 			},
@@ -18,10 +18,10 @@ Blockly.defineBlocksWithJsonArray([
 			  "args0": [
 	          {
 	          "type": "field_input",
-	          "name": "ENTITY",
+	          "name": "ENTITYCHILDREN",
 	          }
 	          ],
-			  "output": "String",
+			  "output": "entitychild",
 			  "colour": 0,
         	  "extensions": ["not_editable_extension"]
 			},
@@ -119,7 +119,8 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "input_value",
-            "name": "NAME"
+            "name": "NAME",
+            "check": "String"
           }
         ],
         "inputsInline": true,
@@ -134,7 +135,8 @@ Blockly.defineBlocksWithJsonArray([
         "args0": [
           {
             "type": "input_value",
-            "name": "entityinput"
+            "name": "entityinput",
+            "check": "entity"
           },
           {
           "type": "field_input",
@@ -156,7 +158,8 @@ Blockly.defineBlocksWithJsonArray([
 	    },
 	    {
             "type": "input_value",
-            "name": "entitystate"
+            "name": "entitystate",
+            "check": "entitychild"
           },
         ],
         "inputsInline": true,
@@ -168,17 +171,54 @@ Blockly.defineBlocksWithJsonArray([
       },
       {
         "type": "givenEntityPropertyblock",
-        "message0": "Given the %1 %2",
+        "message0": "Given the %1 %2 the %3 %4 %5 not %6 %7",
         "args0": [
           {
             "type": "input_value",
-            "name": "entitypropertyinput"
+            "name": "entitypropertyinput",
+            "check": "entitychild"
+          },
+          {
+	      "type": "field_dropdown",
+	      "name": "prep",
+	      "options": [
+	        [ "on", "on" ],
+	        [ "from", "from" ],
+	        [ "in", "in" ],
+	        [ "to", "to" ],
+	        [ "into", "into" ],
+	        [ "for", "for" ],
+	        [ "of", "of" ],
+	      ]
+         },
+         {
+            "type": "input_value",
+            "name": "entitypropertyinput",
+            "check": "entity"
           },
           {
           "type": "field_input",
-          "name": "TEXT",
+          "name": "entityname",
           "text": "name",
-        }
+        },
+        {
+	      "type": "field_dropdown",
+	      "name": "FIELDNAME",
+	      "options": [
+	        [ "is", "is" ],
+	        [ "are", "are" ]
+	      ]
+        },
+        {
+	      "type": "field_checkbox",
+	      "name": "not",
+	      "checked": false
+	    },
+	    {
+          "type": "field_input",
+          "name": "entitypropertyname",
+          "text": "name",
+        },
         ],
         "inputsInline": true,
         "previousStatement": "given",
@@ -188,13 +228,43 @@ Blockly.defineBlocksWithJsonArray([
         "helpUrl": ""
       },
       {
-        "type": "whenblock",
-        "message0": "When I %1",
+        "type": "whenActionBlock",
+        "message0": "When I do not %1 %2  %3 the %4 %5",
         "args0": [
+		  {
+	        "type": "field_checkbox",
+	        "name": "not",
+	        "checked": false
+	      },
           {
             "type": "input_value",
-            "name": "giveninput"
-          }
+            "name": "whenAction",
+            "check": "entitychild"
+          },
+          {
+	      "type": "field_dropdown",
+	      "name": "prep",
+	      "options": [
+			["", ""],
+	        [ "on", "on" ],
+	        [ "from", "from" ],
+	        [ "in", "in" ],
+	        [ "to", "to" ],
+	        [ "into", "into" ],
+	        [ "for", "for" ],
+	        [ "of", "of" ],
+	      ]
+         },
+         {
+            "type": "input_value",
+            "name": "whenAction",
+            "check": "entity"
+          },
+          {
+          "type": "field_input",
+          "name": "entitypropertyname",
+          "text": "name",
+        },
         ],
         "inputsInline": true,
         "previousStatement": "when",
@@ -204,13 +274,165 @@ Blockly.defineBlocksWithJsonArray([
         "helpUrl": ""
       },
       {
-        "type": "thenblock",
-        "message0": "Then the%1",
+        "type": "whenMultipleEntitiesBlock",
+        "message0": "When I do not %1 %2  %3 the %4 %5 %6 the %7 %8",
+        "args0": [
+		  {
+	        "type": "field_checkbox",
+	        "name": "not",
+	        "checked": false
+	      },
+          {
+            "type": "input_value",
+            "name": "whenAction",
+            "check": "entitychild"
+          },
+          {
+	      "type": "field_dropdown",
+	      "name": "prep",
+	      "options": [
+		    ["", ""],
+	        [ "on", "on" ],
+	        [ "from", "from" ],
+	        [ "in", "in" ],
+	        [ "to", "to" ],
+	        [ "into", "into" ],
+	        [ "for", "for" ],
+	        [ "of", "of" ],
+	      ]
+         },
+         {
+            "type": "input_value",
+            "name": "whenAction",
+            "check": "entity"
+          },
+          {
+          "type": "field_input",
+          "name": "entitypropertyname",
+          "text": "name",
+        },
+        {
+	      "type": "field_dropdown",
+	      "name": "prep2",
+	      "options": [
+			["", ""],
+	        [ "on", "on" ],
+	        [ "from", "from" ],
+	        [ "in", "in" ],
+	        [ "to", "to" ],
+	        [ "into", "into" ],
+	        [ "for", "for" ],
+	        [ "of", "of" ],
+	      ]
+         },
+         {
+            "type": "input_value",
+            "name": "whenAction",
+            "check": "entity"
+          },
+         {
+          "type": "field_input",
+          "name": "entitypropertyname2",
+          "text": "name",
+        },
+        ],
+        "inputsInline": true,
+        "previousStatement": "when",
+        "nextStatement": ["then", "whichmean"],
+        "colour": 90,
+        "tooltip": "When I ",
+        "helpUrl": ""
+      },
+      {
+        "type": "thenEntityblock",
+        "message0": "Then the %1 %2 %3 not %4 %5",
         "args0": [
           {
             "type": "input_value",
-            "name": "theninput"
-          }
+            "name": "entityinput",
+            "check": "entity"
+          },
+          {
+          "type": "field_input",
+          "name": "TEXT",
+          "text": "name",
+        },
+        {
+	      "type": "field_dropdown",
+	      "name": "FIELDNAME",
+	      "options": [
+	        [ "is", "is" ],
+	        [ "are", "are" ]
+	      ]
+        },
+        {
+	      "type": "field_checkbox",
+	      "name": "not",
+	      "checked": false
+	    },
+	    {
+            "type": "input_value",
+            "name": "entitystate",
+            "check": "entitychild"
+          },
+        ],
+        "inputsInline": true,
+        "previousStatement": "then",
+        "nextStatement": "whichmean",
+        "colour": 135,
+        "tooltip": "Then the ",
+        "helpUrl": ""
+      },
+      {
+        "type": "thenEntityPropertyblock",
+        "message0": "Then the %1 %2 the %3 %4 %5 not %6 %7",
+        "args0": [
+          {
+            "type": "input_value",
+            "name": "entitypropertyinput",
+            "check": "entitychild"
+          },
+          {
+	      "type": "field_dropdown",
+	      "name": "prep",
+	      "options": [
+	        [ "on", "on" ],
+	        [ "from", "from" ],
+	        [ "in", "in" ],
+	        [ "to", "to" ],
+	        [ "into", "into" ],
+	        [ "for", "for" ],
+	        [ "of", "of" ],
+	      ]
+         },
+         {
+            "type": "input_value",
+            "name": "entitypropertyinput",
+            "check": "entity"
+          },
+          {
+          "type": "field_input",
+          "name": "entityname",
+          "text": "name",
+        },
+        {
+	      "type": "field_dropdown",
+	      "name": "FIELDNAME",
+	      "options": [
+	        [ "is", "is" ],
+	        [ "are", "are" ]
+	      ]
+        },
+        {
+	      "type": "field_checkbox",
+	      "name": "not",
+	      "checked": false
+	    },
+	    {
+          "type": "field_input",
+          "name": "entitypropertyname",
+          "text": "name",
+        },
         ],
         "inputsInline": true,
         "previousStatement": "then",
@@ -363,13 +585,25 @@ var bddToolbox = {
           "type": "givenEntityblock"
         },
         {
+		  "kind": "block",
+		  "type": "givenEntityPropertyblock"
+		},
+        {
           "kind": "block",
-          "type": "whenblock"
+          "type": "whenActionBlock"
         },
         {
           "kind": "block",
-          "type": "thenblock"
+          "type": "whenMultipleEntitiesBlock"
         },
+        {
+          "kind": "block",
+          "type": "thenEntityblock"
+        },
+        {
+		  "kind": "block",
+		  "type": "thenEntityPropertyblock"
+		},
         {
           "kind": "block",
           "type": "whichmeansblock"
@@ -399,7 +633,7 @@ var modelWorkspace = Blockly.inject("blockly-editor", {toolbox: modelToolbox});
 var bddWorkspace = Blockly.inject("blockly-editor2", {toolbox: bddToolbox});
 
 bddWorkspace.registerToolboxCategoryCallback(
-    "getEntities", coloursFlyoutCallback);
+    "getEntities", createEntityBlocks);
 
 function getText(a){
 	let s = ""
@@ -408,18 +642,6 @@ function getText(a){
 		s = s + element.getFieldValue("TEXT") + " ";
 	} else if (element.type == "entityref"){
 		s = s + element.getFieldValue("ENTITY") + " ";
-	}
-	})
-	return s;
-}
-
-function getText2(a){
-	let s = ""
-	a.forEach((element) => {
-	if (element.type == "textblock"){
-		s = element.getFieldValue("TEXT2");
-	} else if (element.type == "entityref"){
-		s = element.getFieldValue("ENTITY");
 	}
 	})
 	return s;
@@ -451,20 +673,177 @@ function createString(e){
 	var s = ""
 	var i = 0
 
-	if (e.getChildren().length > 1){
-		s1 = e.getChildren()[i].getFieldValue("ENTITY") + ""
-		i++
-		s2 = e.getChildren()[i].getFieldValue("ENTITY") + " "
+	switch (e.type) {
+		case "givenEntityblock":
+			if (e.getChildren().length > 1){
+				e.getChildren().forEach((element) => {
+					i++
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s1 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s2 = element.getFieldValue("ENTITYCHILDREN")
+							}
+						}
+				})
+			
+			s = s + s1 +
+			"\"" + e.getFieldValue("TEXT") + "\"" + " " +
+			e.getFieldValue("FIELDNAME") + " "
+			i++
+			if (e.getFieldValue("not") == "TRUE"){
+				s = s + "not" + " "
+			}
+			s = s + s2
+			}
+			break;
 		
-		s = s + s1
-		s = s + "\"" + e.getFieldValue("TEXT") + "\"" + " "
-		s = s + e.getFieldValue("FIELDNAME") + " "
-		i++
-		if (e.getFieldValue("not") == "TRUE"){
-			console.log(e.getFieldValue("not"))
-			s = s + "not" + " "
-		}
-		s = s + s2
+		case "givenEntityPropertyblock":
+			if (e.getChildren().length > 1) {
+				e.getChildren().forEach((element) => {
+					i++
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s2 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s1 = element.getFieldValue("ENTITYCHILDREN") + " "
+							}
+						}
+				})
+				
+				s = s1 + 
+				e.getFieldValue("prep") + " " +
+				"the " +
+				s2 +
+				"\"" + e.getFieldValue("entityname") + "\"" + " "
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "not" + " "
+				}
+				s = s + e.getFieldValue("FIELDNAME") + " " + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\"" + " "
+			}
+			break;
+			
+		case "whenActionBlock":
+			if (e.getChildren().length > 1) {
+				e.getChildren().forEach((element) => {
+					i++
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s2 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s1 = element.getFieldValue("ENTITYCHILDREN")
+							}
+						}
+				})
+				
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "do not" + " "
+				}
+				s = s + s1 +
+				e.getFieldValue("prep") + " " + 
+				"the " + 
+				s2 + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\""
+			}
+			break;
+			
+		case "whenMultipleEntitiesBlock":
+			check = false
+			if (e.getChildren().length > 2) {
+				e.getChildren().forEach((element) => {
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								if (check == false){
+									s2 = element.getFieldValue("ENTITY")
+									check = true
+								} else if (check == true) {
+									s3 = element.getFieldValue("ENTITY")
+								}
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s1 = element.getFieldValue("ENTITYCHILDREN")
+							}
+						}
+				})
+				
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "do not" + " "
+				}
+				s = s + s1 + " " +
+				e.getFieldValue("prep") + 
+				"the " + 
+				s2 + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\" " +
+				e.getFieldValue("prep2") + " " + 
+				"the " + 
+				s3 + 
+				"\"" + e.getFieldValue("entitypropertyname2") + "\" "
+			}
+			break;
+			
+		case "thenEntityblock":
+			if (e.getChildren().length > 1){
+				e.getChildren().forEach((element) => {
+					console.log(element.type + "   i value  " + i)
+					i++
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s1 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s2 = element.getFieldValue("ENTITYCHILDREN")
+							}
+						}
+				})
+			
+			s = s + s1 +
+			"\"" + e.getFieldValue("TEXT") + "\"" + " " +
+			e.getFieldValue("FIELDNAME") + " "
+			i++
+			if (e.getFieldValue("not") == "TRUE"){
+				s = s + "not" + " "
+			}
+			s = s + s2
+			}
+			break;
+			
+		case "thenEntityPropertyblock":
+			if (e.getChildren().length > 1) {
+				e.getChildren().forEach((element) => {
+					i++
+						if (element.type == "entityref") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s1 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityChildrenref") {
+							if (element.getFieldValue("ENTITYCHILDREN") != null) {
+								s2 = element.getFieldValue("ENTITYCHILDREN") + " "
+							}
+						}
+				})
+				
+				s = s1 + 
+				e.getFieldValue("prep") + " " +
+				"the " +
+				s2 +
+				"\"" + e.getFieldValue("entityname") + "\"" + " "
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "not" + " "
+				}
+				s = s + e.getFieldValue("FIELDNAME") + " " + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\"" + " "
+			}
+			break;
+			
 	}
 	
 	return s
@@ -486,64 +865,21 @@ function addBlocksToArray(a){
 				typeArray.push(element.getTooltip());
 				addNestedBlocks(element.getDescendants().slice(1), element);
 			} else if (element.getSurroundParent() == null){
-				if (element.type == "givenEntityblock"){
+				if (element.getFieldValue("not") != null){
 					typeArray.push(element.getTooltip() + createString(element))
-					console.log("test")
 				} else {
 				typeArray.push(element.getTooltip() + getText(element.getChildren()));
-				console.log(element.getChildren())
 				}
 			}
 	})
 }
-
-function findEntity(a){
-	let entities = [["entity", "entity"]];
-	a.forEach((element) => {
-		if (element.type == "entityblock"){
-			entities.push([getText(element.getChildren()), getText(element.getChildren())]);
-		}
-	})
-	return entities;
-}
-
-function findStates(a, parentEntity){
-	let states = [["entitystate", "entitystate"]];
-	
-	a.forEach((element) => {
-		if (getText(element.getChildren()) == parentEntity){
-			let b = element.getDescendants();
-			
-			b.forEach((element) => {
-				if (element.getSurroundParent().type == "entitystatesblock"){
-					states.push(element.getFieldValue("TEXT2"), element.getFieldValue("TEXT2"));
-				}
-			})
-		}
-	})
-	return states;
-}
-
-/*
-  function special(block) {
-	console.log("123")
-	
-	bDEntities = new Blockly.FieldDropdown(findEntity(modelWorkspace.getAllBlocks()), "bde")
-	
-	if (block.getInput("ENTITIES").fieldRow.length != 0) {
-		block.getInput("ENTITIES").removeField("entities")
-	}
-	
-	block.getInput("ENTITIES").appendField(bDEntities, "entities")
-  };
-*/
 
 Blockly.Extensions.register("not_editable_extension",
   function() {
     this.setEditable(false);
   });
 
-function coloursFlyoutCallback() {
+function createEntityBlocks() {
 	var a = modelWorkspace.getAllBlocks()
 	var blockList = [];
 	a.forEach((element) => {
@@ -566,8 +902,9 @@ function coloursFlyoutCallback() {
 				      "kind": "block",
 				      "type": "entityChildrenref",
 				      "fields": {
-				        "ENTITY": element2.getFieldValue("TEXT2")
-				      }
+				        "ENTITYCHILDREN": element2.getFieldValue("TEXT2")
+				      },
+				      "output": "entity"
 					});
 				}
 			})
