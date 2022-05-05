@@ -51,7 +51,7 @@ Blockly.defineBlocksWithJsonArray([
 		  ],
 		  "inputsInline": true,
 		  "previousStatement": ["model", "entity", "property"],
-		  "nextStatement": "entity",
+		  "nextStatement": ["entity", "entity1"],
 		  "colour": 45,
 		  "tooltip": "entity ",
 		  "helpUrl": ""
@@ -69,7 +69,7 @@ Blockly.defineBlocksWithJsonArray([
 		      "check": "text2"
 		    }
 		  ],
-		  "previousStatement": "entity",
+		  "previousStatement": "entity1",
 		  "nextStatement": ["entity", "action"],
 		  "colour": 90,
 		  "tooltip": "actions: ",
@@ -468,6 +468,7 @@ Blockly.defineBlocksWithJsonArray([
           {
           "type": "field_input",
           "name": "TEXT",
+          "check": "String"
         }
       ],
         "output": "String",
@@ -480,40 +481,13 @@ Blockly.defineBlocksWithJsonArray([
           {
           "type": "field_input",
           "name": "TEXT2",
+          "check": "String"
         }
       ],
         "previousStatement": "text2",
         "nextStatement": "text2",
         "colour": 345,
-      },
-      {
-	    "type": "specialblock",
-	    "message0": "%1 %2 %3",
-	    "args0": [
-	      {
-	        "type": "input_dummy",
-      		"name": "ENTITIES"
-	      },
-      	{
-	      "type": "field_dropdown",
-	      "name": "FIELDNAME",
-	      "options": [
-	        [ "is", "is" ],
-	        [ "are", "are" ]
-	      ]
-      },
-      {
-        "type": "input_dummy",
-      	"name": "ENTITYSTATES"
-      },
-    ],
-    "inputsInline": true,
-    "previousstatement": "special",
-    "nextstatement": "special",
-    "style": "text_blocks",
-    "output": "String",
-    "helpUrl": "something"
-  },
+      }
   ]);
  
 
@@ -852,23 +826,24 @@ function createString(e){
 function addBlocksToArray(a){
 	var i = 0;
 	a.forEach((element) => {
-			if (element.type == "entityactionsblock") {
-				typeArray.push("{");
+		console.log(element.type)
+			if (element.type == "entityactionsblock" || element.type == "entitystatesblock" || element.type == "entitypropertiesblock") {
 				typeArray.push(element.getTooltip() + printNestedChildren(element.getDescendants(), element));
-			} else if (element.type == "entitystatesblock"){
-				typeArray.push(element.getTooltip() + printNestedChildren(element.getDescendants(), element));
-			} else if (element.type == "entitypropertiesblock"){
-				typeArray.push(element.getTooltip() + printNestedChildren(element.getDescendants(), element));
-				typeArray.push("}");
-				typeArray.push("");
+				if (element.getNextBlock() == null || element.getNextBlock().type == "entityblock") {
+					typeArray.push("}")
+					typeArray.push("")
+				}
 			} else if (element.type == "whichmeansblock") {
 				typeArray.push(element.getTooltip());
 				addNestedBlocks(element.getDescendants().slice(1), element);
 			} else if (element.getSurroundParent() == null){
 				if (element.getFieldValue("not") != null){
 					typeArray.push(element.getTooltip() + createString(element))
+				} else if (element.type == "entityblock") {
+					typeArray.push(element.getTooltip() + getText(element.getChildren()) + "{")
 				} else {
-				typeArray.push(element.getTooltip() + getText(element.getChildren()));
+					typeArray.push(element.getTooltip() + getText(element.getChildren()));
+					typeArray.push("")
 				}
 			}
 	})
@@ -932,9 +907,7 @@ function onchange(event){
 	bddBlockArray.forEach((block) => {
 		if (block.type == "scenarioblock"){
 			addBlocksToArray(block.getDescendants());
-		} /*else if(block.type == "specialblock"){
-			special(block)
-		}*/
+		}
 	})
 	
 	d.insertFullLines(0, typeArray);
