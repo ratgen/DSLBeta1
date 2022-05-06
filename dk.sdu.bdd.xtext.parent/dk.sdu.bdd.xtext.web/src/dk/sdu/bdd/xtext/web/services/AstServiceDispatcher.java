@@ -1,12 +1,20 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import java.util.Set;
+
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.web.server.IServiceContext;
+import org.eclipse.xtext.web.server.ISession;
 import org.eclipse.xtext.web.server.InvalidRequestException;
 import org.eclipse.xtext.web.server.XtextServiceDispatcher;
 import org.eclipse.xtext.web.server.model.IWebResourceSetProvider;
+
+import dk.sdu.bdd.xtext.bddDsl.StatePhrase;
+import dk.sdu.bdd.xtext.bddDsl.impl.ScenarioStateImpl;
 
 import com.google.inject.Inject;
 
@@ -30,22 +38,55 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
-	ResourceSet resourceSet = resourceSetProvider.get(context.getParameter("resource"), context);
-    URI uri = URI.createURI("resource:/scenarios.bdd");
-    System.out.println(uri);
-	EObject object =  resourceSet.getEObject(uri, false);
-	ServiceDescriptor serviceDescriptor = new ServiceDescriptor();
-    if (object != null) {
-      serviceDescriptor.setService(() -> {
-        return new AstServiceResult(object.getClass().toString());
-      });
-    } else {
-      serviceDescriptor.setService(() -> {
-        return new AstServiceResult("result not available");
-      });
+		String resource = context.getParameter("resource");
+		System.out.println("Resource " + resource);
+		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
+		
+		EList<Resource> list = resourceSet.getResources();
+		for (Resource item : list) {
+			URI uri = item.getURI();
+			System.out.println("Resource  URI: " + uri);
+			EList<EObject> objectContents = item.getContents();
+			System.out.println("item contents " + objectContents);
+			for (EObject obj : objectContents) {
+				System.out.println("EObject_string: " + obj.toString());
+				eContentExplorer(obj);
+			}
+			System.out.println();
+			System.out.println();
 
-    }
+		}
+
+		/*
+	    if (object != null) {
+	      serviceDescriptor.setService(() -> {
+	        return new AstServiceResult(object.getClass().toString());
+	      });
+	    } else {
+	      
+	
+	    }*/
+		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+		serviceDescriptor.setService(() -> {
+	        return new AstServiceResult(resource);
+	      });
 		return serviceDescriptor;
+	}
+	
+	private void eContentExplorer(EObject obj) {
+		for (EObject cont : obj.eContents()) {
+			System.out.println("EObject content string: " + cont.toString());
+			if(cont.getClass() == ScenarioStateImpl.class) {
+				EList<StatePhrase> states = ((ScenarioStateImpl) cont).getStates();
+				for (StatePhrase stat : states) {
+					System.out.println(" entity " + stat.getEntity());
+					System.out.println(" propery " + stat.getProperty());
+				}
+			}
+			if (cont.eContents().size() != 0) {
+				eContentExplorer(cont);
+			}
+		}
 	}
 	
 }
