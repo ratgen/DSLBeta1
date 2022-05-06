@@ -1,6 +1,6 @@
 Blockly.defineBlocksWithJsonArray([
     	{
-			  "type": "entityref",
+			  "type": "entityRef",
 			  "message0": "%1",
 			  "args0": [
 	          {
@@ -9,20 +9,46 @@ Blockly.defineBlocksWithJsonArray([
 	          }
 	          ],
 			  "output": "entity",
-			  "colour": 0,
+			  "colour": 45,
         	  "extensions": ["not_editable_extension"]
 			},
 			{
-			  "type": "entityChildrenref",
+			  "type": "entityActionRef",
 			  "message0": "%1",
 			  "args0": [
 	          {
 	          "type": "field_input",
-	          "name": "ENTITYCHILDREN",
+	          "name": "ENTITYACTION",
 	          }
 	          ],
-			  "output": "entitychild",
-			  "colour": 0,
+			  "output": "entityaction",
+			  "colour": 90,
+        	  "extensions": ["not_editable_extension"]
+			},
+			{
+			  "type": "entityStateRef",
+			  "message0": "%1",
+			  "args0": [
+	          {
+	          "type": "field_input",
+	          "name": "ENTITYSTATE",
+	          }
+	          ],
+			  "output": "entitystate",
+			  "colour": 135,
+        	  "extensions": ["not_editable_extension"]
+			},
+			{
+			  "type": "entityPropertyRef",
+			  "message0": "%1",
+			  "args0": [
+	          {
+	          "type": "field_input",
+	          "name": "ENTITYPROPERTY",
+	          }
+	          ],
+			  "output": "entityproperty",
+			  "colour": 180,
         	  "extensions": ["not_editable_extension"]
 			},
     	{
@@ -158,8 +184,8 @@ Blockly.defineBlocksWithJsonArray([
 	    },
 	    {
             "type": "input_value",
-            "name": "entitystate",
-            "check": "entitychild"
+            "name": "entitystateinput",
+            "check": "entitystate"
           },
         ],
         "inputsInline": true,
@@ -176,7 +202,7 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "entitypropertyinput",
-            "check": "entitychild"
+            "check": "entityproperty"
           },
           {
 	      "type": "field_dropdown",
@@ -239,7 +265,7 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "whenAction",
-            "check": "entitychild"
+            "check": "entityaction"
           },
           {
 	      "type": "field_dropdown",
@@ -285,7 +311,7 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "whenAction",
-            "check": "entitychild"
+            "check": "entityaction"
           },
           {
 	      "type": "field_dropdown",
@@ -372,8 +398,8 @@ Blockly.defineBlocksWithJsonArray([
 	    },
 	    {
             "type": "input_value",
-            "name": "entitystate",
-            "check": "entitychild"
+            "name": "entitystateinput",
+            "check": "entitystate"
           },
         ],
         "inputsInline": true,
@@ -390,7 +416,7 @@ Blockly.defineBlocksWithJsonArray([
           {
             "type": "input_value",
             "name": "entitypropertyinput",
-            "check": "entitychild"
+            "check": "entityproperty"
           },
           {
 	      "type": "field_dropdown",
@@ -614,7 +640,7 @@ function getText(a){
 	a.forEach((element) => {
 	if (element.type == "textblock"){
 		s = s + element.getFieldValue("TEXT") + " ";
-	} else if (element.type == "entityref"){
+	} else if (element.type == "entityRef"){
 		s = s + element.getFieldValue("ENTITY") + " ";
 	}
 	})
@@ -638,7 +664,7 @@ function printNestedChildren(a, e){
 function addNestedBlocks(a, e){
 	a.forEach((element) => {
 		if (element.getSurroundParent() != null && element.getSurroundParent().id == e.id) {
-			typeArray.push("      " + element.getTooltip() + getText(element.getChildren()));
+			typeArray.push("      " + element.getTooltip() + createString(element))
 	}
 	})
 }
@@ -646,19 +672,17 @@ function addNestedBlocks(a, e){
 function createString(e){
 	var s = ""
 	var i = 0
-
 	switch (e.type) {
 		case "givenEntityblock":
-			if (e.getChildren().length > 1){
+			if (e.getChildren().length >= 2){
 				e.getChildren().forEach((element) => {
-					i++
-						if (element.type == "entityref") {
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
 								s1 = element.getFieldValue("ENTITY")
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s2 = element.getFieldValue("ENTITYCHILDREN")
+						} else if (element.type == "entityStateRef") {
+							if (element.getFieldValue("ENTITYSTATE") != null) {
+								s2 = element.getFieldValue("ENTITYSTATE")
 							}
 						}
 				})
@@ -666,7 +690,7 @@ function createString(e){
 			s = s + s1 +
 			"\"" + e.getFieldValue("TEXT") + "\"" + " " +
 			e.getFieldValue("FIELDNAME") + " "
-			i++
+			
 			if (e.getFieldValue("not") == "TRUE"){
 				s = s + "not" + " "
 			}
@@ -675,16 +699,15 @@ function createString(e){
 			break;
 		
 		case "givenEntityPropertyblock":
-			if (e.getChildren().length > 1) {
+			if (e.getChildren().length >= 2) {
 				e.getChildren().forEach((element) => {
-					i++
-						if (element.type == "entityref") {
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
 								s2 = element.getFieldValue("ENTITY")
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s1 = element.getFieldValue("ENTITYCHILDREN") + " "
+						} else if (element.type == "entityPropertyRef") {
+							if (element.getFieldValue("ENTITYPROPERTY") != null) {
+								s1 = element.getFieldValue("ENTITYPROPERTY") + " "
 							}
 						}
 				})
@@ -703,16 +726,18 @@ function createString(e){
 			break;
 			
 		case "whenActionBlock":
-			if (e.getChildren().length > 1) {
+			console.log("test")
+			console.log(e.getChildren().length)
+			if (e.getChildren().length >= 2) {
 				e.getChildren().forEach((element) => {
-					i++
-						if (element.type == "entityref") {
+						console.log(element.type)
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
 								s2 = element.getFieldValue("ENTITY")
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s1 = element.getFieldValue("ENTITYCHILDREN")
+						} else if (element.type == "entityActionRef") {
+							if (element.getFieldValue("ENTITYACTION") != null) {
+								s1 = element.getFieldValue("ENTITYACTION")
 							}
 						}
 				})
@@ -720,7 +745,7 @@ function createString(e){
 				if (e.getFieldValue("not") == "TRUE"){
 					s = s + "do not" + " "
 				}
-				s = s + s1 +
+				s = s + s1 + " " +
 				e.getFieldValue("prep") + " " + 
 				"the " + 
 				s2 + 
@@ -732,7 +757,7 @@ function createString(e){
 			check = false
 			if (e.getChildren().length > 2) {
 				e.getChildren().forEach((element) => {
-						if (element.type == "entityref") {
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
 								if (check == false){
 									s2 = element.getFieldValue("ENTITY")
@@ -741,9 +766,9 @@ function createString(e){
 									s3 = element.getFieldValue("ENTITY")
 								}
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s1 = element.getFieldValue("ENTITYCHILDREN")
+						} else if (element.type == "entityActionRef") {
+							if (element.getFieldValue("ENTITYACTION") != null) {
+								s1 = element.getFieldValue("ENTITYACTION")
 							}
 						}
 				})
@@ -752,10 +777,10 @@ function createString(e){
 					s = s + "do not" + " "
 				}
 				s = s + s1 + " " +
-				e.getFieldValue("prep") + 
+				e.getFieldValue("prep") + " " +
 				"the " + 
 				s2 + 
-				"\"" + e.getFieldValue("entitypropertyname") + "\" " +
+				"\"" + e.getFieldValue("entitypropertyname") + "\"" +
 				e.getFieldValue("prep2") + " " + 
 				"the " + 
 				s3 + 
@@ -766,15 +791,14 @@ function createString(e){
 		case "thenEntityblock":
 			if (e.getChildren().length > 1){
 				e.getChildren().forEach((element) => {
-					console.log(element.type + "   i value  " + i)
-					i++
-						if (element.type == "entityref") {
+					
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
 								s1 = element.getFieldValue("ENTITY")
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s2 = element.getFieldValue("ENTITYCHILDREN")
+						} else if (element.type == "entityStateRef") {
+							if (element.getFieldValue("ENTITYSTATE") != null) {
+								s2 = element.getFieldValue("ENTITYSTATE")
 							}
 						}
 				})
@@ -782,7 +806,7 @@ function createString(e){
 			s = s + s1 +
 			"\"" + e.getFieldValue("TEXT") + "\"" + " " +
 			e.getFieldValue("FIELDNAME") + " "
-			i++
+			
 			if (e.getFieldValue("not") == "TRUE"){
 				s = s + "not" + " "
 			}
@@ -793,14 +817,14 @@ function createString(e){
 		case "thenEntityPropertyblock":
 			if (e.getChildren().length > 1) {
 				e.getChildren().forEach((element) => {
-					i++
-						if (element.type == "entityref") {
+					
+						if (element.type == "entityRef") {
 							if (element.getFieldValue("ENTITY") != null) {
-								s1 = element.getFieldValue("ENTITY")
+								s2 = element.getFieldValue("ENTITY")
 							}
-						} else if (element.type == "entityChildrenref") {
-							if (element.getFieldValue("ENTITYCHILDREN") != null) {
-								s2 = element.getFieldValue("ENTITYCHILDREN") + " "
+						} else if (element.type == "entityPropertyRef") {
+							if (element.getFieldValue("ENTITYPROPERTY") != null) {
+								s1 = element.getFieldValue("ENTITYPROPERTY") + " "
 							}
 						}
 				})
@@ -824,9 +848,9 @@ function createString(e){
 }
 
 function addBlocksToArray(a){
+	typeArray = [];
 	var i = 0;
 	a.forEach((element) => {
-		console.log(element.type)
 			if (element.type == "entityactionsblock" || element.type == "entitystatesblock" || element.type == "entitypropertiesblock") {
 				typeArray.push(element.getTooltip() + printNestedChildren(element.getDescendants(), element));
 				if (element.getNextBlock() == null || element.getNextBlock().type == "entityblock") {
@@ -847,6 +871,7 @@ function addBlocksToArray(a){
 				}
 			}
 	})
+	return typeArray
 }
 
 Blockly.Extensions.register("not_editable_extension",
@@ -861,7 +886,7 @@ function createEntityBlocks() {
 		if (element.type == "entityblock"){
 			blockList.push({  
 		      "kind": "block",
-		      "type": "entityref",
+		      "type": "entityRef",
 		      "fields": {
 		        "ENTITY": getText(element.getChildren())
 		      }
@@ -873,14 +898,37 @@ function createEntityBlocks() {
 					console.log("breaking")
 					return;
 				} else if (element2.type == "textblock2"){
-					blockList.push({  
-				      "kind": "block",
-				      "type": "entityChildrenref",
-				      "fields": {
-				        "ENTITYCHILDREN": element2.getFieldValue("TEXT2")
-				      },
-				      "output": "entity"
-					});
+					switch (element2.getSurroundParent().type) {
+						case "entityactionsblock":
+							blockList.push({  
+						    "kind": "block",
+						    "type": "entityActionRef",
+						    "fields": {
+						    "ENTITYACTION": element2.getFieldValue("TEXT2")
+						    },
+							});
+							break;
+						
+						case "entitystatesblock":
+							blockList.push({  
+						    "kind": "block",
+						    "type": "entityStateRef",
+						    "fields": {
+						    "ENTITYSTATE": element2.getFieldValue("TEXT2")
+						    },
+							});
+							break;
+							
+						case "entitypropertiesblock":
+							blockList.push({  
+						    "kind": "block",
+						    "type": "entityPropertyRef",
+						    "fields": {
+						    "ENTITYPROPERTY": element2.getFieldValue("TEXT2")
+						    },
+							});
+							break;
+					}
 				}
 			})
 		}
@@ -892,25 +940,29 @@ function onchange(event){
 	let modelBlockArray = modelWorkspace.getAllBlocks();
 	let bddBlockArray = bddWorkspace.getAllBlocks();
 	
-	let d = editors[0].env.document.doc;
+	let scenarioTab = editors[0].env.document.doc;
+	let entityTab = editors[1].env.document.doc;
 	
-	typeArray = [];
+	scenarioArray = []
+	entityArray = []
 	
-	d.removeFullLines(0, d.getLength());
+	scenarioTab.removeFullLines(0, scenarioTab.getLength());
+	entityTab.removeFullLines(0, entityTab.getLength());
 	
 	modelBlockArray.forEach((block) => {
 		if (block.type == "modelblock"){
-			addBlocksToArray(block.getDescendants());
+			scenarioArray = addBlocksToArray(block.getDescendants());
 			}
 	})
 	
 	bddBlockArray.forEach((block) => {
 		if (block.type == "scenarioblock"){
-			addBlocksToArray(block.getDescendants());
+			entityArray = addBlocksToArray(block.getDescendants());
 		}
 	})
 	
-	d.insertFullLines(0, typeArray);
+	scenarioTab.insertFullLines(0, scenarioArray);
+	entityTab.insertFullLines(0, entityArray);
 }
 
 modelWorkspace.addChangeListener(onchange);

@@ -43,14 +43,3 @@ a:hover {
 	left: 0;
 	width: 640px;
 }
-
-#xtext-editor {
-	display: block;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-	padding: 4px;
-	border: 1px solid #aaa;
-}
