@@ -517,7 +517,7 @@ Blockly.defineBlocksWithJsonArray([
   ]);
  
 
-var modelToolbox = {
+var entityToolbox = {
   "kind": "categoryToolbox",
   "contents": [
     {
@@ -569,7 +569,7 @@ var modelToolbox = {
   ]
 }
 
-var bddToolbox = {
+var scenarioToolbox = {
   "kind": "categoryToolbox",
   "contents": [
     {
@@ -627,13 +627,6 @@ var bddToolbox = {
 	}
   ]
 }
-
-var modelWorkspace = Blockly.inject("blockly-editor", {toolbox: modelToolbox});
-
-var bddWorkspace = Blockly.inject("blockly-editor2", {toolbox: bddToolbox});
-
-bddWorkspace.registerToolboxCategoryCallback(
-    "getEntities", createEntityBlocks);
 
 function getText(a){
 	let s = ""
@@ -880,7 +873,7 @@ Blockly.Extensions.register("not_editable_extension",
   });
 
 function createEntityBlocks() {
-	var a = modelWorkspace.getAllBlocks()
+	var a = entityWorkspace.getAllBlocks()
 	var blockList = [];
 	a.forEach((element) => {
 		if (element.type == "entityblock"){
@@ -936,9 +929,16 @@ function createEntityBlocks() {
 	  return blockList;
 };
 
+var entityWorkspace = Blockly.inject("blockly-editor", {toolbox: entityToolbox});
+
+var scenarioWorkspace = Blockly.inject("blockly-editor2", {toolbox: scenarioToolbox});
+
+scenarioWorkspace.registerToolboxCategoryCallback(
+    "getEntities", createEntityBlocks);
+
 function onchange(event){	
-	let modelBlockArray = modelWorkspace.getAllBlocks();
-	let bddBlockArray = bddWorkspace.getAllBlocks();
+	let entityBlockArray = entityWorkspace.getAllBlocks();
+	let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
 	
 	let scenarioTab = editors[0].env.document.doc;
 	let entityTab = editors[1].env.document.doc;
@@ -949,13 +949,13 @@ function onchange(event){
 	scenarioTab.removeFullLines(0, scenarioTab.getLength());
 	entityTab.removeFullLines(0, entityTab.getLength());
 	
-	modelBlockArray.forEach((block) => {
+	entityBlockArray.forEach((block) => {
 		if (block.type == "modelblock"){
 			scenarioArray = addBlocksToArray(block.getDescendants());
 			}
 	})
 	
-	bddBlockArray.forEach((block) => {
+	scenarioBlockArray.forEach((block) => {
 		if (block.type == "scenarioblock"){
 			entityArray = addBlocksToArray(block.getDescendants());
 		}
@@ -965,7 +965,9 @@ function onchange(event){
 	entityTab.insertFullLines(0, entityArray);
 }
 
-modelWorkspace.addChangeListener(onchange);
-bddWorkspace.addChangeListener(onchange);
+document.getElementById('blockly-editor2').style.display = "none"
+
+entityWorkspace.addChangeListener(onchange);
+scenarioWorkspace.addChangeListener(onchange);
 
 onchange();
