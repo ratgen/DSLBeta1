@@ -51,6 +51,19 @@ Blockly.defineBlocksWithJsonArray([
 			  "colour": 180,
         	  "extensions": ["not_editable_extension"]
 			},
+			{
+		  "type": "modelRef",
+		  "message0": "%1",
+		  "args0": [
+	          {
+	          "type": "field_input",
+	          "name": "MODEL",
+	          }
+	          ],
+			  "output": "model",
+			  "colour": 0,
+        	  "extensions": ["not_editable_extension"]
+			},
     	{
 		  "type": "modelblock",
 		  "message0": "Model %1",
@@ -62,6 +75,27 @@ Blockly.defineBlocksWithJsonArray([
 		  ],
 		  "inputsInline": true,
 		  "nextStatement": "model",
+		  "colour": 0,
+		  "tooltip": "model ",
+		  "helpUrl": ""
+		},
+		{
+		  "type": "modelUsingBlock",
+		  "message0": "Model %1 using %2",
+		  "args0": [
+		    {
+		      "type": "input_value",
+		      "name": "NAME",
+		      "check": "String"
+		    },
+		    {
+            "type": "input_value",
+            "name": "modelinput",
+            "check": "model"
+          },
+		  ],
+		  "inputsInline": true,
+		  "nextStatement": "modelUsing",
 		  "colour": 0,
 		  "tooltip": "model ",
 		  "helpUrl": ""
@@ -150,6 +184,7 @@ Blockly.defineBlocksWithJsonArray([
           }
         ],
         "inputsInline": true,
+        "previousStatement": "modelUsing",
         "nextStatement": "given",
         "colour": 0,
         "tooltip": "Scenario: ",
@@ -572,7 +607,12 @@ var entityToolbox = {
 var scenarioToolbox = {
   "kind": "categoryToolbox",
   "contents": [
-    {
+      {
+      "kind": "category",
+      "name": "Model",
+	  "custom": "getModel"
+      },
+      {
       "kind": "category",
       "name": "Bdd blocks",
       "contents": [
@@ -835,6 +875,19 @@ function createString(e){
 			}
 			break;
 			
+		case "modelUsingBlock":
+			if (e.getChildren().length > 1) {
+				e.getChildren().forEach((element) => {
+					if (element.type == "textblock"){
+						s1 = element.getFieldValue("TEXT")
+					} else if (element.type == "modelRef"){
+						s2 = element.getFieldValue("MODEL")
+					}
+				})
+			s = s1 + " using " + s2
+			}
+			break;
+			
 	}
 	
 	return s
@@ -842,7 +895,6 @@ function createString(e){
 
 function addBlocksToArray(a){
 	typeArray = [];
-	var i = 0;
 	a.forEach((element) => {
 			if (element.type == "entityactionsblock" || element.type == "entitystatesblock" || element.type == "entitypropertiesblock") {
 				typeArray.push(element.getTooltip() + printNestedChildren(element.getDescendants(), element));
@@ -854,7 +906,7 @@ function addBlocksToArray(a){
 				typeArray.push(element.getTooltip());
 				addNestedBlocks(element.getDescendants().slice(1), element);
 			} else if (element.getSurroundParent() == null){
-				if (element.getFieldValue("not") != null){
+				if (element.getFieldValue("not") != null || element.type == "modelUsingBlock"){
 					typeArray.push(element.getTooltip() + createString(element))
 				} else if (element.type == "entityblock") {
 					typeArray.push(element.getTooltip() + getText(element.getChildren()) + "{")
@@ -871,6 +923,27 @@ Blockly.Extensions.register("not_editable_extension",
   function() {
     this.setEditable(false);
   });
+
+function createModelBlock() {
+	var a = entityWorkspace.getAllBlocks()
+	var blockList = [];
+	a.forEach((element) => {
+	if (element.type == "modelblock"){
+			blockList.push({  
+		      "kind": "block",
+		      "type": "modelUsingBlock"
+			});
+			blockList.push({  
+		      "kind": "block",
+		      "type": "modelRef",
+		      "fields": {
+		        "MODEL": getText(element.getChildren())
+		      }
+			});
+		}
+		})
+		return blockList
+}
 
 function createEntityBlocks() {
 	var a = entityWorkspace.getAllBlocks()
@@ -933,15 +1006,18 @@ var entityWorkspace = Blockly.inject("blockly-editor", {toolbox: entityToolbox})
 
 var scenarioWorkspace = Blockly.inject("blockly-editor2", {toolbox: scenarioToolbox});
 
-scenarioWorkspace.registerToolboxCategoryCallback(
+	scenarioWorkspace.registerToolboxCategoryCallback(
     "getEntities", createEntityBlocks);
+    
+    scenarioWorkspace.registerToolboxCategoryCallback(
+    "getModel", createModelBlock);
 
 function onchange(event){	
 	let entityBlockArray = entityWorkspace.getAllBlocks();
 	let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
 	
-	let scenarioTab = editors[0].env.document.doc;
-	let entityTab = editors[1].env.document.doc;
+	let entityTab = editors[0].env.document.doc;
+	let scenarioTab = editors[1].env.document.doc;
 	
 	scenarioArray = []
 	entityArray = []
@@ -956,7 +1032,7 @@ function onchange(event){
 	})
 	
 	scenarioBlockArray.forEach((block) => {
-		if (block.type == "scenarioblock"){
+		if (block.type == "modelUsingBlock"){
 			entityArray = addBlocksToArray(block.getDescendants());
 		}
 	})

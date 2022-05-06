@@ -62,7 +62,7 @@ let entitiesTab = document.getElementById('entity-tab')
 let entitiesBlock = document.getElementById('blockly-editor')
 let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
-let scenarioBlock = document.getElementById('blockly-editor')
+let scenarioBlock = document.getElementById('blockly-editor2')
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
   currentEditor.style.display = "none"
@@ -72,13 +72,13 @@ function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 }
 
 function switchEditor(e) {
-	b = "blockly-editor2"
+	var b = ""
     if (e.target != currentTab ) {
     removeSelectionBorder(currentTab)
     let editorId = e.target.dataset.editorId
     
-    if (editorId == "xtext-editor-entities") {b = "blockly-editor2"}
-    else if (editorId == "xtext-editor-scenarios") {b = "blockly-editor"}
+    if (editorId == "xtext-editor-entities") {b = "blockly-editor"}
+    else if (editorId == "xtext-editor-scenarios") {b = "blockly-editor2"}
 	
     let editor = document.getElementById(editorId)
     let blockly = document.getElementById(b)
@@ -102,7 +102,8 @@ if (entitiesTab != undefined)
   entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
-currentEditor = scenario
-currentTab = scenarioTab
-currentBlockly = scenarioBlock
-setSelectionBorder(scenarioTab)
+  
+currentEditor = entities
+currentTab = entitiesTab
+currentBlockly = entitiesBlock
+setSelectionBorder(entitiesTab)
