@@ -10,14 +10,14 @@ entity gripper {
 	states: closed, open	
 }
 
-entity sensor {
+entity input {
 	actions: void
 	states: ON/OFF 
 	properties: signal
 }
 
 entity output {
-	actions: turns ON, turns OFF
+	actions: activates, deactivates
 	states: ON/OFF
 }
 

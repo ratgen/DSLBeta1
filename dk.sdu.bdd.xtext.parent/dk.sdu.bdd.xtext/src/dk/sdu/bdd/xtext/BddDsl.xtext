@@ -18,19 +18,18 @@ ModelRef:
 
 EntityDef:
 	'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [EntityDef] (',' superEntities += [EntityDef])*)? '{'
-		('actions:' (actions += ActionDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') actions += ActionDef)*)?
+		('actions:' (actions += ActionDef) (',' actions += ActionDef)*)?
 		('states:' (states += StateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += StateDef)*)?
 		('properties:' (properties += PropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += PropertyDef)*)?
 	'}'
 ;
 
 ActionDef:
-	name = WORD ('and'|'the')? (WORD)? (argument = WORD)? ((preposition = PREP)? | (optionalPref ?= '['? (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']'?))	
+	name = WORD WORD?
 ;
 
 PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with');
 WORD: ID;
-
 
 
 StateDef: postive = StateName PREP? ('/' negative = StateName)?;
@@ -39,7 +38,7 @@ StateName: name = (WORD) ('and'|'off')?  (WORD)?;
 PropertyDef: name = WORD (plural ?= '*')?;
 
 
-//
+
 
 ID_OR_STRING: (ID | STRING);
 
@@ -87,11 +86,11 @@ ScenarioRef:
 ;
 
 //ENTITY_IDENTITY: '#'? (INT | STRING);
-ENTITY_IDENTITY: '#'? (INT | STRING);
+ENTITY_IDENTITY: STRING;
 OPTION:'#'? (INT | STRING) ;
 
 EntityRef:
-	 'the' (entity = [EntityDef | WORD] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
+	 'the' entity = [EntityDef] name = STRING
 ;
 
 EntityStatePhrase:
@@ -151,7 +150,7 @@ VerbAction:
 	action = ActionRef 'and'? WORD? 'on'? (WORD'-'WORD)? ('for' 'the'| 'the'|'on')? (entity = EntityDef)? ('on'|'off'|'in')? entity2 = EntityRef ('on'|'off'|'in')? ('of'|'for'|'for' 'the'|'of' 'the')? PREP? entity = EntityRef?
 ;
 
-EntityAction: entityAction = EntityRef actionDef = [ActionDef] (propertyRef = PropertyRef)?;
+EntityAction: entityAction = EntityRef ('linearly')? actionDef = [ActionDef] (propertyRef = PropertyRef)?;
 
 PropertyRef:
     propertyref = 'to' property = [PropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [PropertyDef]) 
