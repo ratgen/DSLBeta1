@@ -1,5 +1,7 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.web.server.IServiceContext;
 import org.eclipse.xtext.web.server.InvalidRequestException;
@@ -28,11 +30,21 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
-		ResourceSet resourceSet = resourceSetProvider.get(context.getParameter("resource"), context);
-		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();
-		serviceDescriptor.setService(() -> {
-			return new AstServiceResult("resfult");
-		});
+	ResourceSet resourceSet = resourceSetProvider.get(context.getParameter("resource"), context);
+    URI uri = URI.createURI("resource:/scenarios.bdd");
+    System.out.println(uri);
+	EObject object =  resourceSet.getEObject(uri, false);
+	ServiceDescriptor serviceDescriptor = new ServiceDescriptor();
+    if (object != null) {
+      serviceDescriptor.setService(() -> {
+        return new AstServiceResult(object.getClass().toString());
+      });
+    } else {
+      serviceDescriptor.setService(() -> {
+        return new AstServiceResult("result not available");
+      });
+
+    }
 		return serviceDescriptor;
 	}
 	
