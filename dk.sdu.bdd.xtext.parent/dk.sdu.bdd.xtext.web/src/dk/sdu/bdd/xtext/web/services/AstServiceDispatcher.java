@@ -11,6 +11,7 @@ import org.eclipse.xtext.web.server.XtextServiceDispatcher;
 import org.eclipse.xtext.web.server.model.IWebResourceSetProvider;
 
 import dk.sdu.bdd.xtext.bddDsl.StatePhrase;
+import dk.sdu.bdd.xtext.bddDsl.impl.EntityPropertyStatePhraseImpl;
 import dk.sdu.bdd.xtext.bddDsl.impl.ScenarioImpl;
 import dk.sdu.bdd.xtext.bddDsl.impl.ScenarioStateImpl;
 
@@ -48,7 +49,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println("item contents " + objectContents);
 			for (EObject obj : objectContents) {
 				System.out.println("EObject_string: " + obj.toString());
-				eContentExplorer(obj);
+				//eContentExplorer(obj, 0);
+				System.out.println(dump(obj, "   "));
+				
 			}
 			System.out.println();
 			System.out.println();
@@ -71,7 +74,20 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		return serviceDescriptor;
 	}
 	
-	private void eContentExplorer(EObject obj) {
+	private static String dump(EObject mod_, String indent) {
+	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+
+	    for (EObject a :mod_.eCrossReferences()) {
+	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	    }
+	    res += "\n";
+	    for (EObject f :mod_.eContents()) {
+	        res += dump(f, indent+"    ");
+	    }
+	    return res;
+	}
+	private void eContentExplorer(EObject obj, int i) {
+		System.out.println("level" + i);
 		for (EObject cont : obj.eContents()) {
 			System.out.println("EObject content string: " + cont.toString());
 			if(cont.getClass() == ScenarioStateImpl.class) {
@@ -84,20 +100,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			if(cont.getClass() == ScenarioImpl.class) {
 				ScenarioImpl scenario = (ScenarioImpl) cont;
 				System.out.println(scenario.getName());
-				eContentExplorer(scenario.getPreStateE());
-				eContentExplorer(scenario.getPreState());
-				eContentExplorer(scenario.getPostState());
-				eContentExplorer(scenario.getActionE());
-				eContentExplorer(scenario.getPreState1());
-				eContentExplorer(scenario.getAction1());
-				eContentExplorer(scenario.getPostState1());
-				eContentExplorer(scenario.getPreStateE1());
-				eContentExplorer(scenario.getPreState2());
-				eContentExplorer(scenario.getAction2());
-				eContentExplorer(scenario.getPostState2());
+				System.out.println("done with pre and post");
+			}
+			if(cont.getClass() == EntityPropertyStatePhraseImpl.class) {
+				EntityPropertyStatePhraseImpl entity = (EntityPropertyStatePhraseImpl) cont;
+				System.out.println(entity.getProperty());
 			}
 			if (cont.eContents().size() != 0) {
-				eContentExplorer(cont);
+				eContentExplorer(cont, i + 1);
 			}
 		}
 	}
