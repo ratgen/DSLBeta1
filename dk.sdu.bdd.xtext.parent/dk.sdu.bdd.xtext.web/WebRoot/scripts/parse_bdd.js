@@ -10,6 +10,19 @@ function parsebdd() {
     fullText[i] = fullText[i].replace(/\t/g, '')
   }
 
+  parsed.entities = parseEntities(fullText)
+  parsed.scenarios = parseScenarios(fullText)
+
+
+  console.log(fullText)
+}
+
+function removeSpaces(string) {
+  return string.replace(/ *(.*) */g, '$1')
+}
+
+function parseEntities (fullText) {
+  let entities = [] 
   for (i in fullText) {
     if (fullText[i].replace(/(entity) .*/g,'$1') == 'entity') {
       let newEntity = {};
@@ -26,20 +39,33 @@ function parsebdd() {
         if (fullText[j].includes(',')) {
           values = properties[1].split(',')
           for(val in values) {
-            values[val] = values[val].replace(/ *(.*) */g, '$1')
+            values[val] = removeSpaces(values[val])
           }
         } else {
-          values = properties[1] 
+          values = [removeSpaces(properties[1])]
         }
         newEntity[properties[0]] = values
       }
-      parsed.entities.push(newEntity)
+      entities.push(newEntity)
     }
   }
-  console.log(parsed)
-
-  console.log(fullText)
+  return entities
 }
+
+function parseScenarios(fullText) {
+  scenarios = []
+  
+  for ( i in fullText) {
+    //start of scenario block
+    if (fullText[i].contains('Scenario')) {
+      let newScenario = {};
+      newScenario.name = fullText[i]
+
+        
+    }
+  }
+}
+
 
 let parsed;
 let parseBtn = document.getElementById("parse-bdd");
