@@ -1,0 +1,3 @@
+[submodule "dk.sdu.bdd.xtext.parent/dk.sdu.bdd.xtext.web/WebRoot/behave-robot"]
+	path = dk.sdu.bdd.xtext.parent/dk.sdu.bdd.xtext.web/WebRoot/behave-robot
+	url = git@github.com:yonraf/behave-robot.git
