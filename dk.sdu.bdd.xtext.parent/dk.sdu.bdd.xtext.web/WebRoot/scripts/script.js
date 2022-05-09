@@ -59,22 +59,33 @@ function getSavedDocument(editor) {
 
 let entities = document.getElementById('xtext-editor-entities')
 let entitiesTab = document.getElementById('entity-tab')
+let entitiesBlock = document.getElementById('blockly-editor')
 let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
+let scenarioBlock = document.getElementById('blockly-editor2')
 
-function displayEditor(currentEditor, newEditor) {
+function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
   currentEditor.style.display = "none"
+  currentBlockly.style.display = "none"
   newEditor.style.display = "block"
+  newBlockly.style.display = "block"
 }
 
 function switchEditor(e) {
-  if (e.target != currentTab ) {
+	var b = ""
+    if (e.target != currentTab ) {
     removeSelectionBorder(currentTab)
     let editorId = e.target.dataset.editorId
+    
+    if (editorId == "xtext-editor-entities") {b = "blockly-editor"}
+    else if (editorId == "xtext-editor-scenarios") {b = "blockly-editor2"}
+	
     let editor = document.getElementById(editorId)
-    displayEditor(currentEditor, editor)
+    let blockly = document.getElementById(b)
+    displayEditor(currentEditor, editor, currentBlockly, blockly)
     currentEditor = editor
     currentTab = e.target
+    currentBlockly = blockly
     setSelectionBorder(currentTab)
   }
 }
@@ -91,16 +102,9 @@ if (entitiesTab != undefined)
   entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
-currentEditor = scenario;
-currentTab = scenarioTab
-setSelectionBorder(scenarioTab)
 
-
-let astBtn = document.getElementById('get-ast')
-astBtn.onclick = () => {
-  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
-    .then(response => response.json())
-    .then(response => {
-      console.log(response)
-    })
-}
+  
+currentEditor = entities
+currentTab = entitiesTab
+currentBlockly = entitiesBlock
+setSelectionBorder(entitiesTab)

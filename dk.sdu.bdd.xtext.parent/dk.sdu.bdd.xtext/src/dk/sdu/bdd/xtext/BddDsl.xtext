@@ -17,7 +17,7 @@ ModelRef:
 ;
 
 EntityDef:
-	'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [EntityDef] (',' superEntities += [EntityDef])*)? '{'
+	'entity' name = ID ('-'WORD)? ('is' superEntities += [EntityDef] (',' superEntities += [EntityDef])*)? '{'
 		('actions:' (actions += ActionDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') actions += ActionDef)*)?
 		('states:' (states += StateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += StateDef)*)?
 		('properties:' (properties += PropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += PropertyDef)*)?
