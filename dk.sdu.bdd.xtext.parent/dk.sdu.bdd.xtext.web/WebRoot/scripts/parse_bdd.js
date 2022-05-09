@@ -14,7 +14,7 @@ function parsebdd() {
   parsed.scenarios = parseScenarios(fullText)
 
 
-  console.log(fullText)
+  return parsed
 }
 
 function removeSpaces(string) {
@@ -55,15 +55,26 @@ function parseEntities (fullText) {
 function parseScenarios(fullText) {
   scenarios = []
   
-  for ( i in fullText) {
+  for (i in fullText) {
     //start of scenario block
-    if (fullText[i].contains('Scenario')) {
+    if (fullText[i].includes('Scenario')) {
       let newScenario = {};
-      newScenario.name = fullText[i]
+      newScenario.name = fullText[i].split(':')[1].replace(/ *(.*)/g, '$1')
 
-        
+      newScenario.given = {}
+      newScenario.given.name = fullText[parseInt(i) + 1]
+      newScenario.given.given = fullText[parseInt(i) + 3]
+      
+
+      newScenario.when = {}
+
+      newScenario.then = {}
+
+      scenarios.push(newScenario)
     }
   }
+
+  return scenarios
 }
 
 
@@ -71,5 +82,6 @@ let parsed;
 let parseBtn = document.getElementById("parse-bdd");
 parseBtn.onclick = () => {
   parsed = parsebdd()
+  console.log(parsed)
 }
 
