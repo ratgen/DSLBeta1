@@ -52,24 +52,75 @@ function parseEntities (fullText) {
   return entities
 }
 
+//Get an entire block (eg. an entire top-level given/when/then section)
+function getSection(fullText, start, searchString) {
+  let sec = {}
+
+  if (fullText[start].includes(searchString)) {
+    let section = sliceSection(fullText, parseInt(start))
+
+    sec = {
+      name: section.content[0],
+      given: section.content[1],
+      when: section.content[2],
+      then: section.content[3],
+      lines: section.lines
+    }
+  }
+  return sec
+}
+
+//slice a section from the text into a sub-array
+function sliceSection(array, start) {
+  let end = parseInt(start)
+
+  for (end; end < array.length; end++) {
+    //concat And section to the correct lower section
+    if (array[end].includes("And")) {
+      array[end - 1] = array[end - 1] + " " + array[end]
+      array.splice(end, 1)
+      end--
+    }
+    // stop searching if a then block is encounteres (if not top level)
+    if (array[end].includes("Then") && end - start + 1 > 1)
+      break 
+  }
+
+  array = array.slice(start, end + 1) //slice the sub-array
+  array.splice(1, 1) //splice out "which means"
+  return { content: array, lines:  end - start + 1}
+}
+
 function parseScenarios(fullText) {
   scenarios = []
   
   for (i in fullText) {
     //start of scenario block
     if (fullText[i].includes('Scenario')) {
-      let newScenario = {};
+      let newScenario = {
+        name: '',
+        given: {},
+        when: {},
+        then: {}
+      };
       newScenario.name = fullText[i].split(':')[1].replace(/ *(.*)/g, '$1')
 
-      newScenario.given = {}
-      newScenario.given.name = fullText[parseInt(i) + 1]
-      newScenario.given.given = fullText[parseInt(i) + 3]
-      
+      let j = parseInt(i) + 1
 
-      newScenario.when = {}
 
-      newScenario.then = {}
-
+      outerDef: for (j; j < fullText.length; j++) {
+        newScenario.given = getSection(fullText, j, "Given");
+        if ("lines" in newScenario.given)
+          j = j + newScenario.given.lines
+        newScenario.when = getSection(fullText, j, "When")
+        if ("lines" in newScenario.when)
+          j = j + newScenario.when.lines
+        let thi = getSection(fullText, j , "Then")
+        if (thi != undefined && "then" in thi && thi.then != '') {
+            newScenario.then = thi
+            break outerDef
+        }
+      }
       scenarios.push(newScenario)
     }
   }
@@ -82,6 +133,5 @@ let parsed;
 let parseBtn = document.getElementById("parse-bdd");
 parseBtn.onclick = () => {
   parsed = parsebdd()
-  console.log(parsed)
 }
 
