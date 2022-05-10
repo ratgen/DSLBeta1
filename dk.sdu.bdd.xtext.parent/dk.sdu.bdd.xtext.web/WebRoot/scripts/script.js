@@ -107,4 +107,5 @@ if (scenarioTab != undefined)
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
+
 setSelectionBorder(entitiesTab)

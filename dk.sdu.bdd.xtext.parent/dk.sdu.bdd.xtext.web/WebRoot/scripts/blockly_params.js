@@ -652,6 +652,36 @@ var scenarioToolbox = {
     },
     {
       "kind": "category",
+      "name": "And blocks",
+      "contents": [
+        {
+          "kind": "block",
+          "type": "andEntityBlock"
+        },
+        {
+		  "kind": "block",
+		  "type": "andEntityPropertyBlock"
+		},
+        {
+          "kind": "block",
+          "type": "andActionBlock"
+        },
+        {
+          "kind": "block",
+          "type": "andMultipleEntitiesBlock"
+        },
+        {
+          "kind": "block",
+          "type": "andThenEntityBlock"
+        },
+        {
+          "kind": "block",
+          "type": "andThenEntityPropertyBlock"
+        },
+	]
+  	},
+    {
+      "kind": "category",
       "name": "Text blocks",
       "contents": [
         {
@@ -681,6 +711,7 @@ function getText(a){
 }
 
 function printNestedChildren(a, e){
+<<<<<<< HEAD
   let s = "";
   a.forEach((element) => {
     if (element.getFieldValue("TEXT2") != null && element.getSurroundParent().id == e.id) {
@@ -692,6 +723,23 @@ function printNestedChildren(a, e){
     }
   })
   return s;
+=======
+	let s = "";
+	a.forEach((element) => {
+		if (element.getSurroundParent() != null){
+			if (element.getSurroundParent().id == e.id){
+			console.log("fieldvalue: " + element.getFieldValue("TEXT2"))
+			console.log("parent: " + e.type)
+			if (element.getNextBlock() != null && element.getFieldValue("TEXT2") != null) {
+			s = s + element.getFieldValue("TEXT2") + ", "
+			} else {
+				s = s + element.getFieldValue("TEXT2")
+				return s
+			}
+		}
+		}
+	})
+	return s
 }
 
 function addNestedBlocks(a, e){
@@ -891,6 +939,138 @@ function createString(e){
   }
 
   return s
+	var s = ""
+	var i = 0
+	switch (e.type) {
+		case "givenEntityblock": case "thenEntityblock": case "andEntityBlock": case "andThenEntityBlock":
+			console.log(e.type)
+			if (e.getChildren().length >= 2){
+				e.getChildren().forEach((element) => {
+						if (element.type == "entityRef") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s1 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityStateRef") {
+							if (element.getFieldValue("ENTITYSTATE") != null) {
+								s2 = element.getFieldValue("ENTITYSTATE")
+							}
+						}
+				})
+			
+			s = s + s1 +
+			"\"" + e.getFieldValue("TEXT") + "\"" + " " +
+			e.getFieldValue("FIELDNAME") + " "
+			
+			if (e.getFieldValue("not") == "TRUE"){
+				s = s + "not" + " "
+			}
+			s = s + s2
+			}
+			break;
+		
+		case "givenEntityPropertyblock": case "thenEntityPropertyblock": case "andEntityPropertyBlock": case "andThenEntityPropertyBlock":
+			if (e.getChildren().length >= 2) {
+				e.getChildren().forEach((element) => {
+						if (element.type == "entityRef") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s2 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityPropertyRef") {
+							if (element.getFieldValue("ENTITYPROPERTY") != null) {
+								s1 = element.getFieldValue("ENTITYPROPERTY") + " "
+							}
+						}
+				})
+				
+				s = s1 + 
+				e.getFieldValue("prep") + " " +
+				"the " +
+				s2 +
+				"\"" + e.getFieldValue("entityname") + "\"" + " "
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "not" + " "
+				}
+				s = s + e.getFieldValue("FIELDNAME") + " " + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\"" + " "
+			}
+			break;
+			
+		case "whenActionBlock": case "andActionBlock":
+			if (e.getChildren().length >= 2) {
+				e.getChildren().forEach((element) => {
+						if (element.type == "entityRef") {
+							if (element.getFieldValue("ENTITY") != null) {
+								s2 = element.getFieldValue("ENTITY")
+							}
+						} else if (element.type == "entityActionRef") {
+							if (element.getFieldValue("ENTITYACTION") != null) {
+								s1 = element.getFieldValue("ENTITYACTION")
+							}
+						}
+				})
+				
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "do not" + " "
+				}
+				s = s + s1 + " " +
+				e.getFieldValue("prep") + " " + 
+				"the " + 
+				s2 + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\""
+			}
+			break;
+			
+		case "whenMultipleEntitiesBlock": case "andMultipleEntitiesBlock": 
+			check = false
+			if (e.getChildren().length > 2) {
+				e.getChildren().forEach((element) => {
+						if (element.type == "entityRef") {
+							if (element.getFieldValue("ENTITY") != null) {
+								if (check == false){
+									s2 = element.getFieldValue("ENTITY")
+									check = true
+								} else if (check == true) {
+									s3 = element.getFieldValue("ENTITY")
+								}
+							}
+						} else if (element.type == "entityActionRef") {
+							if (element.getFieldValue("ENTITYACTION") != null) {
+								s1 = element.getFieldValue("ENTITYACTION")
+							}
+						}
+				})
+				
+				if (e.getFieldValue("not") == "TRUE"){
+					s = s + "do not" + " "
+				}
+				s = s + s1 + " " +
+				e.getFieldValue("prep") + " " +
+				"the " + 
+				s2 + 
+				"\"" + e.getFieldValue("entitypropertyname") + "\"" +
+				e.getFieldValue("prep2") + " " + 
+				"the " + 
+				s3 + 
+				"\"" + e.getFieldValue("entitypropertyname2") + "\" "
+			}
+			break;
+			
+		case "modelUsingBlock":
+			if (e.getChildren().length > 1) {
+				e.getChildren().forEach((element) => {
+					if (element.type == "textblock"){
+						s1 = element.getFieldValue("TEXT")
+					} else if (element.type == "modelRef"){
+						s2 = element.getFieldValue("MODEL")
+					}
+				})
+			s = s1 + " using " + s2
+			}
+			break;
+			
+	}
+	
+	return s
 }
 
 function addBlocksToArray(a){
@@ -1003,7 +1183,6 @@ function createEntityBlocks() {
 };
 
 var entityWorkspace = Blockly.inject("blockly-editor", {toolbox: entityToolbox});
-
 var scenarioWorkspace = Blockly.inject("blockly-editor2", {toolbox: scenarioToolbox});
 
 scenarioWorkspace.registerToolboxCategoryCallback(
@@ -1012,33 +1191,42 @@ scenarioWorkspace.registerToolboxCategoryCallback(
 scenarioWorkspace.registerToolboxCategoryCallback(
   "getModel", createModelBlock);
 
-function onchange(event){	
-  let entityBlockArray = entityWorkspace.getAllBlocks();
-  let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+function onClick(event) {
+	Blockly.svgResize(scenarioWorkspace);
+	Blockly.svgResize(entityWorkspace);
+}
 
-  let entityTab = editors[0].env.document.doc;
-  let scenarioTab = editors[1].env.document.doc;
-
-  scenarioArray = []
-  entityArray = []
-
-  scenarioTab.removeFullLines(0, scenarioTab.getLength());
-  entityTab.removeFullLines(0, entityTab.getLength());
-
-  entityBlockArray.forEach((block) => {
-    if (block.type == "modelblock"){
-      scenarioArray = addBlocksToArray(block.getDescendants());
-    }
-  })
-
-  scenarioBlockArray.forEach((block) => {
-    if (block.type == "modelUsingBlock"){
-      entityArray = addBlocksToArray(block.getDescendants());
-    }
-  })
-
-  scenarioTab.insertFullLines(0, scenarioArray);
-  entityTab.insertFullLines(0, entityArray);
+function onchange(event){
+	console.log(event)
+	let entityBlockArray = entityWorkspace.getAllBlocks();
+	let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+	
+	let entityTab = editors[0].env.document.doc;
+	let scenarioTab = editors[1].env.document.doc;
+	
+	scenarioArray = []
+	entityArray = []
+	
+	scenarioTab.removeFullLines(0, scenarioTab.getLength());
+	entityTab.removeFullLines(0, entityTab.getLength());
+	
+	entityBlockArray.forEach((block) => {
+		if (block.type == "modelblock"){
+			scenarioArray = addBlocksToArray(block.getDescendants());
+			}
+	})
+	
+	scenarioBlockArray.forEach((block) => {
+		if (block.type == "modelUsingBlock"){
+			entityArray = addBlocksToArray(block.getDescendants());
+		}
+	})
+	
+	scenarioTab.insertFullLines(0, scenarioArray);
+	entityTab.insertFullLines(0, entityArray);
+	
+	Blockly.svgResize(scenarioWorkspace);
+	Blockly.svgResize(entityWorkspace);
 }
 
 document.getElementById('blockly-editor2').style.display = "none"
@@ -1047,3 +1235,8 @@ entityWorkspace.addChangeListener(onchange);
 scenarioWorkspace.addChangeListener(onchange);
 
 onchange();
+window.addEventListener('click', onClick, false);
+
+onchange();
+
+onResize(); 
