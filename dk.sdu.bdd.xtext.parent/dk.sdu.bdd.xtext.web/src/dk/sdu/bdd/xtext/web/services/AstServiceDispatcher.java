@@ -86,30 +86,4 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	    }
 	    return res;
 	}
-	private void eContentExplorer(EObject obj, int i) {
-		System.out.println("level" + i);
-		for (EObject cont : obj.eContents()) {
-			System.out.println("EObject content string: " + cont.toString());
-			if(cont.getClass() == ScenarioStateImpl.class) {
-				EList<StatePhrase> states = ((ScenarioStateImpl) cont).getStates();
-				for (StatePhrase stat : states) {
-					System.out.println(" entity " + stat.getEntity());
-					System.out.println(" propery " + stat.getProperty());
-				}
-			}
-			if(cont.getClass() == ScenarioImpl.class) {
-				ScenarioImpl scenario = (ScenarioImpl) cont;
-				System.out.println(scenario.getName());
-				System.out.println("done with pre and post");
-			}
-			if(cont.getClass() == EntityPropertyStatePhraseImpl.class) {
-				EntityPropertyStatePhraseImpl entity = (EntityPropertyStatePhraseImpl) cont;
-				System.out.println(entity.getProperty());
-			}
-			if (cont.eContents().size() != 0) {
-				eContentExplorer(cont, i + 1);
-			}
-		}
-	}
-	
 }
