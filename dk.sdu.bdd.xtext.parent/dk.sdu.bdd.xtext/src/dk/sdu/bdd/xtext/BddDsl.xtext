@@ -18,128 +18,102 @@ ModelRef:
 
 EntityDef:
 	'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [EntityDef] (',' superEntities += [EntityDef])*)? '{'
-		('actions:' (actions += ActionDef) (',' actions += ActionDef)*)?
+		('actions:' (actions += ActionDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') actions += ActionDef)*)?
 		('states:' (states += StateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += StateDef)*)?
 		('properties:' (properties += PropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += PropertyDef)*)?
 	'}'
 ;
 
 ActionDef:
-	name = WORD WORD?
+	name = WORD ('and'|'the')? (WORD)? (argument = WORD)? ((preposition = PREP)? | (optionalPref ?= '['? (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']'?))	
+	
 ;
 
-PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with');
+PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'of');
 WORD: ID;
 
 
-StateDef: postive = StateName PREP? ('/' negative = StateName)?;
+
+StateDef: positive = StateName PREP? ('/' negative = StateName)?;
 StateName: name = (WORD) ('and'|'off')?  (WORD)?;
 
 PropertyDef: name = WORD (plural ?= '*')?;
 
-
-
+//
 
 ID_OR_STRING: (ID | STRING);
 
+
 Scenario:
-       'Scenario:' name = ID_OR_STRING WORD? ('out'|'off'|'on'|'in'|'-'|'the'|'to' 'the'|'to')? WORD? ('off'|'on'|'in'|'-'|'the')? WORD? ('on'|'in'|'-'|'the')? WORD? ('in'|'-'|'the')? WORD?
-       ((('Given''the'|'Given''I'|'Given') ('do' 'not')? ((OPTION)) | ('Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = HighLevelScenarioState))
-       'which' 'means')?
+       'Scenario:' name = ID_OR_STRING (WORD)*
        
-       'Given' preState = ScenarioState
-       'When' action = ScenarioAction
-       'Then' postState = ScenarioState
+       ('Given'('the'|'all' 'the') preStateE = ScenarioState
+       'which' 'means'
        
+       'Given' ('the'|'all' 'the')? preState = ScenarioState
+       'When' 'I' ('do' 'not')? action = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState = ScenarioState
+      	
+       'When''I' ('do' 'not')? actionE = ScenarioAction
+       'which' 'means'
        
-       (((('When' 'I'|'When' 'the'|'When'|'And''I') ('do' 'not')? ((OPTION))) | ((('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I') | ('When')) actionE = HighLevelScenarioAction ))
-       'which' 'means')?
+       'Given' ('the'|'all' 'the')? preState1 = ScenarioState
+       'When' 'I' ('do' 'not')? action1 = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState1 = ScenarioState
        
-       'Given' preState1 = ScenarioState
-       'When' action1 = ScenarioAction
-       'Then' postState1 = ScenarioState
+       'Then''the' ('do' 'not')?  preStateE1 = ScenarioState
+       'which' 'means'
        
+       'Given' ('the'|'all' 'the')? preState2 = ScenarioState
+       'When' 'I' ('do' 'not')? action2 = ScenarioAction 
+       'Then' ('the'|'all' 'the')? postState2 = ScenarioState)
        
-       ((('Then''the'|'Then''I'|'Then') ('do' 'not')? ((OPTION)) | ('Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = HighLevelScenarioState))
-       'which' 'means')?
-       
-       'Given' preState2 = ScenarioState
-       'When' action2 = ScenarioAction
-       'Then' postState2 = ScenarioState
 ;
 
 
 ScenarioState:
-	states += StatePhrase ('And' states += StatePhrase)*
-;
-
-HighLevelScenarioState:
-	states += HighLevelStatePhrase ('And' states += HighLevelStatePhrase)*
+	states += StatePhrase (('And' 'the') states += StatePhrase)*
 ;
 
 ScenarioAction:
-	actions += ActionPhrase ('And' actions += ActionPhrase)*
+	actions += ActionPhrase (('And' 'I') actions += ActionPhrase)*
 ;
 
-HighLevelScenarioAction:
-	actions += HighLevelActionPhrase ('And' actions += HighLevelActionPhrase)*
-;
+StatePhrase: EntityPropertyStatePhrase | EntityStatePhrase;
 
-StatePhrase: epsp = EntityPropertyStatePhrase | esp = EntityStatePhrase;
- //sr = ScenarioRef | 
 
-HighLevelStatePhrase: sr = ScenarioRef | HighLevelEntityPropertyStatePhrase | esp = HighLevelEntityStatePhrase;
-
+/*
 ScenarioRef:
 	scenarioRef = [Scenario | ID_OR_STRING]
 ;
+*/
 
 //ENTITY_IDENTITY: '#'? (INT | STRING);
-ENTITY_IDENTITY: ('#'INT) | STRING;
+ENTITY_IDENTITY: '#'? (INT | STRING);
 OPTION:'#'? (INT | STRING) ;
 
 EntityRef:
-	 'the' entity = [EntityDef] name = STRING
-;
-
-HighLevelEntityRef:
-	(WORD OPTION 'for' 'the')? ('for'|'of')? (('the'|'all' 'the') entity = [EntityDef | WORD] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
+		(entity = [EntityDef | WORD] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
 ;
 
 EntityStatePhrase:
-	entity = EntityRef 'is' state = [StateName]
-;
-
-HighLevelEntityStatePhrase:
-	(property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('for'|'for' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'))? 
-	entity = EntityRef ('is'|'are') 'not'? state = [StateName] WORD?	
+	(property = [PropertyDef|WORD]? OPTION? (PREP|PREP 'the'))? 
+	entity = EntityRef ('is'|'are') 'not'? state += [StateName] WORD?
 ;
 
 EntityPropertyStatePhrase:
-	 'the' property = [PropertyDef] ('of'|'for') entity = EntityRef 'is' propertyValue = StringValue 
+	  property = [PropertyDef|WORD]? OPTION? (PREP|PREP 'the') entity = EntityRef
+	('is' OPTION = PropertyValue)
 ;
-
-HighLevelEntityPropertyStatePhrase:
-	property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = HighLevelEntityRef
-	((('is'|'is' 'not') value = PropertyValue WORD?) WORD? | (('are'|'are' 'not') (values += PropertyValue) WORD? | (',' values += PropertyValue)*) WORD?) 
-;
-
-
 
 //terminal UNCLOSED_STRING : '"' (!'"')* EOF;
 
-PropertyValue: SimpleValue | ListValue | SetValue
-	
-;
+PropertyValue: SimpleValue | ListValue | SetValue;
 
-SimpleValue: IntValue | BooleanValue | StringValue | DoubleValue;
+SimpleValue: IntValue | BooleanValue | StringValue;
 
 ListValue:
 	{ListValue} '[' (values += SimpleValue (',' values += SimpleValue)*)? ']'
-;
-
-NestedList:
-	{NestedList} '[' (values += ListValue (',' values += ListValue)*)? ']'
 ;
 
 SetValue:
@@ -148,14 +122,10 @@ SetValue:
 
 StringValue:
 	value = STRING
-;	
+;
 
 IntValue:
 	value = INT
-;
-
-DoubleValue:
-	value = DOUBLE
 ;
 
 TRUE: ('true' | 'yes');
@@ -165,30 +135,10 @@ BooleanValue:
 	value = (TRUE | FALSE)
 ;
 
-
-ActionPhrase: EntityAction;
-
-HighLevelActionPhrase:
-	HighLevelEntityAction | VerifyAction | VerbAction
-;
+ActionPhrase: VerbAction;
 
 VerbAction:
-	action = ActionRef 'and'? WORD? 'on'? (WORD'-'WORD)? ('for' 'the'| 'the'|'on')? (entity = EntityDef)? ('on'|'off'|'in')? entity2 = EntityRef ('on'|'off'|'in')? ('of'|'for'|'for' 'the'|'of' 'the')? PREP? entity3 = EntityRef?
+	verb = [ActionDef | WORD] (OPTION? (PREP 'the'|PREP))? 
+	('the' entity = EntityRef OPTION? | entity1 = EntityRef OPTION? ((PREP 'the'|PREP?) 
+	  entity2 = EntityRef OPTION?)?)? 
 ;
-
-EntityAction: entityAction = EntityRef ('linearly')? actionDef = [ActionDef] (propertyRef = PropertyRef)?;
-
-HighLevelEntityAction: entityAction = HighLevelEntityRef (actionDef = ActionDef) (entityRef = HighLevelEntityRef)? (propertyRef = PropertyRef)?;
-
-
-PropertyRef:
-    propertyref = 'to' property = [PropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [PropertyDef])? 
-;
-
-ActionRef: verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = EntityDef))? ;
-
-VerifyAction:
-	'assure' state = StatePhrase
-;
-
-DOUBLE returns ecore::EDouble : INT'.'INT;

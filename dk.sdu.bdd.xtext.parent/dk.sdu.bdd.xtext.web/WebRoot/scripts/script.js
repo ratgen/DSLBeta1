@@ -109,3 +109,12 @@ currentTab = entitiesTab
 currentBlockly = entitiesBlock
 
 setSelectionBorder(entitiesTab)
+
+let astBtn = document.getElementById('get-ast')
+astBtn.onclick = () => {
+  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
+    .then(response => response.json())
+    .then(response => {
+      console.log(response)
+    })
+}
