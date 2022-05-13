@@ -50,7 +50,7 @@ Scenario:
        ('Given'('the'|'all' 'the') preStateE = ScenarioState
        'which' 'means'
        
-       'Given' ('the'|'all' 'the')? preState = ScenarioState
+       'Given' ('the'|'all' 'the'|'all' 'of' 'the')? preState = ScenarioState
        'When' 'I' ('do' 'not')? action = ScenarioAction 
        'Then' ('the'|'all' 'the')? postState = ScenarioState
       	
