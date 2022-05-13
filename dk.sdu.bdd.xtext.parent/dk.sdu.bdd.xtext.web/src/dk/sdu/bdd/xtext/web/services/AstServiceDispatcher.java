@@ -108,15 +108,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	private JSONObject parseLoop(EObject obj) {
-		if (obj.getClass() == GroupImpl.class) {
+		if (obj.getClass() == GroupImpl.class) {:w
+		
 			
 			obj.eContents().forEach(
 					(item) -> {parseLoop(item);}
 			);
 		}
 		if (obj.getClass() == KeywordImpl.class) {
-					
-				}
+
+		}
 		if (obj.getClass() == AssignmentImpl.class) {
 			
 		}
