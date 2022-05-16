@@ -78,6 +78,7 @@
 			<artifactId>dk.sdu.bdd.xtext</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>${project.groupId}</groupId>
 			<artifactId>dk.sdu.bdd.xtext.ide</artifactId>
