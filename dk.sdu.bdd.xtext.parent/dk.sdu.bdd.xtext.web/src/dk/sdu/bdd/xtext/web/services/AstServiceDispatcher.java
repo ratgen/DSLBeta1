@@ -3,7 +3,7 @@ package dk.sdu.bdd.xtext.web.services;
 import java.util.ArrayList;
 
 import org.eclipse.emf.common.util.EList;
-
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EPackage;
@@ -101,34 +101,112 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	//Parse a rule and return a Blockly Block representing the Rule
 	private JSONObject parseRule(ParserRule rule) {
 		JSONObject json = new JSONObject();
+		json.put("output", rule.getName());
 		
-		parseLoop(rule, json);
+		TreeIterator<EObject> iterator =  rule.eAllContents();
+
+		while(iterator.hasNext()) {
+			EObject next = iterator.next();
+			
+			System.out.println(next);
+		}
+		
+		EList<EObject> ruleContents = rule.eContents();
+		
+		
+		//JSONObject result = parseLoop(ruleContents.get(1));
+		//json.putAll(result);
 		
 		return json;
 	}
 	
 	private JSONObject parseLoop(EObject obj) {
+		JSONObject json = new JSONObject();
+		
+		String message0 = "";
+		int argCount = 1;
+		JSONArray arguments = new JSONArray();
+		json.put("args0", arguments);
 		
 		if (obj.getClass() == GroupImpl.class) {
-			
-			
-			//obj.eContents().forEach((item) -> {parseLoop(item);});
+			for (EObject groupMemeber : obj.eContents() ) {
+				return parseLoop(groupMemeber);
+			}
 		}
 		if (obj.getClass() == KeywordImpl.class) {
-
+			Keyword keyWord = (Keyword) obj;
+			message0 = message0.concat(parseKeyword(keyWord) + " ");
 		}
 		if (obj.getClass() == AssignmentImpl.class) {
+			Assignment assignment = (Assignment) obj;
+			ParserRule rule = (ParserRule) assignment.eContents().get(0).eCrossReferences().get(0);
+			message0 = message0.concat("%" + argCount + " ");
+			argCount++;
 			
+			JSONObject argument = new JSONObject();
+			argument.put("type", "input_value");
+			argument.put("name", "feature_name_" + assignment.getFeature());
+			argument.put("check", rule.getName());
+			
+			arguments.add(argument);
 		}
 		if (obj.getClass() == RuleCallImpl.class) {
+			RuleCall rule = (RuleCall) obj;
+			EObject reference = rule.eCrossReferences().get(0);
+			
+			if (reference.getClass() == ParserRule.class) {
+				ParserRule parserRule = (ParserRule) reference;
+				message0 = message0.concat("%" + argCount + " ");
+				argCount++;
+				
+				JSONObject argument = new JSONObject();
+				argument.put("type", "input_value");
+				argument.put("name", "name_" + parserRule.getName());
+				argument.put("check", parserRule.getName());
+				
+				arguments.add(argument);
+			}
+			
 			
 		}
 		if (obj.getClass() == AlternativesImpl.class) {
+			Alternatives alternatives = (Alternatives) obj;
+			
+			message0 = message0.concat("%" + argCount + " ");
+			argCount++;
+			
+			JSONObject argument = new JSONObject();
+			argument.put("type", "field_dropdown");
+			argument.put("name", "ALTERNATIVES");
+			
+			JSONArray argumentOptions = new JSONArray();
+			argument.put("options", argumentOptions);
+			
+			EList<EObject> altContents = alternatives.eContents();
+			for (EObject content : altContents) {
+				if (content.getClass() == Keyword.class) {
+					Keyword keyWord = (Keyword) content;
+					argumentOptions.add(parseKeyword(keyWord));
+				}
+				
+				if(content.getClass() == Group.class) {
+					String option = "";
+					EList<EObject> groupContent = content.eContents();
+					
+					for (EObject groupMember : groupContent) {
+						if (groupMember.getClass() == Keyword.class) {
+							Keyword keyWord = (Keyword) groupMember;
+							option = option.concat(parseKeyword(keyWord));
+						}
+						
+					}
+				}
+			}
 			
 		}
 		if (obj.getClass() == CrossReference.class) {
 		}
-		return null;
+		return json;
 	}
 	
 	
