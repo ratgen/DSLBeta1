@@ -1,12 +1,9 @@
 package dk.sdu.bdd.xtext.web.services;
 
-import java.util.ArrayList;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.xtext.web.server.IServiceContext;
@@ -15,7 +12,6 @@ import org.eclipse.xtext.web.server.XtextServiceDispatcher;
 import org.eclipse.xtext.web.server.model.IWebResourceSetProvider;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
@@ -85,11 +81,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					
 				JSONObject block = parseRule(parserRule);
 				blockArray.add(block);
-				System.out.println(block);
-				System.out.println("rule contents: \n" + dump(rule, "    ")); 
 			}
 		}
 		
+		System.out.println(blockArray);
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 		serviceDescriptor.setService(() -> {
@@ -101,7 +96,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	//Parse a rule and return a Blockly Block representing the Rule
 	private JSONObject parseRule(ParserRule rule) {
 		JSONObject json = new JSONObject();
+		json.put("type", rule.getName());
 		json.put("output", rule.getName());
+		json.put("message0", "");
 		
 		TreeIterator<EObject> iterator =  rule.eAllContents();
 
