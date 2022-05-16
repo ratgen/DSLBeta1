@@ -1,24 +1,36 @@
 model widgets
 
-entity robot {
-	actions: linearly moves, moves
+imperative_entity robot {
+	actions: moves
 	properties: position, speed
 }
 
-entity gripper {
+imperative_entity gripper {
 	actions: closes, opens
-	states: closed, open	
+	states: closed, opened	
 }
 
-entity input {
+imperative_entity input {
 	actions: void
 	states: ON/OFF 
 	properties: signal
 }
 
-entity output {
+imperative_entity sensor is input {
+}
+
+imperative_entity button is input {
+}
+
+imperative_entity output {
 	actions: activates, deactivates
 	states: ON/OFF
+}
+
+imperative_entity light is output {
+}
+
+imperative_entity buzzer is output {
 }
 
 
