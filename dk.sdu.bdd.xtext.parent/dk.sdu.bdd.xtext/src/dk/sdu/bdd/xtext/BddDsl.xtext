@@ -39,18 +39,15 @@ StateName: name = (WORD) ('and'|'off')?  (WORD)?;
 
 PropertyDef: name = WORD (plural ?= '*')?;
 
-//
-
-ID_OR_STRING: (ID | STRING);
 
 
 Scenario:
-       'Scenario:' name = ID_OR_STRING (WORD)*
+       'Scenario:' name = ID (WORD)*
        
        ('Given'('the'|'all' 'the') preStateE = ScenarioState
        'which' 'means'
        
-       'Given' ('the'|'all' 'the'|'all' 'of' 'the')? preState = ScenarioState
+       'Given' ('the'|'all' 'the')? preState = ScenarioState
        'When' 'I' ('do' 'not')? action = ScenarioAction 
        'Then' ('the'|'all' 'the')? postState = ScenarioState
       	
@@ -89,7 +86,7 @@ ScenarioRef:
 */
 
 //ENTITY_IDENTITY: '#'? (INT | STRING);
-ENTITY_IDENTITY: '#'? (INT | STRING);
+ENTITY_IDENTITY: '#'? (INT | ID);
 OPTION:'#'? (INT | STRING) ;
 
 EntityRef:

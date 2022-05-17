@@ -120,18 +120,31 @@ astBtn.onclick = () => {
       response.toolBox = JSON.parse(response.toolBox)
       Blockly.defineBlocksWithJsonArray(response.blocks)
 
+
+      let id_validator = function(newValue) {
+        //if it returns '', then the input is correct
+        let res = newValue.replace(/[\^a-zA-Z_][a-zA-Z_0-9]*/g, '')
+
+        if (res == ''){ 
+          return undefined;
+        }
+        return null;
+      }
+
+      Blockly.Blocks["ID"] = {
+        init: function() {
+          this.setOutput(true, 'ID')
+          this.appendDummyInput()
+            .appendField(new Blockly.FieldTextInput('ID', id_validator));
+
+        }
+      }
+
+      response.toolBox.contents[0].contents.push({"kind" : "block", "type" : "ID"})
+
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
       console.log(response)
-
-      scenarioWorkspace.registerToolboxCategoryCallback( "getEntities", createEntityBlocks);
-      scenarioWorkspace.registerToolboxCategoryCallback( "getModel", createModelBlock);
-
-      scenarioWorkspace.registerToolboxCategoryCallback(
-        "getEntities", createEntityBlocks);
-
-      scenarioWorkspace.registerToolboxCategoryCallback(
-        "getModel", createModelBlock);
 
       function onClick(event) {
         Blockly.svgResize(scenarioWorkspace);
@@ -179,5 +192,7 @@ astBtn.onclick = () => {
       window.addEventListener('click', onClick, false);
 
       onchange();
+      console.log(response)
     })
+
 }

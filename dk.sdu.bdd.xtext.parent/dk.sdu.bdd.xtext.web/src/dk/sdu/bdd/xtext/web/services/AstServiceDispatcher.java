@@ -12,19 +12,17 @@ import org.eclipse.xtext.web.server.XtextServiceDispatcher;
 import org.eclipse.xtext.web.server.model.IWebResourceSetProvider;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.eclipse.xtext.AbstractElement;
 import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
-import org.eclipse.xtext.impl.AlternativesImpl;
-import org.eclipse.xtext.impl.AssignmentImpl;
-import org.eclipse.xtext.impl.GroupImpl;
-import org.eclipse.xtext.impl.KeywordImpl;
-import org.eclipse.xtext.impl.ParserRuleImpl;
+import org.eclipse.xtext.TerminalRule;
 import org.eclipse.xtext.impl.RuleCallImpl;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
@@ -55,61 +53,41 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
 		String resource = context.getParameter("resource");
-		System.out.println("Resource " + resource);
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
 		
 		EList<Resource> list = resourceSet.getResources();
 		for (Resource item : list) {
 			URI uri = item.getURI();
-			System.out.println("Resource  URI: " + uri);
 			EList<EObject> objectContents = item.getContents();
-			System.out.println("item contents " + objectContents);
-			//for (EObject obj : objectContents) {
-				//System.out.println("EObject_string: " + obj.toString());
-				
-				
-				//System.out.println(dump(obj, "   "));
-			//}
 		}
+		
+		
+		//setup toolbox
 		JSONObject toolbox = new JSONObject();
-		JSONObject toolboxCategory = new JSONObject();
-		
-		toolboxCategory.put("kind", "category");
-		toolboxCategory.put("name", "all");
-		
-		JSONArray categoryContent = new JSONArray();
-		
 		toolbox.put("kind", "categoryToolbox");
 		
+		//contents toolbox
+		JSONArray toolboxContents = new JSONArray();
+		toolbox.put("contents", toolboxContents);
+
+		
+		JSONObject category = new JSONObject();
+		category.put("kind", "category");
+		category.put("name", "all");
+		
+		
+		toolboxContents.add(category);
+		
+		JSONArray categoryContent = new JSONArray();
+		category.put("contents", categoryContent);
 		
 		JSONArray blockArray = new JSONArray();
 
-		EList<AbstractRule> rules = grammarAccess.getGrammar().getRules();
-		for (AbstractRule rule : rules) {
-			System.out.println("rule: " + rule.getName());
-			if (rule.getClass() == ParserRuleImpl.class) {
-				ParserRule parserRule = (ParserRule) rule;
-					
-				JSONObject block = parseRule(parserRule);
-				blockArray.add(block);
 
-				
-				
-				JSONObject catItem = new JSONObject();
-				catItem.put("kind", "block");
-				catItem.put("type",  block.get("type"));
-				
-				
-				categoryContent.add(catItem);
-
-			
-				System.out.println(block);
-				System.out.println("rule contents: \n" + dump(rule, "    ")); 
-			}
-		}
+		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), categoryContent));
+		//blockArray.addAll(parseGrammar(grammarAccess.getTerminalsGrammarAccess().getGrammar(), categoryContent));
 		
-		toolboxCategory.put("contents", categoryContent);
-		toolbox.put("contents", toolboxCategory);
+		//addIdBlock(categoryContent, blockArray);
 
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
@@ -118,10 +96,69 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	     });
 		return serviceDescriptor;
 	}
+
+	private void addIdBlock(JSONArray categoryContent, JSONArray blockArray) {
+		//add terminals
+		JSONObject id = new JSONObject();
+		id.put("type", "ID");
+		id.put("message0", "%1");
+		id.put("output", "ID");
+
+		
+		JSONObject text = new JSONObject();
+		text.put("type", "field_input");
+		text.put("name", "ID");
+		text.put("text", "your_id");
+		text.put("spellcheck", false);
+		
+		JSONArray add = new JSONArray();
+		add.add(text);
+		
+		id.put("args0", add);
+		
+		blockArray.add(id);
+		
+		JSONObject cc = new JSONObject();
+		cc.put("kind", "block");
+		cc.put("type", "ID");
+		categoryContent.add(cc);
+	}
+	
+	JSONArray parseGrammar(Grammar grammar, JSONArray categoryContent) {
+		JSONArray blockArray = new JSONArray();
+		EList<AbstractRule> rules = grammar.getRules();
+
+		for (AbstractRule rule : rules) {
+			System.out.println("rule: " + rule.getName());
+			System.out.println(rule);
+			if (rule instanceof ParserRule) {
+				ParserRule parserRule = (ParserRule) rule;
+					
+				JSONObject block = parseRule(parserRule);
+				blockArray.add(block);
+
+				
+				JSONObject catItem = new JSONObject();
+				catItem.put("kind", "block");
+				catItem.put("type",  block.get("type"));
+				
+				categoryContent.add(catItem);
+
+				//System.out.println(block);
+				System.out.println("rule contents: \n" + dump(rule, "    ")); 
+			}
+			if (rule instanceof TerminalRule) {
+				System.out.println("rule contents: \n" + dump(rule, "    ")); 
+			}
+		}
+		
+		return blockArray;
+	}
 	
 	class ParseData {
 		String message;
 		JSONObject argument;
+		boolean prune;
 
 		public String getMessage() {
 			return message;
@@ -143,6 +180,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		ParseData(){
 			message = "";
 			argument = null;
+			prune = false;
+		}
+
+		public boolean isPrune() {
+			return prune;
+		}
+
+		public void setPrune(boolean prune) {
+			this.prune = prune;
 		}
 		
 		
@@ -172,8 +218,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					arguments.add(data.getArgument());
 					argCount++;
 				}
+				if (data.prune) {
+					iterator.prune();
+				}
 			}
-			System.out.println(next);
 		}
 		
 		json.put("message0", message0);
@@ -187,12 +235,54 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private ParseData parseLoop(EObject obj, int argCount) {
 		ParseData data = null;
 		
-		/*if (obj.getClass() == GroupImpl.class) {
-			for (EObject groupMemeber : obj.eContents() ) {
-				return parseLoop(groupMemeber, json);
+		if (obj instanceof Group) {
+			Group group = (Group) obj;
+
+			if (group.getCardinality() == null) {
+				return null;
 			}
-		}*/
-		if (obj.getClass() == KeywordImpl.class) {
+			
+			data = new ParseData();
+			
+			
+			data.setMessage("%" + argCount + " ");
+			
+			JSONObject argument = new JSONObject();
+			argument.put("type", "field_dropdown");
+			argument.put("name", "optional_GROUP");
+			
+			JSONArray argumentOptions = new JSONArray();
+			argument.put("options", argumentOptions);
+			
+			
+			String msg = "";
+			for (AbstractElement groupMember : group.getElements() ) {
+				if (groupMember instanceof Keyword) {
+					Keyword keyWord = (Keyword) groupMember;
+					msg = msg.concat(keyWord.getValue() + " ");
+				}
+			}
+			System.out.println("group mem" + msg);
+
+			JSONArray arr = new JSONArray();
+			arr.add(msg);
+			arr.add(msg);
+			
+			argumentOptions.add(arr.clone());
+			
+			if (group.getCardinality().equals("?")) {
+				arr.clear();
+				arr.add("");
+				arr.add("");
+				argumentOptions.add(arr);
+			}
+			System.out.println(argumentOptions);
+			data.setArgument(argument);
+			data.setPrune(true);
+			return data;
+		}
+		
+		if (obj instanceof Keyword) {
 			data = new ParseData();
 			Keyword keyWord = (Keyword) obj;
 			data.setMessage(keyWord.getValue() + " ");
@@ -208,24 +298,42 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			argument.put("check", rule.getName());
 			
 		}*/
-		if (obj.getClass() == RuleCallImpl.class) {
+		if (obj instanceof RuleCall) {
 			data = new ParseData();
 			RuleCall rule = (RuleCall) obj;
-			
 			AbstractRule abstractRule = rule.getRule();
-			
 			JSONObject argument = new JSONObject();
-			argument.put("type", "input_value");
-			argument.put("name", "name_" + abstractRule.getName());
-			argument.put("check", abstractRule.getName());
+			
+			//required
+			if (rule.getCardinality() == null) {
+				argument.put("type", "input_value");
+				argument.put("name", "name_" + abstractRule.getName());
+				argument.put("check", abstractRule.getName());
+			}
+			//one or more
+			else if (rule.getCardinality().equals("*")) {
+				argument.put("type", "input_value");
+				argument.put("name", "name_" + abstractRule.getName());
+				argument.put("check", abstractRule.getName());
+			}
+			//optional
+			else if (rule.getCardinality().equals("?")) {
+				argument.put("type", "input_value");
+				argument.put("name", "name_" + abstractRule.getName());
+				argument.put("check", abstractRule.getName());
+			}
+			
+			
 			
 			data.setArgument(argument);
 			data.setMessage("%" + argCount + " ");			
 		}
-		/*
-		if (obj.getClass() == AlternativesImpl.class) {
-			Alternatives alternatives = (Alternatives) obj;
+		
+		if (obj instanceof Alternatives) {
+			data = new ParseData();
+			data.setPrune(true);
 			
+			Alternatives alternatives = (Alternatives) obj;
 			
 			JSONObject argument = new JSONObject();
 			argument.put("type", "field_dropdown");
@@ -236,26 +344,44 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 			EList<EObject> altContents = alternatives.eContents();
 			for (EObject content : altContents) {
-				if (content.getClass() == Keyword.class) {
+				if (content instanceof Keyword) {
+					JSONArray arr = new JSONArray();
 					Keyword keyWord = (Keyword) content;
-					argumentOptions.add(parseKeyword(keyWord));
+					arr.add(keyWord.getValue());
+					arr.add(keyWord.getValue());
+
+					argumentOptions.add(arr);
 				}
 				
-				if(content.getClass() == Group.class) {
+				if(content instanceof Group) {
 					String option = "";
 					EList<EObject> groupContent = content.eContents();
 					
 					for (EObject groupMember : groupContent) {
-						if (groupMember.getClass() == Keyword.class) {
+						if (groupMember instanceof Keyword) {
 							Keyword keyWord = (Keyword) groupMember;
-							option = option.concat(parseKeyword(keyWord));
+							option = option.concat(keyWord.getValue() + " ");
 						}
 						
 					}
+					if (option != "") {
+						JSONArray arr = new JSONArray();
+						arr.add(option);
+						arr.add(option);
+
+						argumentOptions.add(arr);
+					}
 				}
 			}
+			if (argumentOptions.size() < 1) { 
+				return null;
+			}
 			
-		}*/
+			data.setArgument(argument);
+			data.setMessage("%" + argCount + " ");
+			
+			
+		}
 		if (obj.getClass() == CrossReference.class) {
 		}
 		return data;
