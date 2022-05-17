@@ -3,13 +3,15 @@ package dk.sdu.bdd.xtext.web.services;
 import org.eclipse.xtext.web.server.IServiceResult;
 
 public class AstServiceResult implements IServiceResult {
-	private final String astResult;
+	private final String blocks;
+	private final String toolBox;
 	
-	public AstServiceResult(String astResult){
-		this.astResult = astResult;
+	public AstServiceResult(String blocks, String toolBox){
+		this.blocks = blocks;
+		this.toolBox = toolBox;
 	}
 
 	public String getAstResult() {
-		return this.astResult;
+		return this.blocks + this.toolBox;
 	}
 }

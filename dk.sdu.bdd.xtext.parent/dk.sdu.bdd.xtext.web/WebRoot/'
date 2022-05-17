@@ -72,14 +72,14 @@ function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 }
 
 function switchEditor(e) {
-  var b = ""
-  if (e.target != currentTab ) {
+	var b = ""
+    if (e.target != currentTab ) {
     removeSelectionBorder(currentTab)
     let editorId = e.target.dataset.editorId
-
+    
     if (editorId == "xtext-editor-entities") {b = "blockly-editor"}
     else if (editorId == "xtext-editor-scenarios") {b = "blockly-editor2"}
-
+	
     let editor = document.getElementById(editorId)
     let blockly = document.getElementById(b)
     displayEditor(currentEditor, editor, currentBlockly, blockly)
@@ -103,7 +103,7 @@ if (entitiesTab != undefined)
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
 
-
+  
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
@@ -115,69 +115,9 @@ astBtn.onclick = () => {
   fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
     .then(response => response.json())
     .then(response => {
+      console.log(reponse)
+      response.astResult = JSON.parse(response.astResult)
+      Blockly.defineBlocksWithJsonArray(response.astResult)
       console.log(response)
-      response.blocks = JSON.parse(response.blocks)
-      response.toolBox = JSON.parse(response.toolBox)
-      Blockly.defineBlocksWithJsonArray(response.blocks)
-
-      scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
-      entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
-      console.log(response)
-
-      scenarioWorkspace.registerToolboxCategoryCallback( "getEntities", createEntityBlocks);
-      scenarioWorkspace.registerToolboxCategoryCallback( "getModel", createModelBlock);
-
-      scenarioWorkspace.registerToolboxCategoryCallback(
-        "getEntities", createEntityBlocks);
-
-      scenarioWorkspace.registerToolboxCategoryCallback(
-        "getModel", createModelBlock);
-
-      function onClick(event) {
-        Blockly.svgResize(scenarioWorkspace);
-        Blockly.svgResize(entityWorkspace);
-      }
-
-      function onchange(event){
-        console.log(event)
-        let entityBlockArray = entityWorkspace.getAllBlocks();
-        let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
-
-        let entityTab = editors[0].env.document.doc;
-        let scenarioTab = editors[1].env.document.doc;
-
-        scenarioArray = []
-        entityArray = []
-
-        scenarioTab.removeFullLines(0, scenarioTab.getLength());
-        entityTab.removeFullLines(0, entityTab.getLength());
-
-        entityBlockArray.forEach((block) => {
-          if (block.type == "modelblock"){
-            scenarioArray = addBlocksToArray(block.getDescendants());
-          }
-        })
-
-        scenarioBlockArray.forEach((block) => {
-          if (block.type == "modelUsingBlock"){
-            entityArray = addBlocksToArray(block.getDescendants());
-          }
-        })
-
-        scenarioTab.insertFullLines(0, scenarioArray);
-        entityTab.insertFullLines(0, entityArray);
-
-        Blockly.svgResize(scenarioWorkspace);
-        Blockly.svgResize(entityWorkspace);
-      }
-
-      document.getElementById('blockly-editor2').style.display = "none"
-
-      entityWorkspace.addChangeListener(onchange);
-      scenarioWorkspace.addChangeListener(onchange);
-
-      window.addEventListener('click', onClick, false);
-
-      onchange();
     })
 }
