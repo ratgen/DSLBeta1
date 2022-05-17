@@ -1,36 +1,36 @@
-model widgets
+model robotic_domain
 
-imperative_entity robot {
+imperative entity robot {
 	actions: moves
 	properties: position, speed
 }
 
-imperative_entity gripper {
+imperative entity gripper {
 	actions: closes, opens
 	states: closed, opened	
 }
 
-imperative_entity input {
+imperative entity input {
 	actions: void
 	states: ON/OFF 
 	properties: signal
 }
 
-imperative_entity sensor is input {
+imperative entity sensor is input {
 }
 
-imperative_entity button is input {
+imperative entity button is input {
 }
 
-imperative_entity output {
+imperative entity output {
 	actions: activates, deactivates
 	states: ON/OFF
 }
 
-imperative_entity light is output {
+imperative entity light is output {
 }
 
-imperative_entity buzzer is output {
+imperative entity buzzer is output {
 }
 
 

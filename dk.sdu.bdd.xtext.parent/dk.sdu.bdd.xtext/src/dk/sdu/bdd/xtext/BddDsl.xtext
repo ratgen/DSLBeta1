@@ -19,7 +19,7 @@ ModelRef:
 
 
 DeclarativeEntityDef:
-	'declarative_entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [DeclarativeEntityDef] (',' superEntities += [DeclarativeEntityDef])*)? '{'
+	'declarative' 'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [DeclarativeEntityDef] (',' superEntities += [DeclarativeEntityDef])*)? '{'
 		('actions:' (actions += ActionDef) (',' actions += ActionDef)*)?
 		('states:' (states += StateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += StateDef)*)?
 		('properties:' (properties += PropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += PropertyDef)*)?
@@ -27,7 +27,7 @@ DeclarativeEntityDef:
 ;
 
 ImperativeEntityDef:
-	'imperative_entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [ImperativeEntityDef] (',' superEntities += [ImperativeEntityDef])*)? '{'
+	'imperative' 'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [ImperativeEntityDef] (',' superEntities += [ImperativeEntityDef])*)? '{'
 		('actions:' (actions += ImperativeActionDef) (',' actions += ImperativeActionDef)*)?
 		('states:' (states += ImperativeStateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += ImperativeStateDef)*)?
 		('properties:' (properties += ImperativePropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += ImperativePropertyDef)*)?
@@ -107,7 +107,7 @@ ImperativeScenarioAction:
  
 
 DeclarativeStatePhrase: 
-	sr = ScenarioRef | DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
+	DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;
 
 ImperativeStatePhrase: 
