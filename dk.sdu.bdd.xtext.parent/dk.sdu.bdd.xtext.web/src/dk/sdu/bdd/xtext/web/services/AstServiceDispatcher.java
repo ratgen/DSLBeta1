@@ -419,6 +419,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 				argumentOptions.add(arr);
 			}
+			if (content instanceof RuleCall) {
+				RuleCall call = (RuleCall) content;
+				AbstractRule rule = call.getRule();
+				
+				JSONArray arr = new JSONArray();
+				arr.add(rule.getName());
+				arr.add(rule.getName());
+				
+			}
 		}
 		return argumentOptions;
 	}
