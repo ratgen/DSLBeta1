@@ -61,12 +61,12 @@ ID_OR_STRING: (ID | STRING);
 
 Scenario:
        'Scenario:' name = ID_OR_STRING (WORD)* 
-       'Given' ('the'|'all' 'the'|'I'|'loooooool')? ('do' 'not')? preStateE = DeclarativeScenarioState
+       'Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState
        'which' 'means'
        
        'Given' preState = ImperativeScenarioState
        'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
-       'Then' postState = ImperativeScenarioState
+       'Then' ('the'|'all' 'the') postState = ImperativeScenarioState
        
        
        'When' ('I'|'the')? ('do' 'not')? actionE = DeclarativeScenarioAction 
@@ -74,15 +74,15 @@ Scenario:
        
        'Given' preState1 = ImperativeScenarioState
        'When' ('I')? ('do' 'not')? action1 = ImperativeScenarioAction
-       'Then' postState1 = ImperativeScenarioState
+       'Then'  ('the'|'all' 'the') postState1 = ImperativeScenarioState
        
        
-       ('Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState
-       'which' 'means')?
+       'Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState
+       'which' 'means'
        
        'Given' preState2 = ImperativeScenarioState
        'When' ('I')? ('do' 'not')?  action2 = ImperativeScenarioAction
-       'Then' postState2 = ImperativeScenarioState
+       'Then'  ('the'|'all' 'the') postState2 = ImperativeScenarioState
 ;
 
 
@@ -151,7 +151,7 @@ DeclarativeEntityPropertyStatePhrase:
 ;
 
 ImperativeEntityPropertyStatePhrase:
-	 'the' property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = StringValue 
+	 property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = StringValue 
 ;
 
 

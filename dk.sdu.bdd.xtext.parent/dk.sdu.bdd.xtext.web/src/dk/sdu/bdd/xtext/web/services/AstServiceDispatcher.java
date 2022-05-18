@@ -152,7 +152,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				categoryContent.add(catItem);
 
 				//System.out.println(block);
-				if (rule.getName().equals("Scenario")) {
+				if (rule.getName().equals("Scenario") || rule.getName().equals("Model")) {
 					System.out.println("rule contents: \n" + dump(rule, "    ")); 
 				}
 				
@@ -247,63 +247,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		if (obj instanceof Group) {
 			Group group = (Group) obj;
-
 			if (group.getCardinality() == null) {
+				//continue walking the tree;
 				return null;
-			}
-			
-			data = new ParseData();
-			
-			
-			data.setMessage("%" + argCount + " ");
-			
-			JSONObject argument = new JSONObject();
-			argument.put("type", "field_dropdown");
-			argument.put("name", "optional_GROUP");
-			
-			JSONArray argumentOptions = new JSONArray();
-			argument.put("options", argumentOptions);
-			
-			
-			String msg = "";
-			for (AbstractElement groupMember : group.getElements() ) {
-				if (groupMember instanceof Keyword) {
-					Keyword keyWord = (Keyword) groupMember;
-					msg = msg.concat(keyWord.getValue() + " ");
-				}
-			}
-			System.out.println("group mem" + msg);
-
-			JSONArray arr = new JSONArray();
-			arr.add(msg);
-			arr.add(msg);
-			
-			argumentOptions.add(arr.clone());
-			
-			if (group.getCardinality().equals("?")) {
-				arr.clear();
-				arr.add("");
-				arr.add("");
-				argumentOptions.add(arr);
-			}
-			System.out.println(argumentOptions);
-			data.setArgument(argument);
-			data.setPrune(true);
-			return data;
+			} 
+			data = parseGroup(argCount, group);
 		}
 		
 		if (obj instanceof Keyword) {
 			Keyword keyWord = (Keyword) obj;
-
-			data = new ParseData();
-			
-			if (keyWord.getCardinality() == null) {
-				data.setMessage(keyWord.getValue() + " ");
-			}
-			else if (keyWord.getCardinality().equals("?")) {
-				
-			}
-			
+			data = parseKeyword(keyWord);
 		}
 		/*
 		if (obj.getClass() == AssignmentImpl.class) {
@@ -317,110 +270,189 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 		}*/
 		if (obj instanceof RuleCall) {
-			data = new ParseData();
 			RuleCall rule = (RuleCall) obj;
-			AbstractRule abstractRule = rule.getRule();
-			JSONObject argument = new JSONObject();
-			
-			//required
-			if (rule.getCardinality() == null) {
-				argument.put("type", "input_value");
-				argument.put("name", "name_" + abstractRule.getName());
-				argument.put("check", abstractRule.getName());
-			}
-			//one or more
-			else if (rule.getCardinality().equals("*")) {
-				argument.put("type", "input_value");
-				argument.put("name", "name_" + abstractRule.getName());
-				argument.put("check", abstractRule.getName());
-			}
-			//optional
-			else if (rule.getCardinality().equals("?")) {
-				argument.put("type", "input_value");
-				argument.put("name", "name_" + abstractRule.getName());
-				argument.put("check", abstractRule.getName());
-			}
-			
-			data.setArgument(argument);
-			data.setMessage("%" + argCount + " ");			
+			data = parseRuleCall(argCount, rule);			
 		}
 		
-		if (obj instanceof Alternatives) {
-			data = new ParseData();
-			data.setPrune(true);
-			
+		if (obj instanceof Alternatives) {			
 			Alternatives alternatives = (Alternatives) obj;
-			
-			JSONObject argument = new JSONObject();
-			argument.put("type", "field_dropdown");
-			argument.put("name", "ALTERNATIVES");
-			
-			JSONArray argumentOptions = new JSONArray();
-			argument.put("options", argumentOptions);
-			
-			EList<EObject> altContents = alternatives.eContents();
-			for (EObject content : altContents) {
-				if (content instanceof Keyword) {
-					JSONArray arr = new JSONArray();
-					Keyword keyWord = (Keyword) content;
-					arr.add(keyWord.getValue());
-					arr.add(keyWord.getValue());
-
-					argumentOptions.add(arr);
-				}
-				
-				if(content instanceof Group) {
-					String option = "";
-					EList<EObject> groupContent = content.eContents();
-					
-					for (EObject groupMember : groupContent) {
-						if (groupMember instanceof Keyword) {
-							Keyword keyWord = (Keyword) groupMember;
-							option = option.concat(keyWord.getValue() + " ");
-						}
-						
-					}
-					if (option != "") {
-						JSONArray arr = new JSONArray();
-						arr.add(option);
-						arr.add(option);
-
-						argumentOptions.add(arr);
-					}
-				}
-			}
-			if (argumentOptions.size() < 1) { 
-				return null;
-			}
-			
-			data.setArgument(argument);
-			data.setMessage("%" + argCount + " ");
-			
+			data = parseAlternatives(argCount, alternatives);
 			
 		}
 		if (obj.getClass() == CrossReference.class) {
 		}
 		return data;
 	}
-	
-	
-	private EList<EObject> parseGroup(Group group){
-		return group.eContents();
-	}
-	
-	private String parseKeyword(Keyword keyword) {
-		return keyword.getValue();
-	}
-	
-	private String parseAssignment(Assignment assignment) {
-		for (EObject rule : assignment.eContents()) {
-			if(rule.getClass() == RuleCallImpl.class) {
-				RuleCall call = (RuleCall) rule;
-				ParserRule ref = (ParserRule) call.eCrossReferences().get(0);
-				return ref.getName();
+
+	private ParseData parseAlternatives(int argCount, Alternatives alternatives) {
+		ParseData data = new ParseData();
+		data.setPrune(true);
+
+		JSONObject argument = new JSONObject();
+		argument.put("type", "field_dropdown");
+		argument.put("name", "ALTERNATIVES");
+
+		JSONArray argumentOptions = null;
+				
+		
+		//use a dropdown menu to select between alternatives
+		if  (alternatives.getCardinality() == null) {
+			argumentOptions = getDropDownArgumentOptions(alternatives);
+
+		}
+		else if (alternatives.getCardinality().equals("?")) {
+			argumentOptions = getDropDownArgumentOptions(alternatives);
+
+			//add an empty array to argumentOptions such that the such can choose ""
+			JSONArray emptyArray = new JSONArray();
+			emptyArray.add("");
+			emptyArray.add("");
+			argumentOptions.add(emptyArray);
+		}
+		else if (alternatives.getCardinality().equals("*")) {
+			//TODO: input statement for each block (modelref, declarativeref, imperativeref, scenario)
+			for (Object statement: argumentOptions) {
+				JSONArray a = (JSONArray) statement;
+				String key = (String) a.get(0);
+				
+				
 			}
 		}
-		return "";
+		
+		data.setArgument(argument);
+		data.setMessage("%" + argCount + " ");
+		
+		if (argumentOptions.size() < 1) { 
+			return null;
+		}
+		argument.put("options", argumentOptions);
+
+		return data;
+	}
+
+	private JSONArray getDropDownArgumentOptions(Alternatives alternatives) {
+		JSONArray argumentOptions = new JSONArray();
+		
+		for (EObject content : alternatives.eContents()) {
+			if (content instanceof Keyword) {
+				JSONArray arr = new JSONArray();
+				Keyword keyWord = (Keyword) content;
+				arr.add(keyWord.getValue());
+				arr.add(keyWord.getValue());
+
+				argumentOptions.add(arr);
+			}
+			
+			if(content instanceof Group) {
+				String option = "";
+				EList<EObject> groupContent = content.eContents();
+				
+				for (EObject groupMember : groupContent) {
+					if (groupMember instanceof Keyword) {
+						Keyword keyWord = (Keyword) groupMember;
+						option = option.concat(keyWord.getValue() + " ");
+					}
+					
+				}
+				if (option != "") {
+					JSONArray arr = new JSONArray();
+					arr.add(option);
+					arr.add(option);
+
+					argumentOptions.add(arr);
+				}
+			}
+		}
+		return argumentOptions;
+	}
+
+	private ParseData parseRuleCall(int argCount, RuleCall rule) {
+		ParseData data = new ParseData();
+		
+		AbstractRule abstractRule = rule.getRule();
+		JSONObject argument = new JSONObject();
+		
+		//required
+		if (rule.getCardinality() == null) {
+			argument.put("type", "input_value");
+			argument.put("name", "name_" + abstractRule.getName());
+			argument.put("check", abstractRule.getName());
+		}
+		//one or more
+		else if (rule.getCardinality().equals("*")) {
+			argument.put("type", "input_value");
+			argument.put("name", "name_" + abstractRule.getName());
+			argument.put("check", abstractRule.getName());
+		}
+		//optional
+		else if (rule.getCardinality().equals("?")) {
+			argument.put("type", "input_value");
+			argument.put("name", "name_" + abstractRule.getName());
+			argument.put("check", abstractRule.getName());
+		}
+		
+		data.setArgument(argument);
+		data.setMessage("%" + argCount + " ");
+		
+		return data;
+	}
+
+	private ParseData parseKeyword(Keyword keyWord) {
+		ParseData data;
+		data = new ParseData();
+		
+		if (keyWord.getCardinality() == null) {
+			data.setMessage(keyWord.getValue() + " ");
+		}
+		//TODO: create dropdown as it is optional
+		else if (keyWord.getCardinality().equals("?")) {
+			
+		}
+		return data;
+	}
+
+	private ParseData parseGroup(int argCount, Group group) {
+		ParseData data;
+		
+		
+		
+		data = new ParseData();
+		
+		
+		data.setMessage("%" + argCount + " ");
+		
+		JSONObject argument = new JSONObject();
+		argument.put("type", "field_dropdown");
+		argument.put("name", "optional_GROUP");
+		
+		JSONArray argumentOptions = new JSONArray();
+		argument.put("options", argumentOptions);
+		
+		
+		String msg = "";
+		for (AbstractElement groupMember : group.getElements() ) {
+			if (groupMember instanceof Keyword) {
+				Keyword keyWord = (Keyword) groupMember;
+				msg = msg.concat(keyWord.getValue() + " ");
+			}
+		}
+
+		JSONArray arr = new JSONArray();
+		arr.add(msg);
+		arr.add(msg);
+		
+		argumentOptions.add(arr.clone());
+		
+		if (group.getCardinality().equals("?")) {
+			arr.clear();
+			arr.add("");
+			arr.add("");
+			argumentOptions.add(arr);
+		}
+		System.out.println(argumentOptions);
+		data.setArgument(argument);
+		data.setPrune(true);
+		return data;
 	}
 	
 	private static String dump(EObject mod_, String indent) {

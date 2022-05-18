@@ -91,31 +91,19 @@ class BddDslScopeProvider extends AbstractBddDslScopeProvider {
 		val decEntityDefs = <DeclarativeEntityDef>newArrayList
 		val contextDecEntityDef = findDecWEntityDef(context)
 		
-		
 		if (contextDecEntityDef !== null) {
 			decEntityDefs += contextDecEntityDef
 		} else {
 			decEntityDefs += getAllDecEntityDefs(findAncestorOfType(context, Model))
 		}
-		
-		
-		
 		for (entityDef : decEntityDefs) {
 			for (T modelElement : getAllInheritedContentsOfType(entityDef, clazz)) {
 				allDecModelElements += modelElement;
 			}
 		}
-		
-		
-		
-		Scopes.scopeFor(allDecModelElements);
-		
 
+		Scopes.scopeFor(allDecModelElements);
 	}
-	
-	
-	
-	
 
 	def <T extends EObject> Iterable<T> getAllInheritedContentsOfType(DeclarativeEntityDef declarativeEntityDef, Class<T> clazz) {
 		val  all = <T>newArrayList
@@ -123,8 +111,6 @@ class BddDslScopeProvider extends AbstractBddDslScopeProvider {
 		declarativeEntityDef.superEntities.forEach[all += getAllInheritedContentsOfType(it, clazz)]
 		all.filter[clazz.isInstance(it)]
 	}
-	
-	
 
 	def DeclarativeEntityDef findDecWEntityDef(EObject context) {
 		val feature = context.eClass.EAllStructuralFeatures.findFirst[EType == BddDslPackage.eINSTANCE.declarativeEntityRef];
@@ -134,7 +120,6 @@ class BddDslScopeProvider extends AbstractBddDslScopeProvider {
 			null
 		}
 	}
-	
 	
 	def <T extends EObject> Iterable<T> getAllInheritedContentsOfType(ImperativeEntityDef imperativeEntityDef, Class<T> clazz) {
 		val  all = <T>newArrayList
