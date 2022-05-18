@@ -1,7 +1,5 @@
 package dk.sdu.bdd.xtext.web.services;
 
-import java.util.ArrayList;
-
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -25,12 +23,11 @@ import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
-import org.eclipse.xtext.impl.RuleCallImpl;
-
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 
 import com.google.inject.Inject;
 
+@SuppressWarnings("warning")
 public class AstServiceDispatcher extends XtextServiceDispatcher {
 	@Inject
 	private IWebResourceSetProvider resourceSetProvider;
@@ -313,15 +310,43 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private ParseData parseAlternatives(int argCount, Alternatives alternatives) {
 		ParseData data = new ParseData();
 		data.setPrune(true);
+		
 		JSONArray argumentOptions = getDropDownArgumentOptions(alternatives);
+		boolean isRuleSet = true;
+		
+		for (Object item : argumentOptions) {
+			JSONArray arrItem = (JSONArray) item;
+			if (!arrItem.get(1).equals("rule")) {
+				isRuleSet = false;
+				break; 
+			}
+		}
 
 		//use a dropdown menu to select between alternatives
 		if  (alternatives.getCardinality() == null || alternatives.getCardinality().equals("?")) {
-			JSONObject argument = new JSONObject();
-			argument.put("type", "field_dropdown");
-			argument.put("name", "ALTERNATIVES");
-			argument.put("options", argumentOptions);
+			JSONObject argument;
+			if (!isRuleSet) {
+				argument = new JSONObject();
+				argument.put("type", "field_dropdown");
+				argument.put("name", "ALTERNATIVES");
+				argument.put("options", argumentOptions);
+			}
+			else {
+				argument = new JSONObject();
+				argument.put("type", "input_value");
+				argument.put("name", "alt_ruleset");
+				
+				JSONArray check = new JSONArray();
+				
+				for (Object item : argumentOptions) {
+					JSONArray arrItem = (JSONArray) item;
+					String str = (String) arrItem.get(0);
+					check.add(str);
+				}
 
+				argument.put("Check", check);
+			}
+			
 			if (alternatives.getCardinality() != null) {
 	 
 				//add an empty array to argumentOptions such that the such can choose ""
@@ -383,12 +408,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		for (EObject content : alternatives.eContents()) {
 			if (content instanceof Keyword) {
-				JSONArray arr = new JSONArray();
 				Keyword keyWord = (Keyword) content;
-				arr.add(keyWord.getValue());
-				arr.add(keyWord.getValue());
-
-				argumentOptions.add(arr);
+				argumentOptions.add(createOptionArray(keyWord.getValue()));
 			}
 			
 			if(content instanceof Group) {
@@ -403,21 +424,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					
 				}
 				if (option != "") {
-					JSONArray arr = new JSONArray();
-					arr.add(option);
-					arr.add(option);
-
-					argumentOptions.add(arr);
+					argumentOptions.add(createOptionArray(option));
 				}
 			}
 			if (content instanceof Assignment) {
 				Assignment assign = (Assignment) content;
 				ParserRule rule = (ParserRule) assign.eContents().get(0).eCrossReferences().get(0);
-				JSONArray arr = new JSONArray();
-				arr.add(rule.getName());
-				arr.add(rule.getName());
-				
-				argumentOptions.add(arr);
+			
+				argumentOptions.add(createOptionArray(rule.getName()));
 			}
 			if (content instanceof RuleCall) {
 				RuleCall call = (RuleCall) content;
@@ -425,11 +439,19 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 				JSONArray arr = new JSONArray();
 				arr.add(rule.getName());
-				arr.add(rule.getName());
-				
+				arr.add("rule");
+				argumentOptions.add(arr);
 			}
 		}
+		
 		return argumentOptions;
+	}
+
+	private JSONArray createOptionArray(String keyWord) {
+		JSONArray arr = new JSONArray();
+		arr.add(keyWord);
+		arr.add(keyWord);
+		return arr;
 	}
 
 	private ParseData parseRuleCall(int argCount, RuleCall rule) {
