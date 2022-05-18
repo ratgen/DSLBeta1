@@ -58,6 +58,7 @@ a:hover {
 	height: 100%;
 }
 
+
 .tab {
   background-color: #ddd;
   padding: 5px 2.5px;
@@ -88,10 +89,10 @@ a:hover {
 }
 
 #blockly-editor {
-	flex: 1;
+	flex: 2;
 	height: 100%;
 }
 #blockly-editor2 {
-	flex: 1;
+	flex: 2;
 	height: 100%;
 } 

@@ -142,6 +142,12 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					block.remove("output");
 				}
 				
+
+				setTopLevelStatement(rule, block, "ModelRef");
+				setTopLevelStatement(rule, block, "DeclarativeEntityDef");
+				setTopLevelStatement(rule, block, "ImperativeEntityDef");
+				setTopLevelStatement(rule, block, "Scenario");
+				
 				blockArray.add(block);
 
 				
@@ -152,7 +158,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 				categoryContent.add(catItem);
 
-				if (rule.getName().equals("Scenario") || rule.getName().equals("Model")) {
+				if (rule.getName().equals("Scenario") || rule.getName().equals("Model") || rule.getName().equals("PREP") ||  rule.getName().equals("DeclarativeEntityDef")) {
 					System.out.println("rule contents: \n" + dump(rule, "    ")); 
 				}
 				
@@ -163,6 +169,22 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		return blockArray;
+	}
+	
+	private void setTopLevelStatement(AbstractRule rule, JSONObject block, String ruleName) {
+		if(rule.getName().equals(ruleName)) {
+	
+			block.remove("output");
+			
+			JSONArray previous = new JSONArray();
+			previous.add("Model");
+			previous.add(ruleName);
+			block.put("previousStatement", previous);
+			
+			JSONArray next = new JSONArray();
+			next.add(ruleName);
+			block.put("nextStatement", next);
+		}
 	}
 	
 	class ParseData {
@@ -310,6 +332,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 			JSONArray args0 = new JSONArray();
 			args0.add(argument);
+			System.out.println(args0);
 			data.setArguments(args0);
 			data.setMessage("%" + argCount + " ");
 
@@ -326,12 +349,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 
 			for (Object statement: argumentOptions) {
-				JSONArray a = (JSONArray) statement;
-				String key = (String) a.get(0);
+				JSONArray con = (JSONArray) statement;
+				String key = (String) con.get(0);
 				
 				JSONObject inputStatement = new JSONObject();
 				inputStatement.put("type", "input_statement");
 				inputStatement.put("name", "statement");
+				
+				JSONArray arr = new JSONArray();
+				arr.add(key);
+				inputStatement.put("check", arr);
 				
 				
 				args0.add(inputStatement);
@@ -385,6 +412,12 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 			if (content instanceof Assignment) {
 				Assignment assign = (Assignment) content;
+				ParserRule rule = (ParserRule) assign.eContents().get(0).eCrossReferences().get(0);
+				JSONArray arr = new JSONArray();
+				arr.add(rule.getName());
+				arr.add(rule.getName());
+				
+				argumentOptions.add(arr);
 			}
 		}
 		return argumentOptions;
