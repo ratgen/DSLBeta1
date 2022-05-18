@@ -135,6 +135,12 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				ParserRule parserRule = (ParserRule) rule;
 					
 				JSONObject block = parseRule(parserRule);
+				
+				// TODO: rule specific code
+				if(rule.getName().equals("Model")) {
+					block.remove("output");
+				}
+				
 				blockArray.add(block);
 
 				
@@ -142,10 +148,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				catItem.put("kind", "block");
 				catItem.put("type",  block.get("type"));
 				
+				
 				categoryContent.add(catItem);
 
 				//System.out.println(block);
-				System.out.println("rule contents: \n" + dump(rule, "    ")); 
+				if (rule.getName().equals("Scenario")) {
+					System.out.println("rule contents: \n" + dump(rule, "    ")); 
+				}
+				
 			}
 			if (rule instanceof TerminalRule) {
 				System.out.println("rule contents: \n" + dump(rule, "    ")); 
@@ -200,13 +210,13 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		JSONObject json = new JSONObject();
 		json.put("type", rule.getName());
 		json.put("output", rule.getName());
+		json.put("tooltip", rule.getName());
 		String message0 = "";
 		int argCount = 1;
 		JSONArray arguments = new JSONArray();
 		
-		
 		TreeIterator<EObject> iterator =  rule.eAllContents();
-
+				
 		while(iterator.hasNext()) {
 			EObject next = iterator.next();
 			
@@ -283,9 +293,17 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		if (obj instanceof Keyword) {
-			data = new ParseData();
 			Keyword keyWord = (Keyword) obj;
-			data.setMessage(keyWord.getValue() + " ");
+
+			data = new ParseData();
+			
+			if (keyWord.getCardinality() == null) {
+				data.setMessage(keyWord.getValue() + " ");
+			}
+			else if (keyWord.getCardinality().equals("?")) {
+				
+			}
+			
 		}
 		/*
 		if (obj.getClass() == AssignmentImpl.class) {
@@ -322,8 +340,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				argument.put("name", "name_" + abstractRule.getName());
 				argument.put("check", abstractRule.getName());
 			}
-			
-			
 			
 			data.setArgument(argument);
 			data.setMessage("%" + argCount + " ");			

@@ -1,0 +1,228 @@
+model widgets
+
+imperative entity widget {
+	actions: move
+	states: displayed, shown, available, enabled/disabled
+}
+imperative entity field is widget {
+}
+
+imperative entity FieldSet is widget {
+}
+
+imperative entity Text is widget {
+}
+
+imperative entity Label is widget {
+}
+
+imperative entity ProgressBar is widget {
+}
+
+imperative entity Tooltip is widget {
+}
+
+imperative entity CheckBox is widget {
+	actions: check, pick, select, choose, uncheck
+	states: checked/unchecked, picked, selected, chosen
+	properties: option, options
+}
+
+imperative entity ListBox is widget {
+	actions: pick, select, choose
+	states: picked, selected, chosen
+	properties: option, options
+}
+
+imperative entity RadioButton is widget {
+	actions: pick, select, choose
+	states: picked, selected, chosen
+	properties: option
+}
+
+imperative entity Button is widget {
+	actions: click [on], submit
+	states: clicked, submitted
+	properties: value
+}
+
+imperative entity Calendar is widget {
+	actions: select, choose, pick, set
+	states: selected, chosen, picked, set
+	properties: date	
+}
+
+imperative entity TimePicker is widget {
+	actions: select, choose, pick, set
+	states: selected, chosen, picked, set
+	properties: time
+}
+
+imperative entity Link is widget {
+	actions: select, choose, click [on]
+	states: selected, chosen, clicked
+	properties: option
+}
+
+imperative entity DropdownList is widget {
+	actions: select, choose, pick
+	states: selected, chosen, picked
+	properties: option
+}
+
+imperative entity Menu is widget {
+	actions: click [on], select
+	states: clicked, selected
+	properties: option
+}
+
+imperative entity MenuItem is widget {
+	actions: click [on], select
+	states: clicked, selected
+	properties: option
+}
+
+imperative entity Grid is widget {
+	actions: click [on], select, type, compare
+	states: clicked, selected, typed, compared
+	properties: table, column, line, cell
+}
+
+imperative entity TextField is widget {
+	actions: type, set, fill [in]
+	states: typed, set, filled
+	properties: value
+}
+
+imperative entity TextArea is widget {
+	actions: type, set, fill [in]
+	states: typed, set, filled
+	properties: text
+	
+}
+
+imperative entity BrowserWindow is widget {
+	actions: go
+	properties: page, title
+}
+
+imperative entity Autocomplete is widget {
+	actions: type and choose, type and select
+	states: set, filled
+	properties: value
+}
+
+imperative entity Tree is widget {
+	actions: click [on], select
+	states: clicked, selected
+	properties: line, tree
+}
+
+imperative entity WindowDialog is widget {
+	actions: confirm, cancel, close
+	states: confirmed, canceled, closed
+	properties: content
+}
+
+imperative entity ModalWindow is widget {
+	actions: confirm, cancel, close
+	states: confirmed, canceled, closed
+	properties: content
+}
+
+imperative entity Accordion is widget {
+	actions: click [on], show, hide
+	states: clicked, shown, hidden
+	properties: item
+}
+
+imperative entity TabBar is widget {
+	actions: click [on], select
+	states: clicked, selected
+	properties: tab
+}
+
+imperative entity Notification is widget {
+	actions: click [on], open, close
+	states: clicked, open, closed
+	properties: message	
+}
+
+imperative entity NumericStepper is widget {
+	actions: type, set, fill [in], increase, decrease
+	states: typed, set, filled, increased, decreased
+	properties: value
+}
+
+imperative entity ToggleButton is widget {
+	actions: switch [on], switch [off]
+	states: switched, switched
+}
+
+imperative entity Breadcrumb is widget {
+	actions: select, choose, click [on]
+	states: selected, chosen, clicked
+	properties: option
+}
+
+imperative entity Icon is widget {
+	actions: click [on]
+	states: clicked
+}
+
+imperative entity Image is widget {
+	actions: click [on]
+	states: clicked
+}
+
+imperative entity ImageCarousel is widget {
+	actions: select, choose, click [on], scroll [to]
+	states: selected, chosen, clicked, scrolled
+	properties: image
+}
+
+imperative entity Pagination is widget {
+	actions: go [to]
+	properties: page
+}
+
+imperative entity SearchBox is widget {
+	actions: type, set, fill [in]
+	states: typed, set, filled
+	properties: value
+}
+
+imperative entity Slider is widget {
+	actions: set [to], adjust, adjust the value to
+	states: set, adjusted
+	properties: value
+}
+
+imperative entity Scrollbar is widget {
+	actions: scroll to the right, scroll to the left, scroll up, scroll down, scroll the page to the right, scroll the page to the left, scroll the page up, scroll the page down
+	states: scrolled to the right, scrolled to the left, scrolled up, scrolled down
+	properties: page
+}
+
+imperative entity Splitter is widget {
+	actions: drag to the right, drag to the left, drag up, drag down 
+	states: dragged to the right, dragged to the right, dragged up, dragged down
+}
+
+imperative entity TagCloud is widget {
+	actions: select, choose, pick, click [on]
+	states: selected, chosen, picked, clicked
+	properties: word
+}
+
+imperative entity Map is widget {
+	actions: zoom [in], zoom [out], switch [to]
+	states: zoomed, switched
+	properties: satelite imagery, street, map
+}
+
+imperative entity VideoPlayer is widget {
+	actions: play, pause, fast forward, rewind, toggle full screen, exit full screen, turn the volume up, turn the volume down
+	states: played, paused, fast forwarded, rewound, toggled, exited, turned up, turned down
+	properties: full screen, volume, video 
+}

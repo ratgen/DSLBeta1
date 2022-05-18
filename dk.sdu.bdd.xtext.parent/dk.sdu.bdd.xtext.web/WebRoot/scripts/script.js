@@ -140,7 +140,28 @@ astBtn.onclick = () => {
         }
       }
 
+      let string_validator = function(newValue) {
+        
+        let res = newValue.replace(/[^\"]*/g, '')
+        if (res == ''){ 
+          return undefined;
+        }
+        return null;
+      }
+
+
+      Blockly.Blocks["STRING"] = {
+        init: function() {
+          this.setOutput(true, 'STRING')
+          this.appendDummyInput()
+            .appendField("\"")
+            .appendField(new Blockly.FieldTextInput('String', string_validator))
+            .appendField("\"");
+        }
+      }
+
       response.toolBox.contents[0].contents.push({"kind" : "block", "type" : "ID"})
+      response.toolBox.contents[0].contents.push({"kind" : "block", "type" : "STRING"})
 
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
