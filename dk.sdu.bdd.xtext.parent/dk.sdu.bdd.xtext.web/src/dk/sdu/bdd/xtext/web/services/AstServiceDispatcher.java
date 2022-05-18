@@ -1,5 +1,7 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import java.util.ArrayList;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -130,7 +132,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 
 		for (AbstractRule rule : rules) {
 			System.out.println("rule: " + rule.getName());
-			System.out.println(rule);
 			if (rule instanceof ParserRule) {
 				ParserRule parserRule = (ParserRule) rule;
 					
@@ -151,7 +152,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 				categoryContent.add(catItem);
 
-				//System.out.println(block);
 				if (rule.getName().equals("Scenario") || rule.getName().equals("Model")) {
 					System.out.println("rule contents: \n" + dump(rule, "    ")); 
 				}
@@ -167,7 +167,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	
 	class ParseData {
 		String message;
-		JSONObject argument;
+		JSONArray arguments;
 		boolean prune;
 
 		public String getMessage() {
@@ -178,18 +178,22 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			this.message = message;
 		}
 
-		public JSONObject getArgument() {
-			return argument;
+		public JSONArray getArguments() {
+			return arguments;
 		}
 
-		public void setArgument(JSONObject argument) {
-			this.argument = argument;
+		public void setArguments(JSONArray argument) {
+			this.arguments = argument;
+		}
+		
+		public void addArgument(JSONObject argument) {
+			arguments.add(argument);
 		}
 
 		
 		ParseData(){
 			message = "";
-			argument = null;
+			arguments = new JSONArray();
 			prune = false;
 		}
 
@@ -223,10 +227,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			ParseData data = parseLoop(next, argCount);
 			if (data != null ) {
 				message0 = message0.concat(data.getMessage());
-				JSONObject argument = data.getArgument();
-				if (argument != null) {
-					arguments.add(data.getArgument());
-					argCount++;
+				JSONArray arguments_contained = data.getArguments();
+				if (arguments != null) {
+					arguments.addAll(arguments_contained);
+					argCount = argCount + arguments_contained.size();
 				}
 				if (data.prune) {
 					iterator.prune();
@@ -287,45 +291,62 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private ParseData parseAlternatives(int argCount, Alternatives alternatives) {
 		ParseData data = new ParseData();
 		data.setPrune(true);
+		JSONArray argumentOptions = getDropDownArgumentOptions(alternatives);
 
-		JSONObject argument = new JSONObject();
-		argument.put("type", "field_dropdown");
-		argument.put("name", "ALTERNATIVES");
-
-		JSONArray argumentOptions = null;
-				
-		
 		//use a dropdown menu to select between alternatives
-		if  (alternatives.getCardinality() == null) {
-			argumentOptions = getDropDownArgumentOptions(alternatives);
+		if  (alternatives.getCardinality() == null || alternatives.getCardinality().equals("?")) {
+			JSONObject argument = new JSONObject();
+			argument.put("type", "field_dropdown");
+			argument.put("name", "ALTERNATIVES");
+			argument.put("options", argumentOptions);
 
-		}
-		else if (alternatives.getCardinality().equals("?")) {
-			argumentOptions = getDropDownArgumentOptions(alternatives);
+			if (alternatives.getCardinality() != null) {
+	 
+				//add an empty array to argumentOptions such that the such can choose ""
+				JSONArray emptyArray = new JSONArray();
+				emptyArray.add("");
+				emptyArray.add("");
+				argumentOptions.add(emptyArray);
+			}
+			JSONArray args0 = new JSONArray();
+			args0.add(argument);
+			data.setArguments(args0);
+			data.setMessage("%" + argCount + " ");
 
-			//add an empty array to argumentOptions such that the such can choose ""
-			JSONArray emptyArray = new JSONArray();
-			emptyArray.add("");
-			emptyArray.add("");
-			argumentOptions.add(emptyArray);
+
 		}
 		else if (alternatives.getCardinality().equals("*")) {
 			//TODO: input statement for each block (modelref, declarativeref, imperativeref, scenario)
+			
+			String str = "";
+			JSONArray args0 = new JSONArray();
+			
+			System.out.println("altertive statement is staaaaaaared ");
+			
+			
+
 			for (Object statement: argumentOptions) {
 				JSONArray a = (JSONArray) statement;
 				String key = (String) a.get(0);
 				
+				JSONObject inputStatement = new JSONObject();
+				inputStatement.put("type", "input_statement");
+				inputStatement.put("name", "statement");
 				
+				
+				args0.add(inputStatement);
+				str = str.concat("%" + argCount + " ");
+				argCount++;
 			}
+			data.setMessage(str);
+			System.out.println(args0);
+			data.setArguments(args0);
 		}
 		
-		data.setArgument(argument);
-		data.setMessage("%" + argCount + " ");
-		
+				
 		if (argumentOptions.size() < 1) { 
 			return null;
 		}
-		argument.put("options", argumentOptions);
 
 		return data;
 	}
@@ -362,6 +383,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					argumentOptions.add(arr);
 				}
 			}
+			if (content instanceof Assignment) {
+				Assignment assign = (Assignment) content;
+			}
 		}
 		return argumentOptions;
 	}
@@ -390,8 +414,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			argument.put("name", "name_" + abstractRule.getName());
 			argument.put("check", abstractRule.getName());
 		}
-		
-		data.setArgument(argument);
+		JSONArray args0 = new JSONArray();
+		args0.add(argument);
+		data.setArguments(args0);
+
 		data.setMessage("%" + argCount + " ");
 		
 		return data;
@@ -449,8 +475,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			arr.add("");
 			argumentOptions.add(arr);
 		}
-		System.out.println(argumentOptions);
-		data.setArgument(argument);
+
+		JSONArray args0 = new JSONArray();
+		args0.add(argument);
+		data.setArguments(args0);
+		
 		data.setPrune(true);
 		return data;
 	}
