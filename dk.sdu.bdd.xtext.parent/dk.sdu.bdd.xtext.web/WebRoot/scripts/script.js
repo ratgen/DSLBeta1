@@ -160,8 +160,12 @@ astBtn.onclick = () => {
         }
       }
 
-      response.toolBox.contents[0].contents.push({"kind" : "block", "type" : "ID"})
-      response.toolBox.contents[0].contents.push({"kind" : "block", "type" : "STRING"})
+      let termArr = []
+      termArr.push({"kind" : "block", "type" : "ID"})
+      termArr.push({"kind" : "block", "type" : "STRING"})
+
+      response.toolBox.contents.push({"kind" : "category", "name" : "Terminals", contents: termArr})
+
 
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
