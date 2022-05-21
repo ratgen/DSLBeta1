@@ -25,12 +25,12 @@ import org.eclipse.xtext.RuleCall;
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
-import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldInput;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.Category;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.CategoryItem;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.CategoryToolBox;
 
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
@@ -63,6 +63,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		EList<Resource> list = resourceSet.getResources();
 		for (Resource item : list) {
+			//used for working with the AST.
 			URI uri = item.getURI();
 			EList<EObject> objectContents = item.getContents();
 		}
@@ -77,6 +78,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
 		
 		ObjectMapper objectMapper = new ObjectMapper();
+		//remove all fields that are null;
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		
 		try {
 			String blockarr = objectMapper.writeValueAsString(blockArray);
@@ -88,8 +91,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		     });
 			return serviceDescriptor;
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
-			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+ 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 			serviceDescriptor.setService(() -> {
 		        return new AstServiceResult("err", "err");
 		     });
@@ -102,7 +104,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ArrayList<Block> parseGrammar(Grammar grammar, Category categoryContent) {
-		ArrayList<Block> blockArray = new ArrayList();
+		ArrayList<Block> blockArray = new ArrayList<>();
 		EList<AbstractRule> rules = grammar.getRules();
 
 		for (AbstractRule rule : rules) {
@@ -114,6 +116,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				if(rule.getName().equals("Model")) {
 					block.setOutput(null);
 				}
+				
 				blockArray.add(block);
 				categoryContent.addCategoryItem(new CategoryItem(block.getType())); 
 				
@@ -160,18 +163,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		if (obj instanceof Keyword) {
 			Keyword keyWord = (Keyword) obj;
 			return parseKeyword(keyWord, block);
-		}
-		/*
-		if (obj.getClass() == AssignmentImpl.class) {
-			Assignment assignment = (Assignment) obj;
-			ParserRule rule = (ParserRule) assignment.eContents().get(0).eCrossReferences().get(0);
-			
-			JSONObject argument = new JSONObject();
-			argument.put("type", "input_value");
-			argument.put("name", "feature_name_" + assignment.getFeature());
-			argument.put("check", rule.getName());
-			
-		}*/
+		} 
+		
 		if (obj instanceof RuleCall) {
 			RuleCall rule = (RuleCall) obj;
 			return parseRuleCall(rule, block);			
@@ -192,7 +185,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		FieldDropdown dropDown = new FieldDropdown("alternativs");
 		getDropDownArgumentOptions(alternatives, dropDown);		
 		//use a dropdown menu to select between alternatives
-			dropDown.addOption("");
+		dropDown.addOption(" ");
 
 		
 		block.addArgument(dropDown);
