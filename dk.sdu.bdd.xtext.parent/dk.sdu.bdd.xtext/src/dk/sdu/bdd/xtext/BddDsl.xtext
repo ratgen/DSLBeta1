@@ -203,11 +203,7 @@ DeclarativeEntityAction:
 ;
 
 ImperativeEntityAction: 
-	entityAction = ImperativeActionDef  |
-	verb = [ImperativeActionDef | WORD] (OPTION? (PREP 'the'|PREP))? 
-	('the' entity = ImperativeEntityRef OPTION? | entity1 = ImperativeEntityRef OPTION? ((PREP 'the'|PREP?) 
-	  entity2 = ImperativeEntityRef OPTION?)?)? |
-	 ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
+	entityAction = ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
 ;
 
 
