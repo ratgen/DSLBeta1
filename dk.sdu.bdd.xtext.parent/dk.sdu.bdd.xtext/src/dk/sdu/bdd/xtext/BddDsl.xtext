@@ -19,7 +19,7 @@ ModelRef:
 
 
 DeclarativeEntityDef:
-	'declarative' 'entity' name = (ID | STRING) ('-'WORD)? ('is' superEntities += [DeclarativeEntityDef] (',' superEntities += [DeclarativeEntityDef])*)? '{'
+	'declarative' 'entity' name = STRING ('-'WORD)? ('is' superEntities += [DeclarativeEntityDef] (',' superEntities += [DeclarativeEntityDef])*)? '{'
 		('actions:' (actions += ActionDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') actions += ActionDef)*)?
 		('states:' (states += StateDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') states += StateDef)*)?
 		('properties:' (properties += PropertyDef) WORD? (WORD'-'WORD)? ((','|'and'|'the') properties += PropertyDef)*)?
@@ -62,27 +62,21 @@ ID_OR_STRING: (ID | STRING);
 Scenario:
        'Scenario:' name = ID_OR_STRING (WORD)* 
        'Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState
-       'which' 'means'
-       
-       'Given' preState = ImperativeScenarioState
-       'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
-       'Then' ('the'|'all' 'the') postState = ImperativeScenarioState
-       
+       imperative1 = ImperativeScenario?
        
        'When' ('I'|'the')? ('do' 'not')? actionE = DeclarativeScenarioAction 
-       'which' 'means'
-       
-       'Given' preState1 = ImperativeScenarioState
-       'When' ('I')? ('do' 'not')? action1 = ImperativeScenarioAction
-       'Then'  ('the'|'all' 'the') postState1 = ImperativeScenarioState
-       
+	   imperative2 = ImperativeScenario?
        
        'Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState
-       'which' 'means'
+	   imperative3 = ImperativeScenario?
+;
+
+ImperativeScenario:
+	'which' 'means'
        
-       'Given' preState2 = ImperativeScenarioState
-       'When' ('I')? ('do' 'not')?  action2 = ImperativeScenarioAction
-       'Then'  ('the'|'all' 'the') postState2 = ImperativeScenarioState
+   'Given' preState = ImperativeScenarioState
+   'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
+   'Then' ('the'|'all' 'the') postState = ImperativeScenarioState
 ;
 
 
@@ -102,7 +96,7 @@ DeclarativeScenarioAction:
 ;
 
 ImperativeScenarioAction:
-	actions += ImperativeActionPhrase ('And' actions += ImperativeActionPhrase)*
+	actions += ImperativeEntityAction ('And' actions += ImperativeEntityAction)*
 ;
  
 
@@ -197,7 +191,6 @@ DeclarativeActionPhrase:
 	// Deleted: | VerifyAction
 ;
 
-ImperativeActionPhrase: ImperativeEntityAction;
 
 
 VerbAction:
@@ -210,7 +203,11 @@ DeclarativeEntityAction:
 ;
 
 ImperativeEntityAction: 
-	entityAction = ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
+	entityAction = ImperativeActionDef  |
+	verb = [ImperativeActionDef | WORD] (OPTION? (PREP 'the'|PREP))? 
+	('the' entity = ImperativeEntityRef OPTION? | entity1 = ImperativeEntityRef OPTION? ((PREP 'the'|PREP?) 
+	  entity2 = ImperativeEntityRef OPTION?)?)? |
+	 ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
 ;
 
 

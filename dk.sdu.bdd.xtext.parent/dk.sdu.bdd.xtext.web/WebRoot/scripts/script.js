@@ -110,8 +110,7 @@ currentBlockly = entitiesBlock
 
 setSelectionBorder(entitiesTab)
 
-let astBtn = document.getElementById('get-ast')
-astBtn.onclick = () => {
+window.onload = () => {
   fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
     .then(response => response.json())
     .then(response => {
@@ -219,5 +218,4 @@ astBtn.onclick = () => {
       onchange();
       console.log(response)
     })
-
 }

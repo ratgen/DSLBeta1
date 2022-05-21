@@ -1,17 +1,17 @@
-model mobile using widgets
+model mobile using widgets_new
 
-declarative entity Celebrant {
+declarative entity "Celebrant" {
 	properties: birthday, wishlist
 }
 
-declarative entity WishList {
+declarative entity "WishList" {
 	actions: create, share
 	states: void, empty, shared, created
 }
 
 
 
-Scenario: Creating a wishlist - creation succeeded
+Scenario: Creating a wishlist  creation succeeded
 Given the birthday of the Celebrant "" is "" 
 	which means
 		Given the BrowserWindow "Home" is displayed 

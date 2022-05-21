@@ -1,4 +1,4 @@
-model widgets
+model widgets_new
 
 imperative entity widget {
 	actions: move

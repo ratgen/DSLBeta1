@@ -1,5 +1,7 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import java.io.Console;
+
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.common.util.URI;
@@ -60,7 +62,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			EList<EObject> objectContents = item.getContents();
 		}
 		
-		
+		//TODO: Better categoires
 		//setup toolbox
 		JSONObject toolbox = new JSONObject();
 		toolbox.put("kind", "categoryToolbox");
@@ -139,7 +141,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					block.remove("output");
 				}
 				
-
 				setTopLevelStatement(rule, block, "ModelRef");
 				setTopLevelStatement(rule, block, "DeclarativeEntityDef");
 				setTopLevelStatement(rule, block, "ImperativeEntityDef");
@@ -155,9 +156,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 				categoryContent.add(catItem);
 
-				if (rule.getName().equals("Scenario") || rule.getName().equals("Model") || rule.getName().equals("PREP") ||  rule.getName().equals("DeclarativeEntityDef")) {
 					System.out.println("rule contents: \n" + dump(rule, "    ")); 
-				}
+				
 				
 			}
 			if (rule instanceof TerminalRule) {
@@ -312,12 +312,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		data.setPrune(true);
 		
 		JSONArray argumentOptions = getDropDownArgumentOptions(alternatives);
-		boolean isRuleSet = true;
+		boolean isRuleSet = false;
 		
 		for (Object item : argumentOptions) {
 			JSONArray arrItem = (JSONArray) item;
+
+			System.out.println("arrIt " + arrItem);
 			if (!arrItem.get(1).equals("rule")) {
-				isRuleSet = false;
+				isRuleSet = true;
 				break; 
 			}
 		}
@@ -436,6 +438,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			if (content instanceof RuleCall) {
 				RuleCall call = (RuleCall) content;
 				AbstractRule rule = call.getRule();
+				
+				JSONArray arr = new JSONArray();
+				arr.add(rule.getName());
+				arr.add("rule");
+				argumentOptions.add(arr);
+			}
+			if (content instanceof Assignment) {
+				Assignment assign = (Assignment) content;
+				RuleCall ruleCall = (RuleCall) assign.getTerminal();
+				AbstractRule rule =  ruleCall.getRule();
 				
 				JSONArray arr = new JSONArray();
 				arr.add(rule.getName());
