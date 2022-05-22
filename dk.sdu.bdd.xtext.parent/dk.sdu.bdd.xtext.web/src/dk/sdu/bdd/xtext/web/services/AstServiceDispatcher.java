@@ -25,6 +25,8 @@ import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures.StatementTypes;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
@@ -44,7 +46,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	@Inject
 	private BddDslGrammarAccess grammarAccess;
 	
-	private static HashMap<String, HashMap<String, ArrayList<String>>> blockFeatures = new HashMap<>(); 
+	private BlockFeatures blockFeatures;
 	
 	@Override
 	protected ServiceDescriptor createServiceDescriptor(String serviceType, IServiceContext context){
@@ -64,6 +66,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	ServiceDescriptor getAstService(IServiceContext context) {
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
+		blockFeatures = new BlockFeatures();
 		
 		EList<Resource> list = resourceSet.getResources();
 		for (Resource item : list) {
@@ -80,6 +83,18 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		ArrayList<Block> blockArray = new ArrayList<>();
 		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
+		
+		blockFeatures.blockFeatures.keySet().forEach((value) -> {System.out.println(value);});
+
+		blockFeatures.blockFeatures.values().forEach((value) -> {System.out.println(value);});
+		for (Block block : blockArray) {
+			block.setPreviousStatement(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
+			block.setNextStatement(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
+			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
+			if (outputs != null) {
+				block.setOutput(outputs.get(0));
+			}
+		}
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;
@@ -197,12 +212,30 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		else if (alternatives.getCardinality().equals("*")) {
 			InputStatement inputStatement = new InputStatement("alternatives_statement");
-			for (EObject item : alternatives.eContents()) {
-				if (item instanceof Assignment) {
-					Assignment assign = (Assignment) item;
-					RuleCall ele = (RuleCall) assign.getTerminal();
-					AbstractRule rule = ele.getRule();
+			EList<EObject> contents = alternatives.eContents();
+			for (int i = 0; i < contents.size(); i++) {
+				if (contents.get(i) instanceof Assignment) {
+					AbstractRule rule = getRuleFromAssignment(contents.get(i));
 					inputStatement.addCheck(rule.getName());
+					blockFeatures.addStatement(rule.getName(), block.getType(), StatementTypes.previousStatement);
+					
+					//add previous blocks as prevstatements
+					for (int j = 0; j < i + 1; j++) {
+						blockFeatures.addStatement(
+								rule.getName(), 
+								getRuleFromAssignment(contents.get(j)).getName(), 
+								StatementTypes.previousStatement
+								);
+					}
+					
+					//add next blocks as nextstatements
+					for (int j = i; j < contents.size(); j++) {
+						blockFeatures.addStatement(
+								rule.getName(), 
+								getRuleFromAssignment(contents.get(j)).getName(), 
+								StatementTypes.nextStatement
+						);
+					}
 				}
 			}
 			block.addArgument(inputStatement);
@@ -211,6 +244,12 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		block.addArgument(dropDown);
 		return true;
+	}
+	
+	private AbstractRule getRuleFromAssignment(EObject obj) {
+		Assignment assign = (Assignment) obj;
+		RuleCall ele = (RuleCall) assign.getTerminal();
+		return ele.getRule();
 	}
 
 	private void getDropDownArgumentOptions(Alternatives alternatives, FieldDropdown dropDown) {
