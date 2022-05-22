@@ -44,7 +44,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	@Inject
 	private BddDslGrammarAccess grammarAccess;
 	
-	private static HashMap<String, ArrayList<Argument>> blockFeatures = new HashMap<>(); 
+	private static HashMap<String, HashMap<String, ArrayList<String>>> blockFeatures = new HashMap<>(); 
 	
 	@Override
 	protected ServiceDescriptor createServiceDescriptor(String serviceType, IServiceContext context){
