@@ -47,6 +47,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private BddDslGrammarAccess grammarAccess;
 	
 	private BlockFeatures blockFeatures;
+	private CategoryToolBox toolBox;
+	private ArrayList<Block> blockArray;
 	
 	@Override
 	protected ServiceDescriptor createServiceDescriptor(String serviceType, IServiceContext context){
@@ -77,22 +79,28 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		//TODO: Better categoires
 		//setup toolbox
-		CategoryToolBox toolBox = new CategoryToolBox();
+		toolBox = new CategoryToolBox();
 		Category all = new Category("all");
 		toolBox.addCategory(all);
 		
-		ArrayList<Block> blockArray = new ArrayList<>();
+		blockArray = new ArrayList<>();
 		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
 		
 		blockFeatures.blockFeatures.keySet().forEach((value) -> {System.out.println(value);});
 
 		blockFeatures.blockFeatures.values().forEach((value) -> {System.out.println(value);});
+		
 		for (Block block : blockArray) {
 			block.setPreviousStatement(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
 			block.setNextStatement(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
 			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
 			if (outputs != null) {
 				block.setOutput(outputs.get(0));
+			}
+			
+			Category cat = block.getBlockCategory();
+			if (cat != null) {
+				toolBox.addCategory(cat);
 			}
 		}
 		
@@ -301,7 +309,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		InputValue argument = new InputValue("name_" + abstractRule.getName());
 		argument.addCheck(abstractRule.getName());
-
+		block.addArgument(argument);
 		
 		return false;
 	}
@@ -319,7 +327,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 
 	private boolean parseGroup(Group group, Block block) {
-		
 		FieldDropdown argument = new FieldDropdown("optionalGroup");
 		for (AbstractElement groupMember : group.getElements() ) {
 			if (groupMember instanceof Keyword) {
@@ -334,7 +341,30 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		if (group.getCardinality().equals("?")) {
-			argument.addOption(" ");
+			EList<EObject> contents = group.eContents();
+			StringBuilder sb = new StringBuilder();
+			contents.forEach((item) -> {
+				if (item instanceof Keyword) {
+					sb.append("_" + ((Keyword) item).getValue());
+				}
+			});
+			
+			String block_id = "subBlock_" + block.getType() + sb.toString();
+			Block subBlock = new Block(block_id);
+			subBlock.setOutput(block_id);
+			
+			InputValue in_val = new InputValue(block.getType() + "_input_" + block.getArgCount());
+			in_val.addCheck(block_id);
+			block.addArgument(in_val);
+			
+			for (EObject item : contents) {
+				parseLoop(item, subBlock);
+			}
+			
+			Category blockCat = block.getBlockCategory();
+			blockCat.addCategoryItem(new CategoryItem(block_id));
+			
+			blockArray.add(subBlock);
 		}
 
 		return true;

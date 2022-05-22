@@ -3,6 +3,7 @@ package dk.sdu.bdd.xtext.web.services.blockly.blocks;
 import java.util.ArrayList;
 
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
+import dk.sdu.bdd.xtext.web.services.blockly.toolbox.Category;
 
 public class Block  {
 	private String type;
@@ -12,8 +13,9 @@ public class Block  {
 	private String message0 = "";
 	private int argCount;
 	
-	ArrayList<Argument> args0;
+	private Category blockCategory;
 	
+	ArrayList<Argument> args0;
 	ArrayList<String> previousStatement;
 	ArrayList<String> nextStatement;
 	
@@ -23,6 +25,21 @@ public class Block  {
 		this.argCount = 1;
 		
 		this.args0 = new ArrayList<>();
+	}
+	
+	public Category getBlockCategory() {
+		if (blockCategory == null) {
+			blockCategory = new Category(type);
+		}
+		return blockCategory;
+	}
+
+	public void setBlockCategory(Category blockCategory) {
+		this.blockCategory = blockCategory;
+	}
+
+	public int getArgCount() {
+		return argCount;
 	}
 	
 	public String getType() {
@@ -73,7 +90,7 @@ public class Block  {
 	}
 	
 	public void addArgument(Argument arg) {
-		this.message0 = this.message0 + "%" + this.argCount;
+		this.message0 = this.message0 + "%" + this.argCount + " ";
 		argCount++;
 		this.args0.add(arg);
 	}

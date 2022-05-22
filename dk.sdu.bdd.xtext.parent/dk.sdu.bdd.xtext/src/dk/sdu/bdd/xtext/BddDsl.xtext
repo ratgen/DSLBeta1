@@ -72,7 +72,7 @@ Scenario:
 ;
 
 ImperativeScenario:
-	'which' 'means'
+   'which' 'means'
        
    'Given' preState = ImperativeScenarioState
    'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
@@ -99,7 +99,6 @@ ImperativeScenarioAction:
 	actions += ImperativeEntityAction ('And' actions += ImperativeEntityAction)*
 ;
  
-
 DeclarativeStatePhrase: 
 	DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;

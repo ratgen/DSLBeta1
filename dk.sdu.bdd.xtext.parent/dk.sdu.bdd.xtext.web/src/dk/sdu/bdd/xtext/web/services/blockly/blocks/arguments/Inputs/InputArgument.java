@@ -11,4 +11,13 @@ public class InputArgument extends Argument {
 		check.add(type);
 	}
 
+	public ArrayList<String> getCheck() {
+		return check;
+	}
+
+	public void setCheck(ArrayList<String> check) {
+		this.check = check;
+	}
+
+	
 }
