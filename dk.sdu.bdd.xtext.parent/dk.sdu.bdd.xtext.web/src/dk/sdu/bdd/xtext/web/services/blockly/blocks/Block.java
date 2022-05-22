@@ -68,7 +68,7 @@ public class Block  {
 		this.nextStatement = nextStatement;
 	}
 	
-	public void concatMessage(String msg) {
+	public void addMessage(String msg) {
 		this.message0 = this.message0.concat(msg);
 	}
 	
@@ -76,5 +76,19 @@ public class Block  {
 		this.message0 = this.message0 + "%" + this.argCount;
 		argCount++;
 		this.args0.add(arg);
+	}
+	
+	public void addPreviousStatement(String state) {
+		if (previousStatement == null) {
+			previousStatement = new ArrayList<>();
+		}
+		previousStatement.add(state);
+	}
+	
+	public void addNextStatement(String state) {
+		if (nextStatement == null) {
+			nextStatement = new ArrayList<>();
+		}
+		nextStatement.add(state);
 	}
 }

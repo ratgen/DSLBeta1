@@ -1,6 +1,7 @@
 package dk.sdu.bdd.xtext.web.services;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -25,6 +26,7 @@ import org.eclipse.xtext.RuleCall;
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.Category;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.CategoryItem;
@@ -41,7 +43,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	
 	@Inject
 	private BddDslGrammarAccess grammarAccess;
-		
+	
+	private static HashMap<String, ArrayList<Argument>> blockFeatures = new HashMap<>(); 
+	
 	@Override
 	protected ServiceDescriptor createServiceDescriptor(String serviceType, IServiceContext context){
 		if (serviceType != null) {
@@ -186,6 +190,23 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		getDropDownArgumentOptions(alternatives, dropDown);		
 		//use a dropdown menu to select between alternatives
 		dropDown.addOption(" ");
+		
+		if (alternatives.getCardinality() == null) {
+			
+		}
+		
+		else if (alternatives.getCardinality().equals("*")) {
+			InputStatement inputStatement = new InputStatement("alternatives_statement");
+			for (EObject item : alternatives.eContents()) {
+				if (item instanceof Assignment) {
+					Assignment assign = (Assignment) item;
+					RuleCall ele = (RuleCall) assign.getTerminal();
+					AbstractRule rule = ele.getRule();
+					inputStatement.addCheck(rule.getName());
+				}
+			}
+			block.addArgument(inputStatement);
+		}
 
 		
 		block.addArgument(dropDown);
@@ -249,7 +270,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private boolean parseKeyword(Keyword keyWord, Block block) {
 		
 		if (keyWord.getCardinality() == null) {
-			block.concatMessage(keyWord.getValue() + " ");
+			block.addMessage(keyWord.getValue() + " ");
 		}
 		//TODO: create dropdown as it is optional
 		else if (keyWord.getCardinality().equals("?")) {
@@ -266,6 +287,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				Keyword keyWord = (Keyword) groupMember;
 				argument.addOption(keyWord.getValue() + " ");
 			}
+		}
+		
+		if (group.getCardinality().equals("*")) {
+			block.addMessage("this");
+			block.addArgument(new InputStatement("this"));
 		}
 		
 		if (group.getCardinality().equals("?")) {
