@@ -99,7 +99,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 			
 			Category cat = block.getBlockCategory();
-			if (cat != null) {
+			System.out.println(cat);
+			if (cat != null && !block.getType().contains("subBlock")) {
 				toolBox.addCategory(cat);
 			}
 		}
@@ -336,8 +337,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		if (group.getCardinality().equals("*")) {
-			block.addMessage("this");
-			block.addArgument(new InputStatement("this"));
+			block.addArgument(new InputStatement("group_input"));
 		}
 		
 		if (group.getCardinality().equals("?")) {
@@ -349,20 +349,27 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				}
 			});
 			
+			//create sub block
 			String block_id = "subBlock_" + block.getType() + sb.toString();
 			Block subBlock = new Block(block_id);
 			subBlock.setOutput(block_id);
 			
+			//create input for the subblock
 			InputValue in_val = new InputValue(block.getType() + "_input_" + block.getArgCount());
 			in_val.addCheck(block_id);
 			block.addArgument(in_val);
 			
-			for (EObject item : contents) {
-				parseLoop(item, subBlock);
-			}
+			
 			
 			Category blockCat = block.getBlockCategory();
 			blockCat.addCategoryItem(new CategoryItem(block_id));
+			//do not make categories for subblocks
+			subBlock.setBlockCategory(blockCat);
+			
+			//populate the subblock
+			for (EObject item : contents) {
+				parseLoop(item, subBlock);
+			}
 			
 			blockArray.add(subBlock);
 		}
