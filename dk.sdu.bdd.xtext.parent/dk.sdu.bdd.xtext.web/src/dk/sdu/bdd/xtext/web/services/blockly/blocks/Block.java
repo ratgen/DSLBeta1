@@ -13,11 +13,11 @@ public class Block  {
 	private String message0 = "";
 	private int argCount;
 	
-	private Category blockCategory;
+	private Category blockCategory = null;
 	
-	ArrayList<Argument> args0;
-	ArrayList<String> previousStatement;
-	ArrayList<String> nextStatement;
+	private ArrayList<Argument> args0;
+	private ArrayList<String> previousStatement;
+	private ArrayList<String> nextStatement;
 	
 	public Block(String type) {
 		this.type = type;
@@ -83,6 +83,24 @@ public class Block  {
 	}
 	public void setNextStatement(ArrayList<String> nextStatement) {
 		this.nextStatement = nextStatement;
+	}
+	
+	public void addAllPrevious(ArrayList<String> array) {
+		if (array != null) {
+			if (previousStatement == null) {
+				previousStatement = new ArrayList<>();
+			}
+			this.previousStatement.addAll(array);
+		}
+	}
+	
+	public void addAllNext(ArrayList<String> array) {
+		if (array != null) {
+			if (nextStatement == null) {
+				nextStatement = new ArrayList<>();
+			}
+			this.nextStatement.addAll(array);
+		}
 	}
 	
 	public void addMessage(String msg) {

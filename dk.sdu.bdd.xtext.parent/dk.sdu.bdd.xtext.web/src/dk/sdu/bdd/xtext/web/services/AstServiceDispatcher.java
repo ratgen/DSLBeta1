@@ -18,11 +18,15 @@ import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
+import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
+import org.eclipse.xtext.TerminalRule;
+import org.eclipse.xtext.TypeRef;
+
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
@@ -86,21 +90,18 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		blockArray = new ArrayList<>();
 		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
 		
-		blockFeatures.blockFeatures.keySet().forEach((value) -> {System.out.println(value);});
-
-		blockFeatures.blockFeatures.values().forEach((value) -> {System.out.println(value);});
-		
 		for (Block block : blockArray) {
-			block.setPreviousStatement(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
-			block.setNextStatement(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
+			block.addAllPrevious(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
+			block.addAllNext(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
 			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
 			if (outputs != null) {
 				block.setOutput(outputs.get(0));
 			}
 			
 			Category cat = block.getBlockCategory();
-			System.out.println(cat);
-			if (cat != null && !block.getType().contains("subBlock")) {
+			if (cat.getContents() != null &&
+					cat.getContents().size() != 0 
+					&& !block.getType().contains("subBlock")) {
 				toolBox.addCategory(cat);
 			}
 		}
@@ -125,10 +126,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		     });
 			e.printStackTrace();
 			return serviceDescriptor;
-
 		}
-		
-		
 	}
 	
 	ArrayList<Block> parseGrammar(Grammar grammar, Category categoryContent) {
@@ -144,34 +142,25 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				if(rule.getName().equals("Model")) {
 					block.setOutput(null);
 				}
-				
 				blockArray.add(block);
 				categoryContent.addCategoryItem(new CategoryItem(block.getType())); 
-				
 				System.out.println("rule contents: \n" + dump(rule, "    ")); 
-				
 			}
 		}
-		
 		return blockArray;
 	}
 	
 	//Parse a rule and return a Blockly Block representing the Rule
 	private Block parseRule(ParserRule rule) {
-		
 		Block block = new Block(rule.getName());
-		
 		TreeIterator<EObject> iterator =  rule.eAllContents();
 				
 		while(iterator.hasNext()) {
 			EObject next = iterator.next();
-			
 			boolean prune = parseLoop(next, block);
-		
 			if (prune) {
 				iterator.prune();
 			}
-			
 		}
 			
 		return block;
@@ -203,7 +192,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			return parseAlternatives(alternatives, block);
 			
 		}
-		if (obj.getClass() == CrossReference.class) {
+		if (obj instanceof CrossReference) {
+			CrossReference ref = (CrossReference) obj;
+			return parseCrossReference(ref, block);
 		}
 		return false;
 	}
@@ -211,15 +202,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private boolean parseAlternatives(Alternatives alternatives, Block block) {
 		
 		FieldDropdown dropDown = new FieldDropdown("alternativs");
-		getDropDownArgumentOptions(alternatives, dropDown);		
+		System.out.println(alternatives.eContents());
+		ArrayList<Class> alternativeContents = getDropDownArgumentOptions(alternatives, dropDown);		
 		//use a dropdown menu to select between alternatives
-		dropDown.addOption(" ");
 		
 		if (alternatives.getCardinality() == null) {
-			
-		}
-		
-		else if (alternatives.getCardinality().equals("*")) {
+			if (alternativeContents.size() == 1 && alternativeContents.get(0) == Keyword.class) {
+				block.addArgument(dropDown);
+			}
+		} else if (alternatives.getCardinality().equals("*")) {
 			InputStatement inputStatement = new InputStatement("alternatives_statement");
 			EList<EObject> contents = alternatives.eContents();
 			for (int i = 0; i < contents.size(); i++) {
@@ -248,10 +239,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				}
 			}
 			block.addArgument(inputStatement);
+		} else if (alternatives.getCardinality().equals("?")) {
+			dropDown.addOption(" ");
+			block.addArgument(dropDown);
 		}
-
 		
-		block.addArgument(dropDown);
 		return true;
 	}
 	
@@ -260,13 +252,17 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		RuleCall ele = (RuleCall) assign.getTerminal();
 		return ele.getRule();
 	}
-
-	private void getDropDownArgumentOptions(Alternatives alternatives, FieldDropdown dropDown) {
+	/*
+	 * Returns the type of the contents of the array; 
+	 */
+	private ArrayList<Class> getDropDownArgumentOptions(Alternatives alternatives, FieldDropdown dropDown) {
+		ArrayList<Class> contents = new ArrayList<>();
 		
 		for (EObject content : alternatives.eContents()) {
 			if (content instanceof Keyword) {
 				Keyword keyWord = (Keyword) content;
 				dropDown.addOption(keyWord.getValue());
+				contents.add(Keyword.class);
 			}
 			
 			if(content instanceof Group) {
@@ -277,32 +273,35 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					if (groupMember instanceof Keyword) {
 						Keyword keyWord = (Keyword) groupMember;
 						option = option.concat(keyWord.getValue() + " ");
+						if (!contents.contains(Keyword.class)) {
+							contents.add(Keyword.class);
+						}
 					}
-					
 				}
 				if (option != "") {
 					dropDown.addOption(option);
 				}
-			}
-			if (content instanceof Assignment) {
-				Assignment assign = (Assignment) content;
-				ParserRule rule = (ParserRule) assign.eContents().get(0).eCrossReferences().get(0);
-			
-				dropDown.addOption(rule.getName());
 			}
 			if (content instanceof RuleCall) {
 				RuleCall call = (RuleCall) content;
 				AbstractRule rule = call.getRule();
 				
 				dropDown.addRule(rule.getName());
+				if (!contents.contains(RuleCall.class)) {
+					contents.add(RuleCall.class);
+				}
 			}
 			if (content instanceof Assignment) {
 				Assignment assign = (Assignment) content;
 				RuleCall ruleCall = (RuleCall) assign.getTerminal();
 				AbstractRule rule =  ruleCall.getRule();
 				dropDown.addRule(rule.getName());
+				if (!contents.contains(Assignment.class)) {
+					contents.add(Assignment.class);
+				}
 			}
 		}
+		return contents;
 	}
 
 	private boolean parseRuleCall(RuleCall rule, Block block) {
@@ -337,43 +336,84 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		if (group.getCardinality().equals("*")) {
-			block.addArgument(new InputStatement("group_input"));
+			InputStatement in_val = new InputStatement(block.getType() + "_input_" + block.getArgCount());
+			in_val.addCheck(null);
+			block.addArgument(in_val);
+			createSubblock(group, block, in_val);
 		}
 		
 		if (group.getCardinality().equals("?")) {
-			EList<EObject> contents = group.eContents();
-			StringBuilder sb = new StringBuilder();
-			contents.forEach((item) -> {
-				if (item instanceof Keyword) {
-					sb.append("_" + ((Keyword) item).getValue());
-				}
-			});
-			
-			//create sub block
-			String block_id = "subBlock_" + block.getType() + sb.toString();
-			Block subBlock = new Block(block_id);
-			subBlock.setOutput(block_id);
-			
-			//create input for the subblock
-			InputValue in_val = new InputValue(block.getType() + "_input_" + block.getArgCount());
-			in_val.addCheck(block_id);
+			InputStatement in_val = new InputStatement(block.getType() + "_input_" + block.getArgCount());
+			in_val.addCheck(null);
 			block.addArgument(in_val);
-			
-			
-			
-			Category blockCat = block.getBlockCategory();
-			blockCat.addCategoryItem(new CategoryItem(block_id));
-			//do not make categories for subblocks
-			subBlock.setBlockCategory(blockCat);
-			
-			//populate the subblock
-			for (EObject item : contents) {
-				parseLoop(item, subBlock);
-			}
-			
-			blockArray.add(subBlock);
+			createSubblock(group, block, in_val);
 		}
 
+		return true;
+	}
+
+	private void createSubblock(Group group, Block block, InputStatement in_val) {
+		EList<EObject> contents = group.eContents();
+		StringBuilder sb = new StringBuilder();
+		contents.forEach((item) -> {
+			if (item instanceof Keyword) {
+				sb.append("_" + ((Keyword) item).getValue());
+			}
+		});
+		
+		//create sub block
+		String block_id = "subBlock_" + block.getType() + sb.toString();
+		Block subBlock = new Block(block_id);
+		subBlock.addPreviousStatement(block_id);
+		if (group.getCardinality().equals("*")) {
+			subBlock.addNextStatement(block_id);
+		}
+		System.out.println(subBlock.getPreviousStatement());
+		
+		//create input for the subblock
+		in_val.addCheck(block_id);
+		
+		Category blockCat = block.getBlockCategory();
+		blockCat.addCategoryItem(new CategoryItem(block_id));
+		//do not make categories for subblocks
+		subBlock.setBlockCategory(blockCat);
+		
+		//populate the subblock
+		TreeIterator<EObject> it = group.eAllContents();
+		while (it.hasNext()) {
+			//System.out.println("populating subblock " + item);
+			boolean prune = parseLoop(it.next(), subBlock);
+			if (prune) {
+				it.prune();
+			}
+		}
+		
+		blockArray.add(subBlock);
+	}
+	
+
+	
+	private boolean parseCrossReference(CrossReference ref, Block block) {
+		//Get the type that the CrossReference refers to
+		TypeRef typeRef = ref.getType();
+		//System.out.println(((GeneratedMetamodel) typeRef.getMetamodel()).getName());
+		;
+		AbstractElement terminal = ref.getTerminal();
+		if (terminal instanceof RuleCall) {
+			RuleCall rule = (RuleCall) terminal;
+			//TODO: Make it such that only an reference (defined by the rule) to a type (defined by the TypeRef) can be placed in the field
+			if (rule.getRule() instanceof TerminalRule) {
+				TerminalRule ter = (TerminalRule) rule.getRule();
+				InputValue val = new InputValue(block.getType() + "_" + ter.getName());
+				val.addCheck(ter.getName());
+				block.addArgument(val);
+				
+			}
+			System.out.println("rule " + rule);
+			System.out.println(rule.getRule());
+			System.out.println(rule.getArguments());
+		}
+		
 		return true;
 	}
 	

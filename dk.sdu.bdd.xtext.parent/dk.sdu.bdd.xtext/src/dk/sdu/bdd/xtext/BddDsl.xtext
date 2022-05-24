@@ -27,7 +27,7 @@ DeclarativeEntityDef:
 ;
 
 ImperativeEntityDef:
-	'imperative' 'entity' name = (ID | STRING) ('-'ID)? ('is' superEntities += [ImperativeEntityDef] (',' superEntities += [ImperativeEntityDef])*)? '{'
+	'imperative' 'entity' name = STRING ('-'ID)? ('is' superEntities += [ImperativeEntityDef] (',' superEntities += [ImperativeEntityDef])*)? '{'
 		('actions:' (actions += ImperativeActionDef) ID? (ID'-'ID)? ((','|'and'|'the') actions += ImperativeActionDef)*)?
 		('states:' (states += ImperativeStateDef) ID? (ID'-'ID)? ((','|'and'|'the') states += ImperativeStateDef)*)?
 		('properties:' (properties += ImperativePropertyDef) ID? (ID'-'ID)? ((','|'and'|'the') properties += ImperativePropertyDef)*)?
