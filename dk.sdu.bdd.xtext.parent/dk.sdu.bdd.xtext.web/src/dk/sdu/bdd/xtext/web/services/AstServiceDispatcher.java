@@ -1,6 +1,7 @@
 package dk.sdu.bdd.xtext.web.services;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 
 import org.eclipse.emf.common.util.EList;
@@ -31,6 +32,7 @@ import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures.StatementTypes;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
@@ -60,6 +62,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			switch (serviceType) {
 				case "ast":
 					return getAstService(context);
+				case "blocks":
+					return getBlocksService(context);
 				default:
 					return super.createServiceDescriptor(serviceType, context);
 			}
@@ -70,17 +74,52 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
+		ObjectMapper objectMapper = new ObjectMapper();
+		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
-		blockFeatures = new BlockFeatures();
-		
+
+
 		EList<Resource> list = resourceSet.getResources();
+		System.out.println(list);
 		for (Resource item : list) {
 			//used for working with the AST.
 			URI uri = item.getURI();
+			System.out.println("Resource  URI: " + uri);
 			EList<EObject> objectContents = item.getContents();
+			System.out.println("item contents " + objectContents);
+			for (EObject obj : objectContents) {
+				System.out.println("EObject_string: " + obj.toString());
+				
+				System.out.println(dump(obj, "   "));
+			}
+			System.out.println();
+			System.out.println();
 		}
+
 		
+		try {
+			String blockarr = objectMapper.writeValueAsString(new String("hidf"));
+			
+			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+			serviceDescriptor.setService(() -> {
+		        return new AstServiceResult(blockarr);
+		     });
+			return serviceDescriptor;
+		} catch (JsonProcessingException e) {
+ 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+			serviceDescriptor.setService(() -> {
+		        return new AstServiceResult("err");
+		     });
+			e.printStackTrace();
+			return serviceDescriptor;
+		}
+
+	}
+	
+	ServiceDescriptor getBlocksService(IServiceContext context) {
+		blockFeatures = new BlockFeatures();
+				
 		//TODO: Better categoires
 		//setup toolbox
 		toolBox = new CategoryToolBox();
@@ -94,7 +133,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			block.addAllPrevious(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
 			block.addAllNext(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
 			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
-			if (outputs != null) {
+			if (outputs != null && block.getPreviousStatement() == null && block.getNextStatement() == null) {
 				block.setOutput(outputs.get(0));
 			}
 			
@@ -116,13 +155,13 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult(blockarr, toolboxstr);
+		        return new BlockServiceResult(blockarr, toolboxstr);
 		     });
 			return serviceDescriptor;
 		} catch (JsonProcessingException e) {
  			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult("err", "err");
+		        return new BlockServiceResult("err", "err");
 		     });
 			e.printStackTrace();
 			return serviceDescriptor;
@@ -158,6 +197,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		while(iterator.hasNext()) {
 			EObject next = iterator.next();
 			boolean prune = parseLoop(next, block);
+			
 			if (prune) {
 				iterator.prune();
 			}
@@ -202,12 +242,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	private boolean parseAlternatives(Alternatives alternatives, Block block) {
 		
 		FieldDropdown dropDown = new FieldDropdown("alternativs");
-		System.out.println(alternatives.eContents());
 		ArrayList<Class> alternativeContents = getDropDownArgumentOptions(alternatives, dropDown);		
+	
 		//use a dropdown menu to select between alternatives
-		
+		System.out.println("dropdown");
+		System.out.println(alternativeContents);
+		System.out.println(dropDown.getOptions());
 		if (alternatives.getCardinality() == null) {
 			if (alternativeContents.size() == 1 && alternativeContents.get(0) == Keyword.class) {
+				System.out.println("adding only args");
+				System.out.println(dropDown.getOptions());
 				block.addArgument(dropDown);
 			}
 		} else if (alternatives.getCardinality().equals("*")) {
@@ -262,7 +306,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			if (content instanceof Keyword) {
 				Keyword keyWord = (Keyword) content;
 				dropDown.addOption(keyWord.getValue());
-				contents.add(Keyword.class);
+				if (!contents.contains(Keyword.class)) {
+					contents.add(Keyword.class);
+				}
 			}
 			
 			if(content instanceof Group) {
@@ -311,6 +357,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		argument.addCheck(abstractRule.getName());
 		block.addArgument(argument);
 		
+		blockFeatures.addStatement(block.getType(), abstractRule.getName(), StatementTypes.output);
+		
 		return false;
 	}
 
@@ -335,18 +383,18 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 		}
 		
-		if (group.getCardinality().equals("*")) {
+		if (group.getCardinality().equals("?") || group.getCardinality().equals("*")) {
+			if (block.getArgs0().size() > 0 && block.isLastIsArg()) {
+				Argument arg = block.getArgs0().get(block.getArgs0().size() - 1);
+				if (arg instanceof InputStatement) {
+					InputStatement in_val = (InputStatement) arg;
+					createSubblock(group, block, in_val); 
+					return true;
+				}
+			}
 			InputStatement in_val = new InputStatement(block.getType() + "_input_" + block.getArgCount());
-			in_val.addCheck(null);
 			block.addArgument(in_val);
-			createSubblock(group, block, in_val);
-		}
-		
-		if (group.getCardinality().equals("?")) {
-			InputStatement in_val = new InputStatement(block.getType() + "_input_" + block.getArgCount());
-			in_val.addCheck(null);
-			block.addArgument(in_val);
-			createSubblock(group, block, in_val);
+			createSubblock(group, block, in_val); 
 		}
 
 		return true;
@@ -360,15 +408,26 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				sb.append("_" + ((Keyword) item).getValue());
 			}
 		});
-		
 		//create sub block
 		String block_id = "subBlock_" + block.getType() + sb.toString();
 		Block subBlock = new Block(block_id);
 		subBlock.addPreviousStatement(block_id);
-		if (group.getCardinality().equals("*")) {
+		if (group.getCardinality().equals("*") ) {
+			//we should be able to connect two instances of the block type
 			subBlock.addNextStatement(block_id);
+		} else if (group.getCardinality().equals("?")) {
+
 		}
-		System.out.println(subBlock.getPreviousStatement());
+		//Get the check of the inputstatement
+		ArrayList<String> vals = in_val.getCheck();
+		if (vals.size() > 0) {
+			//Get the last element
+			String val = vals.get(vals.size() - 1);
+			//Make it connect to the last block in the inputstatement
+			subBlock.addPreviousStatement(val);
+			//Make the last block in the inputstatement connect to the new subblock
+			blockFeatures.addStatement(val, subBlock.getType(), StatementTypes.nextStatement);
+		}
 		
 		//create input for the subblock
 		in_val.addCheck(block_id);
@@ -387,7 +446,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				it.prune();
 			}
 		}
-		
 		blockArray.add(subBlock);
 	}
 	
@@ -418,6 +476,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	private static String dump(EObject mod_, String indent) {
+		
+		
 		
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    

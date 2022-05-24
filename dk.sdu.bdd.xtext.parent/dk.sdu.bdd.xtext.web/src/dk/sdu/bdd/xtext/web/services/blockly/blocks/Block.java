@@ -12,6 +12,7 @@ public class Block  {
 	private String tooltip;
 	private String message0 = "";
 	private int argCount;
+	private boolean lastIsArg = false;
 	
 	private Category blockCategory = null;
 	
@@ -105,12 +106,14 @@ public class Block  {
 	
 	public void addMessage(String msg) {
 		this.message0 = this.message0.concat(msg);
+		lastIsArg = false;
 	}
 	
 	public void addArgument(Argument arg) {
 		this.message0 = this.message0 + "%" + this.argCount + " ";
 		argCount++;
 		this.args0.add(arg);
+		lastIsArg = true;
 	}
 	
 	public void addPreviousStatement(String state) {
@@ -126,4 +129,10 @@ public class Block  {
 		}
 		nextStatement.add(state);
 	}
+
+	public boolean isLastIsArg() {
+		return lastIsArg;
+	}
+	
+	
 }

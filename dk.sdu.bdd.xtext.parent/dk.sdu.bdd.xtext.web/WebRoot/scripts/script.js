@@ -6,26 +6,14 @@ function readFile() {
   reader.onload = () => {
     var fileContent = reader.result
     let editor = getCurrentAceEditor()
-    let document  = editor.env.document.doc
-    if (document !== null || document !== undefined) {
-      document.setValue(fileContent)
+    let doc= editor.env.document.doc
+    if (doc!== null || doc!== undefined) {
+      doc.setValue(fileContent)
       let fileName = document.getElementById('fileName');
       fileName.value = file.name
       localStorage.setItem("fileName", file.name)
     }
   }
-}
-
-window.onload = () => {
-  setTimeout(() => {  
-    for (let editor of editors) {
-      getSavedDocument(editor)
-      let document = editor.env.document.doc
-      document.on('change', onDocumentChange)
-    }
-    let input = document.getElementById('file-input')
-    input.addEventListener('change', readFile) 
-  }, 200);
 }
 
 function printChildren(a){
@@ -111,7 +99,16 @@ currentBlockly = entitiesBlock
 setSelectionBorder(entitiesTab)
 
 window.onload = () => {
-  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
+  setTimeout (() => {
+  for (let editor of editors) {
+    getSavedDocument(editor)
+    let document = editor.env.document.doc
+    document.on('change', onDocumentChange)
+  }
+  let input = document.getElementById('file-input')
+  input.addEventListener('change', readFile) 
+
+  fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
     .then(response => response.json())
     .then(response => {
       console.log(response)
@@ -186,8 +183,9 @@ window.onload = () => {
         scenarioArray = []
         entityArray = []
 
-        scenarioTab.removeFullLines(0, scenarioTab.getLength());
-        entityTab.removeFullLines(0, entityTab.getLength());
+        // do not remove all lines
+        //scenarioTab.removeFullLines(0, scenarioTab.getLength());
+        //entityTab.removeFullLines(0, entityTab.getLength());
 
         entityBlockArray.forEach((block) => {
           if (block.type == "modelblock"){
@@ -216,6 +214,16 @@ window.onload = () => {
       window.addEventListener('click', onClick, false);
 
       onchange();
+      console.log(response)
+    })
+  }, 200)
+}
+
+let astBtn = document.getElementById('get-ast')
+astBtn.onclick = () => {
+  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
+    .then(response => response.json())
+    .then(response => {
       console.log(response)
     })
 }
