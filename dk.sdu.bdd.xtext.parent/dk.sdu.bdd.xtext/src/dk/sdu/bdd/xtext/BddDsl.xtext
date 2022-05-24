@@ -115,11 +115,6 @@ ImperativeStatePhrase:
 ;
 
 
-ScenarioRef:
-	scenarioRef = [Scenario | ID_OR_STRING]
-;
-
-
 ENTITY_IDENTITY: ('#'INT) | STRING;
 OPTION:'#'? (INT | STRING) ;
 
@@ -147,7 +142,7 @@ ImperativeEntityStatePhrase:
 
 DeclarativeEntityPropertyStatePhrase:
 	property = [PropertyDef | WORD]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = DeclarativeEntityRef
-	((('is'|'is' 'not') value = PropertyValue WORD?) WORD? | (('are'|'are' 'not') (values += PropertyValue) WORD? | (',' values += PropertyValue)*) WORD?) 
+	((('is'|'is' 'not') value = SimpleValue WORD?) WORD? | (('are'|'are' 'not') (values += SimpleValue) WORD? | (',' values += SimpleValue)*) WORD?) 
 ;
 
 ImperativeEntityPropertyStatePhrase:
@@ -158,19 +153,10 @@ ImperativeEntityPropertyStatePhrase:
 
 //terminal UNCLOSED_STRING : '"' (!'"')* EOF;
 
-PropertyValue: SimpleValue | ListValue | SetValue
-	
-;
 
-SimpleValue: IntValue | BooleanValue | StringValue | DoubleValue;
 
-ListValue:
-	{ListValue} '[' (values += SimpleValue (',' values += SimpleValue)*)? ']'
-;
+SimpleValue: IntValue | StringValue | DoubleValue;
 
-SetValue:
-	{SetValue} '{' (values += SimpleValue (',' values += SimpleValue)*)? '}'
-;
 
 StringValue:
 	value = STRING
@@ -184,17 +170,8 @@ DoubleValue:
 	value = DOUBLE
 ;
 
-TRUE: ('true' | 'yes');
-FALSE: ('false' | 'no');
-
-BooleanValue:
-	value = (TRUE | FALSE)
-;
-
-
 DeclarativeActionPhrase:
 	DeclarativeEntityAction | VerbAction
-	// Deleted: | VerifyAction
 ;
 
 ImperativeActionPhrase: ImperativeEntityAction;
@@ -221,27 +198,6 @@ ImperativePropertyRef:
     propertyref = 'to' property = [ImperativePropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [ImperativePropertyDef])? 
 ;
 
-DeclarativeActionRef: verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
-
-//ActionRef: verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = EntityDef))? ;
-
-//VerifyAction:
-//	'assure' state = StatePhrase
-//;  Evt. Slet
-
-//ScenarioState:
-	//states += StatePhrase ('And' states += StatePhrase)*
-//;
-
-//ScenarioAction:
-	//actions += ActionPhrase ('And' actions += ActionPhrase)*
-//;
-
-//StatePhrase: epsp = EntityPropertyStatePhrase | esp = EntityStatePhrase;
- //sr = ScenarioRef | 
-
-//EntityAction: entityAction = EntityRef (adverb=ADVERB)? actionDef = [ActionDef] (propertyRef = PropertyRef)?;
-
-
+DeclarativeActionRef: verb = [ActionDef | WORD] 'on'? (argument = SimpleValue)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
 
 DOUBLE returns ecore::EDouble : INT'.'INT;
