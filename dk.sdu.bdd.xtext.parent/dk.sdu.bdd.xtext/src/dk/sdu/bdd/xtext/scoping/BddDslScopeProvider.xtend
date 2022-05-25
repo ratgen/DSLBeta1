@@ -146,34 +146,6 @@ class BddDslScopeProvider extends AbstractBddDslScopeProvider {
 		}
 	}
 	
-	
-
-	def DeclarativeEntityDef findDecWEntityDef(EObject context) {
-		val feature = context.eClass.EAllStructuralFeatures.findFirst[EType == BddDslPackage.eINSTANCE.declarativeEntityRef];
-		if (feature !== null) {
-			(context.eGet(feature) as DeclarativeEntityRef)?.entity
-		} else {
-			null
-		}
-	}
-	
-	
-	def <T extends EObject> Iterable<T> getAllInheritedContentsOfType(ImperativeEntityDef imperativeEntityDef, Class<T> clazz) {
-		val  all = <T>newArrayList
-		all += EcoreUtil2.getAllContentsOfType(imperativeEntityDef, clazz)
-		imperativeEntityDef.superEntities.forEach[all += getAllInheritedContentsOfType(it, clazz)]
-		all.filter[clazz.isInstance(it)]
-	}
-	
-	def ImperativeEntityDef findImpWEntityDef(EObject context){
-		val feature = context.eClass.EAllStructuralFeatures.findFirst[EType == BddDslPackage.eINSTANCE.imperativeEntityRef];
-		if (feature !== null) {
-			(context.eGet(feature) as ImperativeEntityRef)?.entity
-		} else {
-			null
-		}
-	}
-	
 	def <T> T findAncestorOfType(EObject context, Class<T> clazz) {
 		var parent = context;
 		while (parent !== null) {

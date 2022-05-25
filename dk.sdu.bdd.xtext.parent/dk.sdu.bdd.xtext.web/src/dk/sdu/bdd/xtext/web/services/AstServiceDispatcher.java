@@ -245,14 +245,35 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		ArrayList<Class> alternativeContents = getDropDownArgumentOptions(alternatives, dropDown);		
 	
 		//use a dropdown menu to select between alternatives
-		System.out.println("dropdown");
-		System.out.println(alternativeContents);
-		System.out.println(dropDown.getOptions());
 		if (alternatives.getCardinality() == null) {
 			if (alternativeContents.size() == 1 && alternativeContents.get(0) == Keyword.class) {
-				System.out.println("adding only args");
-				System.out.println(dropDown.getOptions());
 				block.addArgument(dropDown);
+			} else {
+				InputStatement inputStatement = new InputStatement("alternatives_statement");
+				EList<EObject> contents = alternatives.eContents();
+				for (int i = 0; i < contents.size(); i++) {
+					if (contents.get(i) instanceof Assignment) {
+						AbstractRule rule = getRuleFromAssignment(contents.get(i));
+						inputStatement.addCheck(rule.getName());
+						
+					}
+					if (contents.get(i) instanceof Keyword) {
+						Keyword keyWord = (Keyword) contents.get(i);
+						inputStatement.addCheck(keyWord.getValue());
+						Block subBlock = new Block("subblock_" + block.getType() + "_" + keyWord.getValue());
+						subBlock.addPreviousStatement(keyWord.getValue());
+						Category cat = block.getBlockCategory();
+						cat.addCategoryItem(new CategoryItem(subBlock.getType()));
+						subBlock.addMessage(keyWord.getValue());
+						/*subBlock.setBlockCategory(cat);
+						;*/
+					}
+					if (contents.get(i) instanceof Group) {
+						Group gr = (Group) contents.get(i);
+						createSubblock(gr, block, inputStatement);
+					}
+				}
+				block.addArgument(inputStatement);
 			}
 		} else if (alternatives.getCardinality().equals("*")) {
 			InputStatement inputStatement = new InputStatement("alternatives_statement");
@@ -356,7 +377,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		InputValue argument = new InputValue("name_" + abstractRule.getName());
 		argument.addCheck(abstractRule.getName());
 		block.addArgument(argument);
-		System.out.println("setting " + block.getType() + " " + abstractRule.getName());
 		blockFeatures.addStatement(abstractRule.getName(), abstractRule.getName(), StatementTypes.output);
 		
 		return false;
@@ -367,7 +387,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		if (keyWord.getCardinality() == null) {
 			block.addMessage(keyWord.getValue() + " ");
 		}
-		//TODO: create dropdown as it is optional
 		else if (keyWord.getCardinality().equals("?")) {
 			
 		}
@@ -412,7 +431,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		String block_id = "subBlock_" + block.getType() + sb.toString();
 		Block subBlock = new Block(block_id);
 		subBlock.addPreviousStatement(block_id);
-		if (group.getCardinality().equals("*") ) {
+		if (group.getCardinality() == null) {
+			
+		}
+		else if (group.getCardinality().equals("*") ) {
 			//we should be able to connect two instances of the block type
 			subBlock.addNextStatement(block_id);
 		} else if (group.getCardinality().equals("?")) {

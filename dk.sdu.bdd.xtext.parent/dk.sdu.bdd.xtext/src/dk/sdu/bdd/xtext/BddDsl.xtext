@@ -35,10 +35,10 @@ ImperativeEntityDef:
 ;
 
 ImperativeActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ((preposition = PREP)? | (optionalPref ?= '['? (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']'?))	
+	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']')?	
 ;
 ActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ((preposition = PREP)? | (optionalPref ?= '['? (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']'?))	
+	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']')?
 ;
 
 PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with');
@@ -49,12 +49,12 @@ StateDef: postive = StateName PREP? ('/' negative = StateName)?;
 
 StateName: name = (ID) ('and'|'off')?  (ID)?;
 
-PropertyDef: name = ID (plural ?= '*')?;
+PropertyDef: name = ID  (plural ?= '*')? (ID?);
 
 ImperativeStateDef: postive = ImperativeStateName PREP? ('/' negative = ImperativeStateName)?;
 ImperativeStateName: name = (ID) ('and'|'off')?  (ID)?;
 
-ImperativePropertyDef: name = ID (plural ?= '*')?;
+ImperativePropertyDef: name = ID  (plural ?= '*')? (ID?);
 
 Scenario:
        'Scenario:' name = ID (ID)* 
