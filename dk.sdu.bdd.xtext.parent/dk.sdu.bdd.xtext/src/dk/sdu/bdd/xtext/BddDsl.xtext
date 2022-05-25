@@ -44,7 +44,9 @@ ActionDef:
 PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with');
 ADVERB: ('linearly');
 
+
 StateDef: postive = StateName PREP? ('/' negative = StateName)?;
+
 StateName: name = (ID) ('and'|'off')?  (ID)?;
 
 PropertyDef: name = ID (plural ?= '*')?;
@@ -54,11 +56,8 @@ ImperativeStateName: name = (ID) ('and'|'off')?  (ID)?;
 
 ImperativePropertyDef: name = ID (plural ?= '*')?;
 
-
-ID_OR_STRING: (ID | STRING);
-
 Scenario:
-       'Scenario:' name = ID_OR_STRING (ID)* 
+       'Scenario:' name = ID (ID)* 
        'Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState
        imperative1 = ImperativeScenario?
        
@@ -76,7 +75,6 @@ ImperativeScenario:
    'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
    'Then' ('the'|'all' 'the') postState = ImperativeScenarioState
 ;
-
 
 
 DeclarativeScenarioState:
@@ -97,17 +95,13 @@ ImperativeScenarioAction:
 	actions += ImperativeEntityAction ('And' actions += ImperativeEntityAction)*
 ;
  
+
 DeclarativeStatePhrase: 
 	DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;
 
 ImperativeStatePhrase: 
 	epsp = ImperativeEntityPropertyStatePhrase | esp = ImperativeEntityStatePhrase
-;
-
-
-ScenarioRef:
-	scenarioRef = [Scenario | ID_OR_STRING]
 ;
 
 
@@ -138,30 +132,15 @@ ImperativeEntityStatePhrase:
 
 DeclarativeEntityPropertyStatePhrase:
 	property = [PropertyDef | ID]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = DeclarativeEntityRef
-	((('is'|'is' 'not') value = PropertyValue ID?) ID? | (('are'|'are' 'not') (values += PropertyValue) ID? | (',' values += PropertyValue)*) ID?) 
+	((('is'|'is' 'not') value = SimpleValue ID?) ID? | (('are'|'are' 'not') (values += SimpleValue) ID? | (',' values += SimpleValue)*) ID?) 
 ;
 
 ImperativeEntityPropertyStatePhrase:
 	 property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = StringValue 
 ;
 
+SimpleValue: IntValue | StringValue | DoubleValue;
 
-
-//terminal UNCLOSED_STRING : '"' (!'"')* EOF;
-
-PropertyValue: SimpleValue | ListValue | SetValue
-	
-;
-
-SimpleValue: IntValue | BooleanValue | StringValue | DoubleValue;
-
-ListValue:
-	{ListValue} '[' (values += SimpleValue (',' values += SimpleValue)*)? ']'
-;
-
-SetValue:
-	{SetValue} '{' (values += SimpleValue (',' values += SimpleValue)*)? '}'
-;
 
 StringValue:
 	value = STRING
@@ -175,20 +154,10 @@ DoubleValue:
 	value = DOUBLE
 ;
 
-TRUE: ('true' | 'yes');
-FALSE: ('false' | 'no');
-
-BooleanValue:
-	value = (TRUE | FALSE)
-;
-
-
 DeclarativeActionPhrase:
 	DeclarativeEntityAction | VerbAction
 	// Deleted: | VerifyAction
 ;
-
-
 
 VerbAction:
 	action = DeclarativeActionRef 'and'? ID? 'on'? (ID'-'ID)? ('for' 'the'| 'the'|'on')? (entity = DeclarativeEntityDef)? ('on'|'off'|'in')? entity2 = DeclarativeEntityRef ('on'|'off'|'in')? ('of'|'for'|'for' 'the'|'of' 'the')? PREP? entity3 = DeclarativeEntityRef?
@@ -211,27 +180,6 @@ ImperativePropertyRef:
     propertyref = 'to' property = [ImperativePropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [ImperativePropertyDef])? 
 ;
 
-DeclarativeActionRef: verb = [ActionDef | ID] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
-
-//ActionRef: verb = [ActionDef | WORD] 'on'? (argument = PropertyValue)? (preposition = PREP)? (('the'|'on')(entity = EntityDef))? ;
-
-//VerifyAction:
-//	'assure' state = StatePhrase
-//;  Evt. Slet
-
-//ScenarioState:
-	//states += StatePhrase ('And' states += StatePhrase)*
-//;
-
-//ScenarioAction:
-	//actions += ActionPhrase ('And' actions += ActionPhrase)*
-//;
-
-//StatePhrase: epsp = EntityPropertyStatePhrase | esp = EntityStatePhrase;
- //sr = ScenarioRef | 
-
-//EntityAction: entityAction = EntityRef (adverb=ADVERB)? actionDef = [ActionDef] (propertyRef = PropertyRef)?;
-
-
+DeclarativeActionRef: verb = [ActionDef | ID] 'on'? (argument = SimpleValue)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
 
 DOUBLE returns ecore::EDouble : INT'.'INT;

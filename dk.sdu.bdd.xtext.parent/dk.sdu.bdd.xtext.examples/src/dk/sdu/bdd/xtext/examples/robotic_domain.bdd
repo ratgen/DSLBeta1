@@ -1,4 +1,65 @@
-model widgets
+model robotic_domain
+
+imperative entity robot {
+	actions: moves
+	properties: position, speed
+}
+
+imperative entity gripper {
+	actions: closes, opens
+	states: closed, opened	
+}
+
+imperative entity input {
+	actions: void
+	states: ON/OFF 
+	properties: signal
+}
+
+imperative entity sensor is input {
+}
+
+imperative entity button is input {
+}
+
+imperative entity output {
+	actions: activates, deactivates
+	states: ON/OFF
+}
+
+imperative entity light is output {
+}
+
+imperative entity buzzer is output {
+}
+
+
+
+
+// execute/terminate works as start/stop for commands
+/*
+entity command {
+	actions: execute, terminate
+	states: executing/terminated
+}
+
+entity moveL is command {
+	actions: move, stop
+	properties: pose, speed, acceleration, asynchronous
+}
+
+entity moveJ is command {
+	actions: move, stop
+	properties: joint positions, speed, acceleration, asynchronous
+}
+
+entity movePath is command {
+	actions: move
+	properties: wayPoint*, asynchronous
+}
+
+
+// -----------------------------------------
 
 entity widget {
 	actions: move
@@ -99,7 +160,6 @@ entity TextArea is widget {
 	actions: type, set, fill [in]
 	states: typed, set, filled
 	properties: text
-	
 }
 
 entity BrowserWindow is widget {
@@ -221,9 +281,4 @@ entity Map is widget {
 	states: zoomed, switched
 	properties: satelite imagery, street, map
 }
-
-entity VideoPlayer is widget {
-	actions: play, pause, fast forward, rewind, toggle full screen, exit full screen, turn the volume up, turn the volume down
-	states: played, paused, fast forwarded, rewound, toggled, exited, turned up, turned down
-	properties: full screen, volume, video 
-}
+*/

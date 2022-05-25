@@ -1,19 +1,11 @@
-model sample using robotic_domain
-
-declarative entity item {
-	states: assembled, ready
-}
-
-declarative entity assembler {
-	actions: inserts
-	states: ready
-}
 
 
 
-Scenario: "Assembling Lego"
-Given the item "lego" is assembled
-    which means
+
+
+Feature: Assembling Lego
+
+	Scenario: Given the item "lego" is assembled
         Given the output "active light" is OFF
         And the gripper "two-finger" is opened
         And the signal of the input "ready" is "ON"
@@ -22,16 +14,16 @@ Given the item "lego" is assembled
         And the gripper "two-finger" closes
         And the robot "Assembler" moves to position "point 1" with "fast" speed
         Then the gripper "two-finger" is opened
-When the assembler #1 inserts the item "block"
-    which means
+
+	Scenario: When the assembler #1 inserts the item "block"
         Given the position of the robot "Assembler" is "above point 3"
         And the gripper "two-finger" is opened
         When the robot "Assembler" linearly moves to position "point 3" with "slow" speed
         And the gripper "Two-finger" closes
         And the robot "Assembler" moves to position "above point 1" with "fast" speed
         Then the gripper "two-finger" is opened
-Then the item "assembling" is ready
-    which means
+
+	Scenario: Then the item "assembling" is ready
         Given the signal of the input "done" is "ON"
         When the robot "Assembler" moves to position "default" with "fast" speed
         Then the output "active light" is OFF
