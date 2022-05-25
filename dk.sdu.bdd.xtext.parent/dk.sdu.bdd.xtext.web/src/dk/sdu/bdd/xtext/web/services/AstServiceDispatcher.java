@@ -34,6 +34,8 @@ import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures.StatementTypes;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldInput;
+import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputArgument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.Category;
@@ -249,31 +251,31 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			if (alternativeContents.size() == 1 && alternativeContents.get(0) == Keyword.class) {
 				block.addArgument(dropDown);
 			} else {
-				InputStatement inputStatement = new InputStatement("alternatives_statement");
+				InputValue inputValue = new InputValue("alternatives_statement");
 				EList<EObject> contents = alternatives.eContents();
 				for (int i = 0; i < contents.size(); i++) {
 					if (contents.get(i) instanceof Assignment) {
 						AbstractRule rule = getRuleFromAssignment(contents.get(i));
-						inputStatement.addCheck(rule.getName());
+						inputValue.addCheck(rule.getName());
 						
 					}
 					if (contents.get(i) instanceof Keyword) {
 						Keyword keyWord = (Keyword) contents.get(i);
-						inputStatement.addCheck(keyWord.getValue());
-						Block subBlock = new Block("subblock_" + block.getType() + "_" + keyWord.getValue());
-						subBlock.addPreviousStatement(keyWord.getValue());
+						inputValue.addCheck(keyWord.getValue());
+						Block subBlock = new Block("subBlock_" + block.getType() + "_" + keyWord.getValue());
+						subBlock.addMessage(keyWord.getValue());
+						subBlock.setOutput(keyWord.getValue());
 						Category cat = block.getBlockCategory();
 						cat.addCategoryItem(new CategoryItem(subBlock.getType()));
-						subBlock.addMessage(keyWord.getValue());
-						/*subBlock.setBlockCategory(cat);
-						;*/
+						subBlock.setBlockCategory(cat);
+						blockArray.add(subBlock);
 					}
 					if (contents.get(i) instanceof Group) {
 						Group gr = (Group) contents.get(i);
-						createSubblock(gr, block, inputStatement);
+						createSubblock(gr, block, inputValue);
 					}
 				}
-				block.addArgument(inputStatement);
+				block.addArgument(inputValue);
 			}
 		} else if (alternatives.getCardinality().equals("*")) {
 			InputStatement inputStatement = new InputStatement("alternatives_statement");
@@ -419,7 +421,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		return true;
 	}
 
-	private void createSubblock(Group group, Block block, InputStatement in_val) {
+	private void createSubblock(Group group, Block block, InputArgument in_val) {
 		EList<EObject> contents = group.eContents();
 		StringBuilder sb = new StringBuilder();
 		contents.forEach((item) -> {
@@ -430,29 +432,38 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		//create sub block
 		String block_id = "subBlock_" + block.getType() + sb.toString();
 		Block subBlock = new Block(block_id);
-		subBlock.addPreviousStatement(block_id);
-		if (group.getCardinality() == null) {
-			
-		}
-		else if (group.getCardinality().equals("*") ) {
-			//we should be able to connect two instances of the block type
-			subBlock.addNextStatement(block_id);
-		} else if (group.getCardinality().equals("?")) {
+		
+		if (in_val instanceof InputStatement) {
+			subBlock.addPreviousStatement(block_id);
+			if (group.getCardinality() == null) {
+				
+			}
+			else if (group.getCardinality().equals("*") ) {
+				//we should be able to connect two instances of the block type
+				subBlock.addNextStatement(block_id);
+			} else if (group.getCardinality().equals("?")) {
 
-		}
-		//Get the check of the inputstatement
-		ArrayList<String> vals = in_val.getCheck();
-		if (vals.size() > 0) {
-			//Get the last element
-			String val = vals.get(vals.size() - 1);
-			//Make it connect to the last block in the inputstatement
-			subBlock.addPreviousStatement(val);
-			//Make the last block in the inputstatement connect to the new subblock
-			blockFeatures.addStatement(val, subBlock.getType(), StatementTypes.nextStatement);
+			}
+			//Get the check of the inputstatement
+			ArrayList<String> vals = in_val.getCheck();
+			if (vals.size() > 0) {
+				//Get the last element
+				String val = vals.get(vals.size() - 1);
+				//Make it connect to the last block in the inputstatement
+				subBlock.addPreviousStatement(val);
+				//Make the last block in the inputstatement connect to the new subblock
+				blockFeatures.addStatement(val, subBlock.getType(), StatementTypes.nextStatement);
+			}
+			
+			//create input for the subblock
+			in_val.addCheck(block_id);
 		}
 		
-		//create input for the subblock
-		in_val.addCheck(block_id);
+		if (in_val instanceof InputValue) {
+			subBlock.setOutput(block_id);
+			in_val.addCheck(block_id);
+		}
+		
 		
 		Category blockCat = block.getBlockCategory();
 		blockCat.addCategoryItem(new CategoryItem(block_id));
