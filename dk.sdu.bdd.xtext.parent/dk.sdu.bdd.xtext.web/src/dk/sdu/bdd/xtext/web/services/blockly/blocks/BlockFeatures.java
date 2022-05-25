@@ -20,7 +20,6 @@ public class BlockFeatures {
 		assert(blockId != null);
 		assert(connectorId != null);
 		HashMap<StatementTypes, ArrayList<String>> block = blockFeatures.get(blockId);
-		System.out.println(block);
 		if (block == null) {
 			block = new HashMap<>();
 		}

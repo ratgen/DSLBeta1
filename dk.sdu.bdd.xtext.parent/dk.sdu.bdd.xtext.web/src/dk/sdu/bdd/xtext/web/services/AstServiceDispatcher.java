@@ -356,8 +356,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		InputValue argument = new InputValue("name_" + abstractRule.getName());
 		argument.addCheck(abstractRule.getName());
 		block.addArgument(argument);
-		
-		blockFeatures.addStatement(block.getType(), abstractRule.getName(), StatementTypes.output);
+		System.out.println("setting " + block.getType() + " " + abstractRule.getName());
+		blockFeatures.addStatement(abstractRule.getName(), abstractRule.getName(), StatementTypes.output);
 		
 		return false;
 	}
