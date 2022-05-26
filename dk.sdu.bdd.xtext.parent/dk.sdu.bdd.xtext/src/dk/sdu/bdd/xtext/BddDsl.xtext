@@ -59,36 +59,45 @@ ImperativePropertyDef: name = WORD (plural ?= '*')?;
 
 ID_OR_STRING: (ID | STRING);
 
+ImperativeScenario:
+   'which' 'means'
+       
+   'Given' preState = ImperativeScenarioState
+   'When'  action = ImperativeScenarioAction
+   'Then'  postState = ImperativeScenarioState
+;
+
 Scenario:
        'Scenario:' name = ID_OR_STRING WORD? ('out'|'off'|'on'|'in'|'-'|'the'|'to' 'the'|'to')? WORD? ('off'|'on'|'in'|'-'|'the')? WORD? ('on'|'in'|'-'|'the')? WORD? ('in'|'-'|'the')? WORD?
-       ((('Given''the'|'Given''I'|'Given') ('do' 'not')? ((OPTION)) | ('Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState))
-       'which' 'means')?
+       (('Given''the'|'Given''I'|'Given') ('do' 'not')? ((OPTION)) | ('Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState))
        
-       'Given' preState = ImperativeScenarioState
-       'When' action = ImperativeScenarioAction
-       'Then' postState = ImperativeScenarioState
-       
-       
-       (((('When' 'I'|'When' 'the'|'When'|'And''I') ('do' 'not')? ((OPTION))) | ((('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I') | ('When')) actionE = DeclarativeScenarioAction ))
-       'which' 'means')?
-       
-       'Given' preState1 = ImperativeScenarioState
-       'When' action1 = ImperativeScenarioAction
-       'Then' postState1 = ImperativeScenarioState
+       imperative1 = ImperativeScenario?
+       //'Given' preState = ImperativeScenarioState
+       //'When' action = ImperativeScenarioAction
+       //'Then' postState = ImperativeScenarioState
        
        
-       ((('Then''the'|'Then''I'|'Then') ('do' 'not')? ((OPTION)) | ('Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState))
-       'which' 'means')?
+       ((('When' 'I'|'When' 'the'|'When'|'And''I') ('do' 'not')? ((OPTION))) | ((('When' 'I') |('When' 'I' 'do' 'not')| ('When' 'the') | ('Given' 'I') | ('When')) actionE = DeclarativeScenarioAction ))
        
-       'Given' preState2 = ImperativeScenarioState
-       'When' action2 = ImperativeScenarioAction
-       'Then' postState2 = ImperativeScenarioState
+       imperative2 = ImperativeScenario?
+       //'Given' preState1 = ImperativeScenarioState
+       //'When' action1 = ImperativeScenarioAction
+       //'Then' postState1 = ImperativeScenarioState
+       
+       
+       (('Then''the'|'Then''I'|'Then') ('do' 'not')? ((OPTION)) | ('Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState))
+       
+       imperative3 = ImperativeScenario?
+       //'Given' preState2 = ImperativeScenarioState
+       //'When' action2 = ImperativeScenarioAction
+       //'Then' postState2 = ImperativeScenarioState
 ;
 
 
 
 DeclarativeScenarioState:
-	states += DeclarativeStatePhrase ('And' states += DeclarativeStatePhrase)*
+	states = DeclarativeStatePhrase
+	//states += DeclarativeStatePhrase ('And' states += DeclarativeStatePhrase)*
 ;
 
 ImperativeScenarioState:
@@ -98,7 +107,8 @@ ImperativeScenarioState:
 
 
 DeclarativeScenarioAction:
-	actions += DeclarativeActionPhrase ('And' actions += DeclarativeActionPhrase)*
+	actions = DeclarativeActionPhrase
+	// actions += DeclarativeActionPhrase ('And' actions += DeclarativeActionPhrase)*
 ;
 
 ImperativeScenarioAction:
@@ -187,7 +197,7 @@ DeclarativeEntityAction:
 ;
 
 ImperativeEntityAction: 
-	entityAction = ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
+	entityAction = ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)? 
 ;
 
 
