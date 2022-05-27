@@ -8,15 +8,23 @@ import dk.sdu.bdd.xtext.bddDsl.Model
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.extensions.InjectionExtension
 import org.eclipse.xtext.testing.util.ParseHelper
+import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.^extension.ExtendWith
+
 
 @ExtendWith(InjectionExtension)
 @InjectWith(BddDslInjectorProvider)
 class BddDslParsingTest {
 	@Inject
 	ParseHelper<Model> parseHelper
+	@Inject 
+	ValidationTestHelper validationTestHelper
+	
+	
+	
+	
 	
 	@Test
 	def void loadModel() {
@@ -27,4 +35,331 @@ class BddDslParsingTest {
 		val errors = result.eResource.errors
 		Assertions.assertTrue(errors.isEmpty, '''Unexpected errors: «errors.join(", ")»''')
 	}
+	
+	
+	
+	
+	@Test
+	def void testDeclarativeEntityDef(){
+		val result = parseHelper.parse(
+		"model test
+		declarative entity assembler {
+			actions: inserts
+			states: ready
+		}")
+		
+		validationTestHelper.assertNoIssues(result)
+		val errors  = validationTestHelper.validate(result)
+		result.eResource.errors
+		Assertions.assertTrue(errors.isEmpty)
+				
+	}
+	
+	@Test
+	def void testImperativeEntityDef(){
+		val result = parseHelper.parse(
+		"model test
+		imperative entity assembler {
+			actions: inserts
+			states: ready
+		}")
+		
+		validationTestHelper.assertNoIssues(result)
+		val errors  = validationTestHelper.validate(result)
+		Assertions.assertTrue(errors.isEmpty)
+				
+	}
+	
+	
+	@Test
+	def void testSuccesfulScenario(){
+		val result = parseHelper.parse(
+		'''
+		model test
+		
+		imperative entity robot {
+			actions: moves
+			properties: position, speed
+		}
+		
+		imperative entity gripper {
+			actions: closes, opens
+			states: closed, opened	
+		}
+		
+		imperative entity input {
+			states: ON/OFF 
+			properties: signal
+		}
+		
+		imperative entity sensor is input {
+		}
+		
+		imperative entity button is input {
+		}
+		
+		imperative entity output {
+			actions: activates, deactivates
+			states: ON/OFF
+		}
+		
+		imperative entity light is output {
+		}
+		
+		imperative entity buzzer is output {
+		}
+		declarative entity box {
+			states: full
+		}
+		declarative entity can {
+			states: ready
+			
+		}
+		declarative entity packager {
+			actions: packages
+			states: finished, started
+		}
+		
+		Scenario: "Can is moved to box"
+		Given the can "cans" is ready
+			which means
+				Given the signal of the button "can-button" is "ON"
+				When the robot "Packager" moves to position "above cans"
+				Then the light "Cans are ready" is ON 
+		When the packager "Can packager" packages
+			which means
+				Given the position of the robot "Packager" is "above cans"
+				When the robot "Packager" moves to position "can 1"
+				And the gripper "Packager" closes
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				And the gripper "packager" opens
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "can 2"
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				Then the gripper "Packager" is opened
+		Then the packager "Can packager" is finished
+			which means
+				Given the signal of the button "can-button" is "ON"
+				When the robot "Packager" moves to position "above cans"
+		 		Then the light "Cans are ready" is OFF
+		'''
+		)
+		
+		validationTestHelper.assertNoIssues(result)
+		val errors  = validationTestHelper.validate(result)
+		Assertions.assertTrue(errors.isEmpty)
+				
+	}
+	
+	@Test
+	def void testScenario(){
+		val result = parseHelper.parse(
+		'''
+		model test
+		
+		
+		declarative entity box {
+			states: full
+		}
+		declarative entity can {
+			states: ready
+			
+		}
+		declarative entity packager {
+			actions: packages
+			states: finished, started
+		}
+		
+		Scenario: "Can is moved to box"
+		Given the can "cans" is ready
+		When the packager "Can packager" packages
+		Then the packager "Can packager" is finished
+			
+		'''
+		)
+		
+		
+		validationTestHelper.assertNoIssues(result)
+	
+}
+
+	@Test
+	def void failedEntityDef(){
+		val result = parseHelper.parse(
+			'''
+			model test
+			
+			entity car {
+				actions: drive, stop
+				states: stopped
+				properties: wheel, speed, window, door
+			}
+			'''
+		)
+		val error = validationTestHelper.validate(result)
+		Assertions.assertFalse(error.isEmpty)	
+	}
+	
+	@Test
+	def testAdaptiveImperative(){
+	val result = parseHelper.parse(
+		'''
+		model test
+		
+		imperative entity robot {
+			actions: moves
+			properties: position, speed
+		}
+		
+		imperative entity gripper {
+			actions: closes, opens
+			states: closed, opened	
+		}
+		
+		imperative entity input {
+			states: ON/OFF 
+			properties: signal
+		}
+		
+		imperative entity sensor is input {
+		}
+		
+		imperative entity button is input {
+		}
+		
+		imperative entity output {
+			actions: activates, deactivates
+			states: ON/OFF
+		}
+		
+		imperative entity light is output {
+		}
+		
+		imperative entity buzzer is output {
+		}
+		declarative entity box {
+			states: full
+		}
+		declarative entity can {
+			states: ready
+			
+		}
+		declarative entity packager {
+			actions: packages
+			states: finished, started
+		}
+		
+		Scenario: "Can is moved to box"
+		Given the can "cans" is ready
+			which means
+				Given the signal of the button "can-button" is "ON"
+				When the robot "Packager" moves to position "above cans"
+				Then the light "Cans are ready" is ON 
+		When the packager "Can packager" packages
+			which means
+				Given the position of the robot "Packager" is "above cans"
+				When the robot "Packager" moves to position "can 1"
+				And the gripper "Packager" closes
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				And the gripper "packager" opens
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "can 2"
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				Then the gripper "Packager" is opened
+		Then the packager "Can packager" is finished
+		
+		'''
+		)
+		
+		validationTestHelper.assertNoIssues(result)
+		val errors  = validationTestHelper.validate(result)
+		Assertions.assertTrue(errors.isEmpty)
+				
+	}
+	
+	@Test
+	def testImperativeEntityUsageOnly(){
+	val result = parseHelper.parse(
+		'''
+		model test
+		
+		imperative entity robot {
+			actions: moves
+			properties: position, speed
+		}
+		
+		imperative entity gripper {
+			actions: closes, opens
+			states: closed, opened	
+		}
+		
+		imperative entity input {
+			states: ON/OFF 
+			properties: signal
+		}
+		
+		imperative entity sensor is input {
+		}
+		
+		imperative entity button is input {
+		}
+		
+		imperative entity output {
+			actions: activates, deactivates
+			states: ON/OFF
+		}
+		
+		imperative entity light is output {
+		}
+		
+		imperative entity buzzer is output {
+		}
+		imperative entity box {
+			states: full
+		}
+		imperative entity can {
+			states: ready
+			
+		}
+		imperative entity packager {
+			actions: packages
+			states: finished, started
+		}
+		
+		Scenario: "Can is moved to box"
+		Given the can "cans" is ready
+			which means
+				Given the signal of the button "can-button" is "ON"
+				When the robot "Packager" moves to position "above cans"
+				Then the light "Cans are ready" is ON 
+		When the packager "Can packager" packages
+			which means
+				Given the position of the robot "Packager" is "above cans"
+				When the robot "Packager" moves to position "can 1"
+				And the gripper "Packager" closes
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				And the gripper "packager" opens
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "can 2"
+				And the robot "Packager" moves to position "above cans"
+				And the robot "Packager" moves to position "box"
+				Then the gripper "Packager" is opened
+		Then the packager "Can packager" is finished
+			which means
+				Given the signal of the button "can-button" is "ON"
+				When the robot "Packager" moves to position "above cans"
+				Then the light "Cans are ready" is OFF
+		
+		'''
+		)
+		
+		val errors = validationTestHelper.validate(result)
+		Assertions.assertFalse(errors.isEmpty)		
+	}
+
 }
