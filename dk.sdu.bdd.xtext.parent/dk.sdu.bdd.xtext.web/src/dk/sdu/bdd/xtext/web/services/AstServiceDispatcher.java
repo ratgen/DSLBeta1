@@ -405,7 +405,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		if (group.getCardinality().equals("?") || group.getCardinality().equals("*")) {
-			if (block.getArgs0().size() > 0 && block.isLastIsArg()) {
+			if (block.getArgs0().size() > 0 && block.lastIsArg()) {
 				Argument arg = block.getArgs0().get(block.getArgs0().size() - 1);
 				if (arg instanceof InputStatement) {
 					InputStatement in_val = (InputStatement) arg;
@@ -417,7 +417,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			block.addArgument(in_val);
 			createSubblock(group, block, in_val); 
 		}
-
 		return true;
 	}
 

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class FieldDropdown extends FieldArgument {
 	
-	ArrayList<ArrayList<String>> options;
+	private ArrayList<ArrayList<String>> options;
 	
 	public FieldDropdown(String name) {
 		this.name = name;

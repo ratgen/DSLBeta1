@@ -19,10 +19,6 @@ public class CategoryToolBox {
 		return kind;
 	}
 
-	public void setKind(String kind) {
-		this.kind = kind;
-	}
-
 	public ArrayList<Category> getContents() {
 		return contents;
 	}
@@ -30,6 +26,4 @@ public class CategoryToolBox {
 	public void setContents(ArrayList<Category> contents) {
 		this.contents = contents;
 	}
-	
-	
 }
