@@ -178,7 +178,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println("rule: " + rule.getName());
 			if (rule instanceof ParserRule) {
 				ParserRule parserRule = (ParserRule) rule;
-				Block block = parseRule(parserRule);
+				Block newBlock = new Block(rule.getName());
+				Block block = parseRule(parserRule, newBlock);
 				// TODO: rule specific code
 				if(rule.getName().equals("Model")) {
 					block.setOutput(null);
@@ -192,8 +193,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	//Parse a rule and return a Blockly Block representing the Rule
-	private Block parseRule(ParserRule rule) {
-		Block block = new Block(rule.getName());
+	private Block parseRule(ParserRule rule, Block block) {
 		TreeIterator<EObject> iterator =  rule.eAllContents();
 				
 		while(iterator.hasNext()) {
@@ -217,6 +217,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				return false;
 			} 
 			return parseGroup(group, block);
+		}
+		
+		if (obj instanceof Assignment) {
+			Assignment assign = (Assignment) obj;
+			return parseAssignment(assign, block);
 		}
 		
 		if (obj instanceof Keyword) {
@@ -371,6 +376,33 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 		}
 		return contents;
+	}
+	
+	private boolean parseAssignment (Assignment assignment, Block block) {
+		if (assignment.getCardinality() == null) {
+			AbstractElement assignmentContent = assignment.getTerminal();
+			if (assignmentContent instanceof RuleCall) {
+				RuleCall rule = (RuleCall) assignmentContent;
+				AbstractRule ruleContent = rule.getRule();
+				if (ruleContent instanceof ParserRule) {
+					System.out.println("expanding parserrule " + ruleContent.getName());
+					ParserRule parseRule = (ParserRule) ruleContent;
+					parseRule(parseRule, block);
+
+				}
+				if (ruleContent instanceof TerminalRule) {
+					System.out.println("terminal");
+					System.out.println(ruleContent);
+					InputValue argument = new InputValue("name_" + ruleContent.getName());
+					argument.addCheck(ruleContent.getName());
+					block.addArgument(argument);
+					blockFeatures.addStatement(ruleContent.getName(), ruleContent.getName(), StatementTypes.output);
+
+				}
+			}
+		}
+
+		return true;
 	}
 
 	private boolean parseRuleCall(RuleCall rule, Block block) {
