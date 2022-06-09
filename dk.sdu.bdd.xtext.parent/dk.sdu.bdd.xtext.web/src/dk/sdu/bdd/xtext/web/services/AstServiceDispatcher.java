@@ -216,8 +216,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				return false;
 			} 
 			return parseGroup(group, block);
-		}
-		
+		} 
 		if (obj instanceof Assignment) {
 			Assignment assign = (Assignment) obj;
 			return parseAssignment(assign, block);

@@ -35,19 +35,18 @@ ImperativeEntityDef:
 ;
 
 ImperativeActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP) ']')?	
+	name = ID (('and'|'the') ID)?  ('[' (preposition = PREP) ']')?	 ('the' argument = ID)?
 ;
 ActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP) ']')?
+	name = ID (('and'|'the') ID)?  ('[' (preposition = PREP) ']')?	 ('the' argument = ID)?
 ;
 
 PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with' | 'out' | 'off' | 'on' 'the' 'row');
 ADVERB: ('linearly');
 
 
-StateDef: postive = StateName PREP? ('/' negative = StateName)?;
-
-StateName: name = (ID) ('and'|'off')?  (ID)?;
+StateDef: postive = StateName ('/' negative = StateName)?;
+StateName: name = ID (('and'|'off') ID)?;
 
 PropertyDef: name = ID  (plural ?= '*')? (ID?);
 
