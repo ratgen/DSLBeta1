@@ -19,7 +19,6 @@ import org.eclipse.xtext.AbstractRule;
 import org.eclipse.xtext.Alternatives;
 import org.eclipse.xtext.Assignment;
 import org.eclipse.xtext.CrossReference;
-import org.eclipse.xtext.GeneratedMetamodel;
 import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.Keyword;
@@ -262,7 +261,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					if (contents.get(i) instanceof Assignment) {
 						AbstractRule rule = getRuleFromAssignment(contents.get(i));
 						inputValue.addCheck(rule.getName());
-						
 					}
 					if (contents.get(i) instanceof Keyword) {
 						Keyword keyWord = (Keyword) contents.get(i);
@@ -385,34 +383,34 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				RuleCall rule = (RuleCall) assignmentContent;
 				AbstractRule ruleContent = rule.getRule();
 				if (ruleContent instanceof ParserRule) {
-					System.out.println("expanding parserrule " + ruleContent.getName());
 					ParserRule parseRule = (ParserRule) ruleContent;
 					parseRule(parseRule, block);
-
 				}
 				if (ruleContent instanceof TerminalRule) {
-					System.out.println("terminal");
-					System.out.println(ruleContent);
-					InputValue argument = new InputValue("name_" + ruleContent.getName());
-					argument.addCheck(ruleContent.getName());
-					block.addArgument(argument);
-					blockFeatures.addStatement(ruleContent.getName(), ruleContent.getName(), StatementTypes.output);
-
+					createInputFromAbstractRule(ruleContent, block);
 				}
+			}
+		} else if (assignment.getCardinality().equals("?")) {
+			AbstractElement assignmentContent = assignment.getTerminal();
+			if (assignmentContent instanceof RuleCall) {
+				RuleCall rule = (RuleCall) assignmentContent;
+				createInputFromAbstractRule(rule.getRule(), block);
 			}
 		}
 
 		return true;
 	}
+	
+	private void createInputFromAbstractRule(AbstractRule rule, Block block) {
+		InputValue argument = new InputValue("name_" + rule.getName());
+		argument.addCheck(rule.getName());
+		block.addArgument(argument);
+		blockFeatures.addStatement(rule.getName(), rule.getName(), StatementTypes.output);
+	}
 
 	private boolean parseRuleCall(RuleCall rule, Block block) {
 		AbstractRule abstractRule = rule.getRule();
-		
-		InputValue argument = new InputValue("name_" + abstractRule.getName());
-		argument.addCheck(abstractRule.getName());
-		block.addArgument(argument);
-		blockFeatures.addStatement(abstractRule.getName(), abstractRule.getName(), StatementTypes.output);
-		
+		createInputFromAbstractRule(abstractRule, block);
 		return false;
 	}
 

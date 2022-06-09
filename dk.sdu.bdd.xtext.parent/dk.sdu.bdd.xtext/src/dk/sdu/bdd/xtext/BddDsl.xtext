@@ -96,11 +96,11 @@ ImperativeScenarioAction:
 ;
  
 
-DeclarativeStatePhrase: 
+DeclarativeStatePhrase:
 	DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;
 
-ImperativeStatePhrase: 
+ImperativeStatePhrase:
 	epsp = ImperativeEntityPropertyStatePhrase | esp = ImperativeEntityStatePhrase
 ;
 
