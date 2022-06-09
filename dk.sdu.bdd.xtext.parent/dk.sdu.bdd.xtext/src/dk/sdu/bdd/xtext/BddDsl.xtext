@@ -20,28 +20,28 @@ ModelRef:
 
 DeclarativeEntityDef:
 	'declarative' 'entity' name = ID ('-'ID)? ('is' superEntities += [DeclarativeEntityDef] (',' superEntities += [DeclarativeEntityDef])*)? '{'
-		('actions:' (actions += ActionDef) ((','|'and'|'the') actions += ActionDef)*)?
-		('states:' (states += StateDef) ((','|'and'|'the') states += StateDef)*)?
-		('properties:' (properties += PropertyDef) ((','|'and'|'the') properties += PropertyDef)*)?
+		('actions:' (actions += ActionDef) ((',') actions += ActionDef)*)?
+		('states:' (states += StateDef) ((',') states += StateDef)*)?
+		('properties:' (properties += PropertyDef) ((',') properties += PropertyDef)*)?
 	'}'
 ;
 
 ImperativeEntityDef:
 	'imperative' 'entity' name = ID ('-'ID)? ('is' superEntities += [ImperativeEntityDef] (',' superEntities += [ImperativeEntityDef])*)? '{'
-		('actions:' (actions += ImperativeActionDef)  ((','|'and'|'the') actions += ImperativeActionDef)*)?
-		('states:' (states += ImperativeStateDef) ((','|'and'|'the') states += ImperativeStateDef)*)?
-		('properties:' (properties += ImperativePropertyDef) ((','|'and'|'the') properties += ImperativePropertyDef)*)?
+		('actions:' (actions += ImperativeActionDef)  ((',') actions += ImperativeActionDef)*)?
+		('states:' (states += ImperativeStateDef) ((',') states += ImperativeStateDef)*)?
+		('properties:' (properties += ImperativePropertyDef) ((',') properties += ImperativePropertyDef)*)?
 	'}'
 ;
 
 ImperativeActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']')?	
+	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP) ']')?	
 ;
 ActionDef:
-	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP|'out'|'off'|'on' 'the' 'row') ']')?
+	name = ID ('and'|'the')? (ID)? (argument = ID)? ('[' (preposition = PREP) ']')?
 ;
 
-PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with');
+PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with' | 'out' | 'off' | 'on' 'the' 'row');
 ADVERB: ('linearly');
 
 
