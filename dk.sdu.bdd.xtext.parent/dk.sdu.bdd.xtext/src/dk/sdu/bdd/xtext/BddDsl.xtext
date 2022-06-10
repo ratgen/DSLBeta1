@@ -96,7 +96,7 @@ ImperativeScenarioAction:
  
 
 DeclarativeStatePhrase:
-	DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
+	epsp = DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;
 
 ImperativeStatePhrase:
@@ -120,7 +120,7 @@ ImperativeEntityRef:
 
 DeclarativeEntityStatePhrase:
 	(property = [PropertyDef | ID]? ('of'|'of' 'the')? OPTION? ('for'|'for' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'))? 
-	entity = DeclarativeEntityRef ('is'|'are') 'not'? state = [StateName] ID?	
+	entity = DeclarativeEntityRef ('is'|'are') ('not')? state = [StateName] ID?	
 ;
 
 ImperativeEntityStatePhrase:

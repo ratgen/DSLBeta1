@@ -260,6 +260,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					if (contents.get(i) instanceof Assignment) {
 						AbstractRule rule = getRuleFromAssignment(contents.get(i));
 						inputValue.addCheck(rule.getName());
+						blockFeatures.addStatement(rule.getName(), rule.getName(), StatementTypes.output);
 					}
 					if (contents.get(i) instanceof Keyword) {
 						Keyword keyWord = (Keyword) contents.get(i);
@@ -419,7 +420,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			block.addMessage(keyWord.getValue() + " ");
 		}
 		else if (keyWord.getCardinality().equals("?")) {
-			
+
 		}
 		return false;
 	}
