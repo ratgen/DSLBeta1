@@ -42,7 +42,6 @@ ActionDef:
 ;
 
 PREP: ('on' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with' | 'out' | 'off' | 'on' 'the' 'row');
-ADVERB: ('linearly');
 
 
 StateDef: postive = StateName ('/' negative = StateName)?;
@@ -176,7 +175,7 @@ DeclarativeEntityAction:
 ;
 
 ImperativeEntityAction: 
-	entityAction = ImperativeEntityRef (adverb=ADVERB)? actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
+	entityAction = ImperativeEntityRef actionDef = [ImperativeActionDef] (propertyRef = ImperativePropertyRef)?
 ;
 
 
