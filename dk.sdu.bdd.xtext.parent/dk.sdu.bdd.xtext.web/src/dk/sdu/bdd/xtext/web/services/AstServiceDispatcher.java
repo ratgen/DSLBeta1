@@ -277,6 +277,13 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						Group gr = (Group) contents.get(i);
 						createSubblock(gr, block, inputValue);
 					}
+					if (contents.get(i) instanceof RuleCall) {
+						RuleCall ruleCall = (RuleCall) contents.get(i);
+						AbstractRule rule = ruleCall.getRule();
+						inputValue.addCheck(rule.getName());
+						blockFeatures.addStatement(rule.getName(), rule.getName(), StatementTypes.output);
+
+					}
 				}
 				block.addArgument(inputValue);
 			}
@@ -389,6 +396,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				if (ruleContent instanceof TerminalRule) {
 					createInputFromAbstractRule(ruleContent, block);
 				}
+			}
+			if (assignmentContent instanceof Alternatives) {
+				Alternatives alt = (Alternatives) assignmentContent;
+				parseAlternatives(alt, block);
 			}
 		} else if (assignment.getCardinality().equals("?")) {
 			AbstractElement assignmentContent = assignment.getTerminal();
@@ -538,12 +549,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	private static String dump(EObject mod_, String indent) {
-		
-		
-		
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
-	   
 	    for (EObject a :mod_.eCrossReferences()) {
 	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    }
