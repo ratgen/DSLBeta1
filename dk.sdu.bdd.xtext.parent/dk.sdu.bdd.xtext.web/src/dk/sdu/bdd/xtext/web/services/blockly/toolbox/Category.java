@@ -1,6 +1,7 @@
 package dk.sdu.bdd.xtext.web.services.blockly.toolbox;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Category {
 	private String kind;
@@ -11,6 +12,18 @@ public class Category {
 		this.kind = "category";
 		this.name = categoryName;
 		this.contents = new ArrayList<>();
+	}
+	
+	public CategoryItem popCategoryItem(String categoryItemType) {
+		Iterator<CategoryItem> it = contents.iterator();
+		while(it.hasNext()) {
+			CategoryItem item = it.next();
+			if (item.getType().equals(categoryItemType)) {
+				it.remove();
+				return item;
+			}
+		}
+		return null;
 	}
 	 
 	public void addCategoryItem(CategoryItem item) {

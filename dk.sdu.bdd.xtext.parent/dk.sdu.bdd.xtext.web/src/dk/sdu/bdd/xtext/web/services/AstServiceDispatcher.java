@@ -3,6 +3,7 @@ package dk.sdu.bdd.xtext.web.services;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -130,13 +131,23 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		blockArray = new ArrayList<>();
 		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
 		
-		for (Block block : blockArray) {
+		Iterator<Block> blockIterator =  blockArray.iterator();
+		
+		while(blockIterator.hasNext()) {
+			Block block = blockIterator.next();
 			block.addAllPrevious(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
 			block.addAllNext(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
 			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
 			if (outputs != null && block.getPreviousStatement() == null && block.getNextStatement() == null) {
 				block.setOutput(outputs.get(0));
 			}
+			
+			if (block.getPreviousStatement() == null && block.getOutput() == null) {
+				all.popCategoryItem(block.getType());
+				blockIterator.remove();
+				continue;
+			}
+			
 			
 			Category cat = block.getBlockCategory();
 			if (cat.getContents() != null &&
@@ -145,7 +156,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				toolBox.addCategory(cat);
 			}
 		}
-		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
