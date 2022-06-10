@@ -48,36 +48,41 @@ ADVERB: ('linearly');
 StateDef: postive = StateName ('/' negative = StateName)?;
 StateName: name = ID (('and'|'off') ID)?;
 
-PropertyDef: name = ID  (plural ?= '*')? (ID?);
+//Remove plural
+PropertyDef: name = ID (ID?);
 
 ImperativeStateDef: postive = ImperativeStateName PREP? ('/' negative = ImperativeStateName)?;
 ImperativeStateName: name = (ID) ('and'|'off')?  (ID)?;
 
-ImperativePropertyDef: name = ID  (plural ?= '*')? (ID?);
+//Remove Plural
+ImperativePropertyDef: name = ID (ID?);
 
+//Multiple ID's for one name, Scenario-ref is not used, maybe string instead?
+//Does not?
 Scenario:
-       'Scenario:' name = ID (ID)* 
-       'Given' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE = DeclarativeScenarioState
+       'Scenario:' STRING
+       'Given' ('the'|'all' 'the'|'I')? ('do' 'not' | 'does' 'not')? preStateE = DeclarativeScenarioState
        imperative1 = ImperativeScenario?
        
-       'When' ('I'|'the')? ('do' 'not')? actionE = DeclarativeScenarioAction 
+       'When' ('I'|'the')? ('do' 'not'| 'does' 'not')? actionE = DeclarativeScenarioAction 
 	   imperative2 = ImperativeScenario?
        
-       'Then' ('the'|'all' 'the'|'I')? ('do' 'not')? preStateE1 = DeclarativeScenarioState
+       'Then' ('the'|'all' 'the'|'I')? ('do' 'not'| 'does' 'not')? preStateE1 = DeclarativeScenarioState
 	   imperative3 = ImperativeScenario?
 ;
 
+//Match the scenario to the declarative 
 ImperativeScenario:
    'which' 'means'
        
-   'Given' preState = ImperativeScenarioState
-   'When' ('I')? ('do' 'not')? action = ImperativeScenarioAction
-   'Then' ('the'|'all' 'the') postState = ImperativeScenarioState
+   'Given' ('the'|'all' 'the'|'I')? ('do' 'not' | 'does' 'not')? preState = ImperativeScenarioState
+   'When' ('I'|'the')? ('do' 'not'| 'does' 'not')? action = ImperativeScenarioAction
+   'Then' ('the'|'all' 'the'|'I')? ('do' 'not'| 'does' 'not')? postState = ImperativeScenarioState
 ;
 
 
 DeclarativeScenarioState:
-	states += DeclarativeStatePhrase ('And' states += DeclarativeStatePhrase)*
+	states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase) ('And' states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase))*
 ;
 
 ImperativeScenarioState:
@@ -94,11 +99,12 @@ ImperativeScenarioAction:
 	actions += ImperativeEntityAction ('And' actions += ImperativeEntityAction)*
 ;
  
-
+//Maybe gather?
 DeclarativeStatePhrase:
 	epsp = DeclarativeEntityPropertyStatePhrase | esp = DeclarativeEntityStatePhrase
 ;
 
+//Maybe gather?
 ImperativeStatePhrase:
 	epsp = ImperativeEntityPropertyStatePhrase | esp = ImperativeEntityStatePhrase
 ;
@@ -138,6 +144,7 @@ ImperativeEntityPropertyStatePhrase:
 	 property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = StringValue 
 ;
 
+//Simple values
 SimpleValue: IntValue | StringValue | DoubleValue;
 
 
@@ -153,6 +160,7 @@ DoubleValue:
 	value = DOUBLE
 ;
 
+//Maybe gather?
 DeclarativeActionPhrase:
 	DeclarativeEntityAction | VerbAction
 	// Deleted: | VerifyAction
