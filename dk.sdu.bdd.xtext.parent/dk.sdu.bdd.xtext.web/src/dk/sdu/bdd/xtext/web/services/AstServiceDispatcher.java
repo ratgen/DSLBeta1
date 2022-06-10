@@ -535,6 +535,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 
 	
 	private boolean parseCrossReference(CrossReference ref, Block block) {
+		/*
 		//Get the type that the CrossReference refers to
 		TypeRef typeRef = ref.getType();
 		//System.out.println(((GeneratedMetamodel) typeRef.getMetamodel()).getName());
@@ -554,7 +555,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println(rule.getRule());
 			System.out.println(rule.getArguments());
 		}
-		
+		*/
 		return true;
 	}
 	
