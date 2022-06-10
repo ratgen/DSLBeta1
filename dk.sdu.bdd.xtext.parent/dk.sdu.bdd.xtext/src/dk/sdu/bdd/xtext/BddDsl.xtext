@@ -110,11 +110,10 @@ ImperativeStatePhrase:
 
 
 ENTITY_IDENTITY: ('#'INT) | STRING;
-OPTION:'#'? (INT | STRING) ;
 
 
 DeclarativeEntityRef:
-	(ID OPTION 'for' 'the')? ('for'|'of')? (('the'|'all' 'the') entity = [DeclarativeEntityDef | ID] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
+	(ID ENTITY_IDENTITY 'for' 'the')? ('for'|'of')? (('the'|'all' 'the') entity = [DeclarativeEntityDef | ID] name = ENTITY_IDENTITY) | (name = ENTITY_IDENTITY)
 ;
 
 ImperativeEntityRef:
@@ -124,7 +123,7 @@ ImperativeEntityRef:
 
 
 DeclarativeEntityStatePhrase:
-	(property = [PropertyDef | ID]? ('of'|'of' 'the')? OPTION? ('for'|'for' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'))? 
+	(property = [PropertyDef | ID]? ('of'|'of' 'the')? ENTITY_IDENTITY? ('for'|'for' 'the')? ('of'|'of' 'the'|'for' 'the'|'for'))? 
 	entity = DeclarativeEntityRef ('is'|'are') ('not')? state = [StateName] ID?	
 ;
 
@@ -135,28 +134,12 @@ ImperativeEntityStatePhrase:
 
 
 DeclarativeEntityPropertyStatePhrase:
-	property = [PropertyDef | ID]? ('of'|'of' 'the')? OPTION? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = DeclarativeEntityRef
-	((('is'|'is' 'not') value = SimpleValue ID?) ID? | (('are'|'are' 'not') (values += SimpleValue) ID? | (',' values += SimpleValue)*) ID?) 
+	property = [PropertyDef | ID]? ('of'|'of' 'the')? ENTITY_IDENTITY? ('of'|'for' |'from'|'for' 'the'|'of' 'the')  entity = DeclarativeEntityRef
+	((('is'|'is' 'not') value = ENTITY_IDENTITY ID?) ID? | (('are'|'are' 'not') (values += ENTITY_IDENTITY) ID? | (',' values += ENTITY_IDENTITY)*) ID?) 
 ;
 
 ImperativeEntityPropertyStatePhrase:
-	 property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = StringValue 
-;
-
-//Simple values
-SimpleValue: IntValue | StringValue | DoubleValue;
-
-
-StringValue:
-	value = STRING
-;	
-
-IntValue:
-	value = INT
-;
-
-DoubleValue:
-	value = DOUBLE
+	 property = [ImperativePropertyDef] ('of'|'for') entity = ImperativeEntityRef 'is' propertyValue = STRING 
 ;
 
 //Maybe gather?
@@ -180,12 +163,12 @@ ImperativeEntityAction:
 
 
 PropertyRef:
-    propertyref = 'to' property = [PropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [PropertyDef])? 
+    propertyref = 'to' property = [PropertyDef] propertyValue = STRING ('with' properyValue2 = STRING propery2 = [PropertyDef])? 
 ;
 ImperativePropertyRef:
-    propertyref = 'to' property = [ImperativePropertyDef] propertyValue = StringValue ('with' properyValue2 = StringValue propery2 = [ImperativePropertyDef])? 
+    propertyref = 'to' property = [ImperativePropertyDef] propertyValue = STRING ('with' properyValue2 = STRING propery2 = [ImperativePropertyDef])? 
 ;
 
-DeclarativeActionRef: verb = [ActionDef | ID] 'on'? (argument = SimpleValue)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
+DeclarativeActionRef: verb = [ActionDef | ID] 'on'? (argument = ENTITY_IDENTITY)? (preposition = PREP)? (('the'|'on')(entity = DeclarativeEntityDef))? ;
 
 DOUBLE returns ecore::EDouble : INT'.'INT;
