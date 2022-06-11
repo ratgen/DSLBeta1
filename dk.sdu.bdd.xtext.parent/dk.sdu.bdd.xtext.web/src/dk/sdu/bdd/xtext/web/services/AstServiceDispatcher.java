@@ -1,13 +1,10 @@
 package dk.sdu.bdd.xtext.web.services;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -24,17 +21,17 @@ import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
+
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
-import org.eclipse.xtext.TypeRef;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
+
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures.StatementTypes;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
-import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldInput;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputArgument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
@@ -76,46 +73,23 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
-		ObjectMapper objectMapper = new ObjectMapper();
 		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
 
-
-		EList<Resource> list = resourceSet.getResources();
-		System.out.println(list);
-		for (Resource item : list) {
-			//used for working with the AST.
-			URI uri = item.getURI();
-			System.out.println("Resource  URI: " + uri);
-			EList<EObject> objectContents = item.getContents();
-			System.out.println("item contents " + objectContents);
-			for (EObject obj : objectContents) {
-				System.out.println("EObject_string: " + obj.toString());
-				
-				System.out.println(dump(obj, "   "));
-			}
-			System.out.println();
-			System.out.println();
-		}
-
 		
-		try {
-			String blockarr = objectMapper.writeValueAsString(new String("hidf"));
-			
-			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
-			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult(blockarr);
-		     });
-			return serviceDescriptor;
-		} catch (JsonProcessingException e) {
- 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
-			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult("err");
-		     });
-			e.printStackTrace();
-			return serviceDescriptor;
-		}
+		EList<Resource> list = resourceSet.getResources();
+		AstServiceProvider provider = new AstServiceProvider();
+		ArrayList<String> astArr = new ArrayList<>();
+		list.forEach((item) -> {
+			astArr.add(provider.parseResource(item));
+		});
+		
+		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+		serviceDescriptor.setService(() -> {
+	        return new AstServiceResult(provider.parseArr(astArr));
+	     });
+		return serviceDescriptor;
 
 	}
 	
@@ -555,7 +529,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		return true;
 	}
 	
-	private static String dump(EObject mod_, String indent) {
+	public static String dump(EObject mod_, String indent) {
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {
