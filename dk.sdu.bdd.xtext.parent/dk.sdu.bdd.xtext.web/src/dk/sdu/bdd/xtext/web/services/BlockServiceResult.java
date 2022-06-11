@@ -11,7 +11,7 @@ public class BlockServiceResult implements IServiceResult {
 		this.toolBox = toolBox;
 	}
 
-	public String getAstResult() {
+	public String getBlockServiceResult() {
 		return this.blocks + this.toolBox;
 	}
 }
