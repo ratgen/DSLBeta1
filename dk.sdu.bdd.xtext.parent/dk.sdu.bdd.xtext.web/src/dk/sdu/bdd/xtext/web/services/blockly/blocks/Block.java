@@ -130,7 +130,7 @@ public class Block  {
 		nextStatement.add(state);
 	}
 
-	public boolean isLastIsArg() {
+	public boolean lastIsArg() {
 		return lastIsArg;
 	}
 	

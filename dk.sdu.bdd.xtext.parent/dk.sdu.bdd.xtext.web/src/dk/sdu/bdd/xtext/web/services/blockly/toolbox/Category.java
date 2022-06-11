@@ -3,9 +3,9 @@ package dk.sdu.bdd.xtext.web.services.blockly.toolbox;
 import java.util.ArrayList;
 
 public class Category {
-	String kind;
-	String name;
-	ArrayList<CategoryItem> contents;
+	private String kind;
+	private String name;
+	private ArrayList<CategoryItem> contents;
 	
 	public Category (String categoryName) {
 		this.kind = "category";
