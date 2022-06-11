@@ -1,13 +1,10 @@
 package dk.sdu.bdd.xtext.web.services;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
@@ -24,17 +21,17 @@ import org.eclipse.xtext.Grammar;
 import org.eclipse.xtext.Group;
 import org.eclipse.xtext.Keyword;
 import org.eclipse.xtext.ParserRule;
+
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
-import org.eclipse.xtext.TypeRef;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
+
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.Block;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.BlockFeatures.StatementTypes;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldDropdown;
-import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Fields.FieldInput;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputArgument;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputStatement;
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Inputs.InputValue;
@@ -76,46 +73,23 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	ServiceDescriptor getAstService(IServiceContext context) {
-		ObjectMapper objectMapper = new ObjectMapper();
 		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
 
-
-		EList<Resource> list = resourceSet.getResources();
-		System.out.println(list);
-		for (Resource item : list) {
-			//used for working with the AST.
-			URI uri = item.getURI();
-			System.out.println("Resource  URI: " + uri);
-			EList<EObject> objectContents = item.getContents();
-			System.out.println("item contents " + objectContents);
-			for (EObject obj : objectContents) {
-				System.out.println("EObject_string: " + obj.toString());
-				
-				System.out.println(dump(obj, "   "));
-			}
-			System.out.println();
-			System.out.println();
-		}
-
 		
-		try {
-			String blockarr = objectMapper.writeValueAsString(new String("hidf"));
-			
-			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
-			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult(blockarr);
-		     });
-			return serviceDescriptor;
-		} catch (JsonProcessingException e) {
- 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
-			serviceDescriptor.setService(() -> {
-		        return new AstServiceResult("err");
-		     });
-			e.printStackTrace();
-			return serviceDescriptor;
-		}
+		EList<Resource> list = resourceSet.getResources();
+		AstServiceProvider provider = new AstServiceProvider();
+		ArrayList<String> astArr = new ArrayList<>();
+		list.forEach((item) -> {
+			astArr.add(provider.parseResource(item));
+		});
+		
+		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
+		serviceDescriptor.setService(() -> {
+	        return new AstServiceResult(provider.parseArr(astArr));
+	     });
+		return serviceDescriptor;
 
 	}
 	
@@ -142,7 +116,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				block.setOutput(outputs.get(0));
 			}
 			
-			if (block.getPreviousStatement() == null && block.getOutput() == null) {
+			if (block.getPreviousStatement() == null && block.getOutput() == null && !block.getMessage0().contains("model")) {
 				all.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
@@ -267,12 +241,13 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				InputValue inputValue = new InputValue("alternatives_statement");
 				EList<EObject> contents = alternatives.eContents();
 				for (int i = 0; i < contents.size(); i++) {
-					if (contents.get(i) instanceof Assignment) {
+					EObject item = contents.get(i);
+					if (item instanceof Assignment) {
 						AbstractRule rule = getRuleFromAssignment(contents.get(i));
 						inputValue.addCheck(rule.getName());
 						blockFeatures.addStatement(rule.getName(), rule.getName(), StatementTypes.output);
 					}
-					if (contents.get(i) instanceof Keyword) {
+					if (item instanceof Keyword) {
 						Keyword keyWord = (Keyword) contents.get(i);
 						inputValue.addCheck(keyWord.getValue());
 						Block subBlock = new Block("subBlock_" + block.getType() + "_" + keyWord.getValue());
@@ -283,11 +258,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						subBlock.setBlockCategory(cat);
 						blockArray.add(subBlock);
 					}
-					if (contents.get(i) instanceof Group) {
+					if (item instanceof Group) {
 						Group gr = (Group) contents.get(i);
 						createSubblock(gr, block, inputValue);
 					}
-					if (contents.get(i) instanceof RuleCall) {
+					if (item instanceof RuleCall) {
 						RuleCall ruleCall = (RuleCall) contents.get(i);
 						AbstractRule rule = ruleCall.getRule();
 						inputValue.addCheck(rule.getName());
@@ -305,23 +280,17 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					AbstractRule rule = getRuleFromAssignment(contents.get(i));
 					inputStatement.addCheck(rule.getName());
 					blockFeatures.addStatement(rule.getName(), block.getType(), StatementTypes.previousStatement);
-					
-					//add previous blocks as prevstatements
-					for (int j = 0; j < i + 1; j++) {
+					for (int j = 0; j < contents.size(); j++) {
 						blockFeatures.addStatement(
 								rule.getName(), 
 								getRuleFromAssignment(contents.get(j)).getName(), 
 								StatementTypes.previousStatement
 								);
-					}
-					
-					//add next blocks as nextstatements
-					for (int j = i; j < contents.size(); j++) {
 						blockFeatures.addStatement(
 								rule.getName(), 
 								getRuleFromAssignment(contents.get(j)).getName(), 
 								StatementTypes.nextStatement
-						);
+								);
 					}
 				}
 			}
@@ -398,18 +367,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			AbstractElement assignmentContent = assignment.getTerminal();
 			if (assignmentContent instanceof RuleCall) {
 				RuleCall rule = (RuleCall) assignmentContent;
-				AbstractRule ruleContent = rule.getRule();
-				if (ruleContent instanceof ParserRule) {
-					ParserRule parseRule = (ParserRule) ruleContent;
-					parseRule(parseRule, block);
-				}
-				if (ruleContent instanceof TerminalRule) {
-					createInputFromAbstractRule(ruleContent, block);
-				}
+				parseRuleCall(rule, block);
 			}
 			if (assignmentContent instanceof Alternatives) {
 				Alternatives alt = (Alternatives) assignmentContent;
 				parseAlternatives(alt, block);
+			}
+			if (assignmentContent instanceof CrossReference) {
+				CrossReference ref = (CrossReference) assignmentContent;
+				parseCrossReference(ref, block);
 			}
 		} else if (assignment.getCardinality().equals("?")) {
 			AbstractElement assignmentContent = assignment.getTerminal();
@@ -430,8 +396,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 
 	private boolean parseRuleCall(RuleCall rule, Block block) {
-		AbstractRule abstractRule = rule.getRule();
-		createInputFromAbstractRule(abstractRule, block);
+		AbstractRule ruleContent = rule.getRule();
+		if (ruleContent instanceof ParserRule) {
+			ParserRule parseRule = (ParserRule) ruleContent;
+			parseRule(parseRule, block);
+		}
+		if (ruleContent instanceof TerminalRule) {
+			createInputFromAbstractRule(ruleContent, block);
+		}
 		return false;
 	}
 
@@ -532,8 +504,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		blockArray.add(subBlock);
 	}
 	
-
-	
 	private boolean parseCrossReference(CrossReference ref, Block block) {
 		/*
 		//Get the type that the CrossReference refers to
@@ -555,11 +525,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println(rule.getRule());
 			System.out.println(rule.getArguments());
 		}
-		*/
+		*/		
 		return true;
 	}
 	
-	private static String dump(EObject mod_, String indent) {
+	public static String dump(EObject mod_, String indent) {
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {
