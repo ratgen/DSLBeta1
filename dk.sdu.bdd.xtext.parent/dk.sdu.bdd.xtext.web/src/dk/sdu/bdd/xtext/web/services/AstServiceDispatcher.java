@@ -142,7 +142,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				block.setOutput(outputs.get(0));
 			}
 			
-			if (block.getPreviousStatement() == null && block.getOutput() == null) {
+			if (block.getPreviousStatement() == null && block.getOutput() == null && !block.getMessage0().contains("model")) {
 				all.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
@@ -267,12 +267,13 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				InputValue inputValue = new InputValue("alternatives_statement");
 				EList<EObject> contents = alternatives.eContents();
 				for (int i = 0; i < contents.size(); i++) {
-					if (contents.get(i) instanceof Assignment) {
+					EObject item = contents.get(i);
+					if (item instanceof Assignment) {
 						AbstractRule rule = getRuleFromAssignment(contents.get(i));
 						inputValue.addCheck(rule.getName());
 						blockFeatures.addStatement(rule.getName(), rule.getName(), StatementTypes.output);
 					}
-					if (contents.get(i) instanceof Keyword) {
+					if (item instanceof Keyword) {
 						Keyword keyWord = (Keyword) contents.get(i);
 						inputValue.addCheck(keyWord.getValue());
 						Block subBlock = new Block("subBlock_" + block.getType() + "_" + keyWord.getValue());
@@ -283,11 +284,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						subBlock.setBlockCategory(cat);
 						blockArray.add(subBlock);
 					}
-					if (contents.get(i) instanceof Group) {
+					if (item instanceof Group) {
 						Group gr = (Group) contents.get(i);
 						createSubblock(gr, block, inputValue);
 					}
-					if (contents.get(i) instanceof RuleCall) {
+					if (item instanceof RuleCall) {
 						RuleCall ruleCall = (RuleCall) contents.get(i);
 						AbstractRule rule = ruleCall.getRule();
 						inputValue.addCheck(rule.getName());
@@ -305,23 +306,17 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					AbstractRule rule = getRuleFromAssignment(contents.get(i));
 					inputStatement.addCheck(rule.getName());
 					blockFeatures.addStatement(rule.getName(), block.getType(), StatementTypes.previousStatement);
-					
-					//add previous blocks as prevstatements
-					for (int j = 0; j < i + 1; j++) {
+					for (int j = 0; j < contents.size(); j++) {
 						blockFeatures.addStatement(
 								rule.getName(), 
 								getRuleFromAssignment(contents.get(j)).getName(), 
 								StatementTypes.previousStatement
 								);
-					}
-					
-					//add next blocks as nextstatements
-					for (int j = i; j < contents.size(); j++) {
 						blockFeatures.addStatement(
 								rule.getName(), 
 								getRuleFromAssignment(contents.get(j)).getName(), 
 								StatementTypes.nextStatement
-						);
+								);
 					}
 				}
 			}
@@ -398,18 +393,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			AbstractElement assignmentContent = assignment.getTerminal();
 			if (assignmentContent instanceof RuleCall) {
 				RuleCall rule = (RuleCall) assignmentContent;
-				AbstractRule ruleContent = rule.getRule();
-				if (ruleContent instanceof ParserRule) {
-					ParserRule parseRule = (ParserRule) ruleContent;
-					parseRule(parseRule, block);
-				}
-				if (ruleContent instanceof TerminalRule) {
-					createInputFromAbstractRule(ruleContent, block);
-				}
+				parseRuleCall(rule, block);
 			}
 			if (assignmentContent instanceof Alternatives) {
 				Alternatives alt = (Alternatives) assignmentContent;
 				parseAlternatives(alt, block);
+			}
+			if (assignmentContent instanceof CrossReference) {
+				CrossReference ref = (CrossReference) assignmentContent;
+				parseCrossReference(ref, block);
 			}
 		} else if (assignment.getCardinality().equals("?")) {
 			AbstractElement assignmentContent = assignment.getTerminal();
@@ -430,8 +422,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 
 	private boolean parseRuleCall(RuleCall rule, Block block) {
-		AbstractRule abstractRule = rule.getRule();
-		createInputFromAbstractRule(abstractRule, block);
+		AbstractRule ruleContent = rule.getRule();
+		if (ruleContent instanceof ParserRule) {
+			ParserRule parseRule = (ParserRule) ruleContent;
+			parseRule(parseRule, block);
+		}
+		if (ruleContent instanceof TerminalRule) {
+			createInputFromAbstractRule(ruleContent, block);
+		}
 		return false;
 	}
 
@@ -532,8 +530,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		blockArray.add(subBlock);
 	}
 	
-
-	
 	private boolean parseCrossReference(CrossReference ref, Block block) {
 		/*
 		//Get the type that the CrossReference refers to
@@ -555,7 +551,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println(rule.getRule());
 			System.out.println(rule.getArguments());
 		}
-		*/
+		*/		
 		return true;
 	}
 	
