@@ -10,6 +10,7 @@ import org.eclipse.emf.ecore.resource.Resource;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import dk.sdu.bdd.xtext.bddDsl.ImperativeEntityDef;
 import dk.sdu.bdd.xtext.bddDsl.Model;
 
 public class AstServiceProvider {
@@ -27,17 +28,19 @@ public class AstServiceProvider {
 		EList<EObject> objectContents = resource.getContents();
 		System.out.println("item contents " + objectContents);
 		for (EObject obj : objectContents) {
-		    if (obj instanceof Model) {
-		    	Model model = (Model) obj;
-		    	return ((Model) obj).getName();
-		    }
 			System.out.println("EObject_string: " + obj.toString());
 			
 			System.out.println(AstServiceDispatcher.dump(obj, "   "));
+
+		    if (obj instanceof Model) {
+		    	Model model = (Model) obj;
+		    	EList<ImperativeEntityDef> entityList =  model.getImperativeEntityDef();
+		    	return ((Model) obj).getName();
+		    }
 		}
 		System.out.println();
 		System.out.println();
-		return "m";
+		return "";
 	}
 	
 	public String parseArr(ArrayList<String> arr) {

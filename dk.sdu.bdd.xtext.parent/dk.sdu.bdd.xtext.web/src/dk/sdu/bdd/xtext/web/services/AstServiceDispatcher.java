@@ -24,6 +24,7 @@ import org.eclipse.xtext.ParserRule;
 
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
+import org.eclipse.xtext.TypeRef;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 
@@ -82,7 +83,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		AstServiceProvider provider = new AstServiceProvider();
 		ArrayList<String> astArr = new ArrayList<>();
 		list.forEach((item) -> {
-			astArr.add(provider.parseResource(item));
+			String models = provider.parseResource(item);
+			if (!models.equals("")) {
+				astArr.add(models);
+			}
 		});
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
@@ -505,9 +509,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	private boolean parseCrossReference(CrossReference ref, Block block) {
-		/*
+		
 		//Get the type that the CrossReference refers to
-		TypeRef typeRef = ref.getType();
+		//TypeRef typeRef = ref.getType();
 		//System.out.println(((GeneratedMetamodel) typeRef.getMetamodel()).getName());
 		;
 		AbstractElement terminal = ref.getTerminal();
@@ -525,7 +529,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			System.out.println(rule.getRule());
 			System.out.println(rule.getArguments());
 		}
-		*/		
+		
 		return true;
 	}
 	

@@ -31,7 +31,6 @@ class BddDslScopeProvider extends AbstractBddDslScopeProvider {
 			scopeForDecEntityModelElements(context, PropertyDef);
 		}	else if (reference.EType == BddDslPackage.eINSTANCE.imperativeActionDef) {
 			scopeForImpEntityModelElements(context, ImperativeActionDef);
-			
 		} else if (reference.EType == BddDslPackage.eINSTANCE.imperativePropertyDef) {
 			scopeForImpEntityModelElements(context, ImperativePropertyDef);
 			
