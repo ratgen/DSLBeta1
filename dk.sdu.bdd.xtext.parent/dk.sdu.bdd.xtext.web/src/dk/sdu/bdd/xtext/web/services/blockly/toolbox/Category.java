@@ -6,13 +6,11 @@ import java.util.Iterator;
 public class Category {
 	private String kind;
 	private String name;
-	private int colour;
 	private ArrayList<CategoryItem> contents;
 	
-	public Category (String categoryName, int colour) {
+	public Category (String categoryName) {
 		this.kind = "category";
 		this.name = categoryName;
-		this.colour = colour;
 		this.contents = new ArrayList<>();
 	}
 	
