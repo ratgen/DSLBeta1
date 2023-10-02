@@ -32,7 +32,7 @@ public class Block  {
 	
 	public Category getBlockCategory() {
 		if (blockCategory == null) {
-			blockCategory = new Category(type);
+			blockCategory = new Category(type, colour);
 		}
 		return blockCategory;
 	}

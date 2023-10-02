@@ -103,7 +103,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		//TODO: Better categoires
 		//setup toolbox
 		toolBox = new CategoryToolBox();
-		Category all = new Category("all");
+		Category all = new Category("all", 100);
 		toolBox.addCategory(all);
 		
 		blockArray = new ArrayList<>();
