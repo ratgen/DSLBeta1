@@ -11,6 +11,7 @@ public class Block  {
 	private String output;
 	private String tooltip;
 	private String message0 = "";
+	private int colour = 0;
 	private int argCount;
 	private boolean lastIsArg = false;
 	
@@ -23,6 +24,7 @@ public class Block  {
 	public Block(String type) {
 		this.type = type;
 		this.tooltip = type;
+		this.colour = 100;
 		this.argCount = 1;
 		
 		this.args0 = new ArrayList<>();
