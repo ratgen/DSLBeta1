@@ -26,8 +26,10 @@ public class Block  {
 		this.type = type;
 		this.tooltip = type;
 		
-		Random random = new Random();
+		long seed = type.hashCode();
+		Random random = new Random(seed);		
 		this.colour = random.nextInt(361);
+		
 		this.argCount = 1;
 		
 		this.args0 = new ArrayList<>();
