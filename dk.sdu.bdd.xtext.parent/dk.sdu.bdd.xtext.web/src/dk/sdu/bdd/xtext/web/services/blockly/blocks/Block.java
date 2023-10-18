@@ -1,6 +1,7 @@
 package dk.sdu.bdd.xtext.web.services.blockly.blocks;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import dk.sdu.bdd.xtext.web.services.blockly.blocks.arguments.Argument;
 import dk.sdu.bdd.xtext.web.services.blockly.toolbox.Category;
@@ -11,6 +12,7 @@ public class Block  {
 	private String output;
 	private String tooltip;
 	private String message0 = "";
+	private int colour = 0;
 	private int argCount;
 	private boolean lastIsArg = false;
 	
@@ -23,6 +25,11 @@ public class Block  {
 	public Block(String type) {
 		this.type = type;
 		this.tooltip = type;
+		
+		long seed = type.hashCode();
+		Random random = new Random(seed);		
+		this.colour = random.nextInt(361);
+		
 		this.argCount = 1;
 		
 		this.args0 = new ArrayList<>();
@@ -60,6 +67,12 @@ public class Block  {
 	}
 	public void setTooltip(String tooltip) {
 		this.tooltip = tooltip;
+	}
+	public int getColour() {
+		return colour;
+	}
+	public void setColour(int colour) {
+		this.colour = colour;
 	}
 	public String getMessage0() {
 		return message0;

@@ -129,6 +129,7 @@ window.onload = () => {
 
       Blockly.Blocks["ID"] = {
         init: function() {
+		  this.setColour(200)
           this.setOutput(true, 'ID')
           this.appendDummyInput()
             .appendField(new Blockly.FieldTextInput('ID', id_validator));
@@ -148,6 +149,7 @@ window.onload = () => {
 
       Blockly.Blocks["STRING"] = {
         init: function() {
+		  this.setColour(300)
           this.setOutput(true, 'STRING')
           this.appendDummyInput()
             .appendField("\"")
