@@ -135,6 +135,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					catContents.size() != 0 
 					&& !block.getType().contains("subBlock")) {
 				
+				System.out.print("type ");
+				System.out.println(block.getType());
+				System.out.print("category ");
+				System.out.println(cat.getName());
+				
 				Category existingCategory = null;
 				
 				for (Category c : toolBox.getContents()) {
@@ -143,6 +148,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		                break;
 		            }
 		        }
+				
+				boolean blockExistsInContents = false;
+				for (CategoryItem i : cat.getContents())
+				{
+					if (i.getType().equals(block.getType()))
+						blockExistsInContents = true;
+				}
+				
+				if (!blockExistsInContents)
+					cat.addCategoryItem(new CategoryItem(block.getType()));
 				
 				if (existingCategory == null)
 					toolBox.addCategory(cat);
@@ -158,6 +173,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		try {
 			String blockarr = objectMapper.writeValueAsString(blockArray);
 			String toolboxstr = objectMapper.writeValueAsString(toolBox);
+			System.out.println(toolboxstr);
 			
 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 			serviceDescriptor.setService(() -> {
