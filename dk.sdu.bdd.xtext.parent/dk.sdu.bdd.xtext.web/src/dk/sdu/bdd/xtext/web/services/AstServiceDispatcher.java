@@ -120,7 +120,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				block.setOutput(outputs.get(0));
 			}
 			
-			if (block.getPreviousStatement() == null && block.getOutput() == null && !block.getMessage0().contains("model")) {
+			if (block.getPreviousStatement() == null && block.getOutput() == null && 
+					!block.getMessage0().contains("model")) {
 				all.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
@@ -128,10 +129,41 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 			
 			Category cat = block.getBlockCategory();
-			if (cat.getContents() != null &&
-					cat.getContents().size() != 0 
+			ArrayList<CategoryItem> catContents = cat.getContents();
+			
+			if (catContents != null &&
+					catContents.size() != 0 
 					&& !block.getType().contains("subBlock")) {
-				toolBox.addCategory(cat);
+				
+				System.out.print("type ");
+				System.out.println(block.getType());
+				System.out.print("category ");
+				System.out.println(cat.getName());
+				
+				Category existingCategory = null;
+				
+				for (Category c : toolBox.getContents()) {
+		            if (cat.getName().equals(c.getName())) {
+		                existingCategory = c;
+		                break;
+		            }
+		        }
+				
+				boolean blockExistsInContents = false;
+				for (CategoryItem i : cat.getContents())
+				{
+					if (i.getType().equals(block.getType()))
+						blockExistsInContents = true;
+				}
+				
+				if (!blockExistsInContents)
+					cat.addCategoryItem(new CategoryItem(block.getType()));
+				
+				if (existingCategory == null)
+					toolBox.addCategory(cat);
+				else
+					for (CategoryItem i : cat.getContents())
+						existingCategory.addCategoryItem(i);
 			}
 		}
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -141,6 +173,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		try {
 			String blockarr = objectMapper.writeValueAsString(blockArray);
 			String toolboxstr = objectMapper.writeValueAsString(toolBox);
+			System.out.println(toolboxstr);
 			
 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 			serviceDescriptor.setService(() -> {

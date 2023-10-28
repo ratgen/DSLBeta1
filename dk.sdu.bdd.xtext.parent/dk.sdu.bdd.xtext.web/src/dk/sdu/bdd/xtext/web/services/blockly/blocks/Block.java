@@ -37,7 +37,7 @@ public class Block  {
 	
 	public Category getBlockCategory() {
 		if (blockCategory == null) {
-			blockCategory = new Category(type);
+			blockCategory = new Category(getCategoryForType(type));
 		}
 		return blockCategory;
 	}
@@ -147,5 +147,55 @@ public class Block  {
 		return lastIsArg;
 	}
 	
-	
+	public String getCategoryForType(String type)
+	{
+		switch (type)
+		{
+			case "Model":
+			case "ModelRef":
+				return "Model";
+			case "DeclarativeEntityDef":
+			case "DeclarativeEntityRef":
+			case "DeclarativeEntityStatePhrase":
+			case "DeclarativeEntityPropertyStatePhrase":
+			case "DeclarativeEntityAction":
+			case "DeclarativeEntityPropertyRef":
+				return "Declarative Entities and Definitions";
+			case "ImperativeEntityDef":
+			case "ImperativeEntityRef":
+			case "ImperativeEntityStatePhrase":
+			case "ImperativeEntityPropertyStatePhrase":
+			case "ImperativeEntityAction":
+			case "ImperativePropertyRef":
+				return "Imperative Entities and Definitions";
+			case "ActionDef":
+			case "ImperativeActionDef":
+			case "VerbAction":
+			case "ActionRef":
+			case "ImperativeActionRef":
+				return "Actions and Verbs";
+			case "StateDef":
+			case "PropertyDef":
+			case "ImperativeStateDef":
+			case "ImperativePropertyDef":
+				return "States and Properties";
+			case "Scenario":
+			case "PrePostWords":
+			case "WhenWords": 
+				return "Scenario Definitions";
+			case "ImperativeScenario":
+			case "ImperativeScenarioState":
+				return "Imperative Scenarios";
+			case "DeclarativeScenarioState":
+			case "DeclarativeScenarioAction":
+				return "Declarative Scenarios";
+			case "DOUBLE":
+			case "PREP":
+			case "ENTITY_IDENTITY":
+			case "ADVERB":
+				return "General";
+			default:
+				return "Unknown";
+		}
+	}
 }
