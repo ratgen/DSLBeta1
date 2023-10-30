@@ -195,17 +195,7 @@ window.onload = () => {
       console.log(response)      
 
       if (entities != undefined) {
-        //entities.onchange = onEntityEditorChange;
         entities.addEventListener("input", onEntityEditorChange);
-
-        if (entities.innerText == null || entities.innerText.replace(/[^a-zA-Z]/g, '').trim() === '')
-        {
-          setDisabled(scenarioTab);
-        }
-        else
-        {
-          setEnabled(scenarioTab);
-        }
       }
 
       function onClick(event) {
@@ -263,6 +253,7 @@ window.onload = () => {
 
       onchange();
       console.log(response)
+      onEntityEditorChange();
     })
   }, 200)
 }
