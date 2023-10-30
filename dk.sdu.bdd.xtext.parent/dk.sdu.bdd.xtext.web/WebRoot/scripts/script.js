@@ -51,6 +51,7 @@ let entitiesBlock = document.getElementById('blockly-editor')
 let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
 let scenarioBlock = document.getElementById('blockly-editor2')
+let warningMessage = document.getElementById('warning-message')
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
   currentEditor.style.display = "none"
@@ -60,6 +61,9 @@ function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 }
 
 function switchEditor(e) {
+  if (e.target.disabled)  
+    return;
+
   var b = ""
   if (e.target != currentTab ) {
     removeSelectionBorder(currentTab)
@@ -78,6 +82,13 @@ function switchEditor(e) {
   }
 }
 
+function onEntityEditorChange() {
+  if (entities.innerText != null && entities.innerText.replace(/[^a-zA-Z]/g, '').trim() !== '')
+    setEnabled(scenarioTab);
+  else
+    setDisabled(scenarioTab);
+}
+
 function setSelectionBorder(element) {
   element.style.border = "2px black solid";
 }
@@ -86,17 +97,31 @@ function removeSelectionBorder(element) {
   element.style.border = "2px white solid"
 }
 
+function setDisabled(element) {
+  element.style.backgroundColor = "#f2f2f2";
+  element.style.pointerEvents = "none";
+  element.disabled = true;
+  warningMessage.style.visibility = "visible";
+}
+
+function setEnabled(element) {
+  element.style.backgroundColor = "#ddd";
+  element.style.pointerEvents = "auto";
+  element.disabled = false;
+  warningMessage.style.visibility = "hidden";
+}
+
 if (entitiesTab != undefined)
   entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
 
-
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
 
-setSelectionBorder(entitiesTab)
+setEnabled(entitiesTab);
+setSelectionBorder(entitiesTab);
 
 window.onload = () => {
   setTimeout (() => {
@@ -167,7 +192,11 @@ window.onload = () => {
 
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
-      console.log(response)
+      console.log(response)      
+
+      if (entities != undefined) {
+        entities.addEventListener("input", onEntityEditorChange);
+      }
 
       function onClick(event) {
         Blockly.svgResize(scenarioWorkspace);
@@ -175,7 +204,7 @@ window.onload = () => {
       }
 
       function onchange(event){
-        console.log(event)
+        console.log(event);
         let entityBlockArray = entityWorkspace.getAllBlocks();
         let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
 
@@ -206,6 +235,13 @@ window.onload = () => {
 
         Blockly.svgResize(scenarioWorkspace);
         Blockly.svgResize(entityWorkspace);
+
+        if (entityWorkspace.getAllBlocks().length > 0) {
+          setEnabled(document.getElementById('scenario-tab'));
+        }
+        else {
+          setDisabled(document.getElementById('scenario-tab'));
+        }
       }
 
       document.getElementById('blockly-editor2').style.display = "none"
@@ -217,6 +253,7 @@ window.onload = () => {
 
       onchange();
       console.log(response)
+      onEntityEditorChange();
     })
   }, 200)
 }
