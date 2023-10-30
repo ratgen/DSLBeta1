@@ -60,6 +60,9 @@ function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 }
 
 function switchEditor(e) {
+  if (e.target.disabled)  
+    return;
+
   var b = ""
   if (e.target != currentTab ) {
     removeSelectionBorder(currentTab)
@@ -78,6 +81,11 @@ function switchEditor(e) {
   }
 }
 
+function onEntityEditorChange(e) {
+  if (e.innerText != null && e.innerText.trim() !== '')
+    setEnabled(scenarioTab);
+}
+
 function setSelectionBorder(element) {
   element.style.border = "2px black solid";
 }
@@ -86,17 +94,40 @@ function removeSelectionBorder(element) {
   element.style.border = "2px white solid"
 }
 
+function setDisabled(element) {
+  element.style.backgroundColor = "#e6e6e6";
+  element.style.pointerEvents = "none";
+  element.disabled = true;
+  console.log("!!!disabled!!!");
+}
+
+function setEnabled(element) {
+  element.style.backgroundColor = "#ddd";
+  element.style.pointerEvents = "auto";
+  element.disabled = false;
+  console.log("!!!enabled!!!");
+}
+
 if (entitiesTab != undefined)
   entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
 
+if (entities != undefined)
+  entities.onchange = onEntityEditorChange
 
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
 
-setSelectionBorder(entitiesTab)
+setEnabled(entitiesTab);
+setSelectionBorder(entitiesTab);
+
+if (entities.innerText == null || entities.innerText.trim() === '')
+  setDisabled(scenarioTab);
+else
+  setEnabled(scenarioTab);
+
 
 window.onload = () => {
   setTimeout (() => {
@@ -175,7 +206,7 @@ window.onload = () => {
       }
 
       function onchange(event){
-        console.log(event)
+        console.log(event);
         let entityBlockArray = entityWorkspace.getAllBlocks();
         let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
 
@@ -206,6 +237,11 @@ window.onload = () => {
 
         Blockly.svgResize(scenarioWorkspace);
         Blockly.svgResize(entityWorkspace);
+
+        if (scenarioTab.disabled && entityWorkspace.getAllBlocks().length > 0) {
+          console.log("SET ENABLEDDD");
+          setEnabled(scenarioTab);
+        }
       }
 
       document.getElementById('blockly-editor2').style.display = "none"
