@@ -51,6 +51,7 @@ let entitiesBlock = document.getElementById('blockly-editor')
 let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
 let scenarioBlock = document.getElementById('blockly-editor2')
+let warningMessage = document.getElementById('warning-message')
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
   currentEditor.style.display = "none"
@@ -81,9 +82,11 @@ function switchEditor(e) {
   }
 }
 
-function onEntityEditorChange(e) {
-  if (e.innerText != null && e.innerText.trim() !== '')
+function onEntityEditorChange() {
+  if (entities.innerText != null && entities.innerText.replace(/[^a-zA-Z]/g, '').trim() !== '')
     setEnabled(scenarioTab);
+  else
+    setDisabled(scenarioTab);
 }
 
 function setSelectionBorder(element) {
@@ -95,17 +98,17 @@ function removeSelectionBorder(element) {
 }
 
 function setDisabled(element) {
-  element.style.backgroundColor = "#e6e6e6";
+  element.style.backgroundColor = "#f2f2f2";
   element.style.pointerEvents = "none";
   element.disabled = true;
-  console.log("!!!disabled!!!");
+  warningMessage.style.visibility = "visible";
 }
 
 function setEnabled(element) {
   element.style.backgroundColor = "#ddd";
   element.style.pointerEvents = "auto";
   element.disabled = false;
-  console.log("!!!enabled!!!");
+  warningMessage.style.visibility = "hidden";
 }
 
 if (entitiesTab != undefined)
@@ -113,21 +116,12 @@ if (entitiesTab != undefined)
 if (scenarioTab != undefined)
   scenarioTab.onclick = switchEditor
 
-if (entities != undefined)
-  entities.onchange = onEntityEditorChange
-
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
 
 setEnabled(entitiesTab);
 setSelectionBorder(entitiesTab);
-
-if (entities.innerText == null || entities.innerText.trim() === '')
-  setDisabled(scenarioTab);
-else
-  setEnabled(scenarioTab);
-
 
 window.onload = () => {
   setTimeout (() => {
@@ -198,7 +192,21 @@ window.onload = () => {
 
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
-      console.log(response)
+      console.log(response)      
+
+      if (entities != undefined) {
+        //entities.onchange = onEntityEditorChange;
+        entities.addEventListener("input", onEntityEditorChange);
+
+        if (entities.innerText == null || entities.innerText.replace(/[^a-zA-Z]/g, '').trim() === '')
+        {
+          setDisabled(scenarioTab);
+        }
+        else
+        {
+          setEnabled(scenarioTab);
+        }
+      }
 
       function onClick(event) {
         Blockly.svgResize(scenarioWorkspace);
@@ -238,9 +246,11 @@ window.onload = () => {
         Blockly.svgResize(scenarioWorkspace);
         Blockly.svgResize(entityWorkspace);
 
-        if (scenarioTab.disabled && entityWorkspace.getAllBlocks().length > 0) {
-          console.log("SET ENABLEDDD");
-          setEnabled(scenarioTab);
+        if (entityWorkspace.getAllBlocks().length > 0) {
+          setEnabled(document.getElementById('scenario-tab'));
+        }
+        else {
+          setDisabled(document.getElementById('scenario-tab'));
         }
       }
 
