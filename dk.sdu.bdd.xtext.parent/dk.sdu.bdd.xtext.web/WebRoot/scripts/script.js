@@ -84,9 +84,15 @@ function switchEditor(e) {
 
 function onEntityEditorChange() {
   if (entities.innerText != null && entities.innerText.replace(/[^a-zA-Z]/g, '').trim() !== '')
+  {
     setEnabled(scenarioTab);
-  else
+    enabledByText = true;
+  }
+  else if (!enabledByCodeBlocks)
+  {
     setDisabled(scenarioTab);
+    enabledByText = false;
+  }
 }
 
 function setSelectionBorder(element) {
@@ -119,6 +125,9 @@ if (scenarioTab != undefined)
 currentEditor = entities
 currentTab = entitiesTab
 currentBlockly = entitiesBlock
+
+enabledByText = false
+enabledByCodeBlocks = false
 
 setEnabled(entitiesTab);
 setSelectionBorder(entitiesTab);
@@ -236,11 +245,15 @@ window.onload = () => {
         Blockly.svgResize(scenarioWorkspace);
         Blockly.svgResize(entityWorkspace);
 
+        var scenarioTabElement = document.getElementById('scenario-tab')
+
         if (entityWorkspace.getAllBlocks().length > 0) {
-          setEnabled(document.getElementById('scenario-tab'));
+          setEnabled(scenarioTabElement);
+          enabledByCodeBlocks = true;
         }
-        else {
-          setDisabled(document.getElementById('scenario-tab'));
+        else if (!enabledByText) {
+          setDisabled(scenarioTabElement);
+          enabledByCodeBlocks = false;
         }
       }
 
