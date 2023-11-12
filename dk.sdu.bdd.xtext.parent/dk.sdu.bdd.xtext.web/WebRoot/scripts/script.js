@@ -288,10 +288,10 @@ function loadBlocks(element) {
 function filterCategories(element, contents) {
 	if (element === entitiesTab) {
 		let categories = ["Scenario Definitions", "Imperative Scenarios"];
-		return contents.filter(item => !categories.includes(item));
+		return contents.filter(item => !categories.includes(item.name));
 	}
 	else if (element === scenarioTab) {
 		let categories = ["Declarative Entities and Definitions", "Imperative Entities and Definitions"];
-		return contents.filter(item => !categories.includes(item));
+		return contents.filter(item => !categories.includes(item.name));
 	}
 }
