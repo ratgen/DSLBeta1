@@ -102,16 +102,17 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				
 		//TODO: Better categoires
 		//setup toolbox
-		toolBox = new CategoryToolBox();
+		toolBox = new CategoryToolBox();	
+		
 		Category modelCategory = new Category("Model");
 		toolBox.addCategory(modelCategory);
 		modelCategory.addCategoryItem(new CategoryItem("Model"));
 		modelCategory.addCategoryItem(new CategoryItem("ModelRef"));
 		
+		Category others = new Category("Others");
+		
 		blockArray = new ArrayList<>();
-		blockArray.addAll(parseGrammar(grammarAccess.getGrammar()));
-		
-		
+		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), others));
 		
 		Iterator<Block> blockIterator =  blockArray.iterator();
 		
@@ -126,6 +127,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 			if (block.getPreviousStatement() == null && block.getOutput() == null && 
 					!block.getMessage0().contains("model")) {
+				others.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
 			}
@@ -142,6 +144,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				System.out.println(block.getType());
 				System.out.print("category ");
 				System.out.println(cat.getName());
+				
+				others.popCategoryItem(block.getType());
 				
 				Category existingCategory = null;
 				
@@ -169,6 +173,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						existingCategory.addCategoryItem(i);
 			}
 		}
+		
+		others.popCategoryItem("Model");
+		others.popCategoryItem("ModelRef");
+		toolBox.addCategory(others);
+		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;
 		objectMapper.setSerializationInclusion(Include.NON_NULL);
@@ -193,7 +202,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 	}
 	
-	ArrayList<Block> parseGrammar(Grammar grammar) {
+	ArrayList<Block> parseGrammar(Grammar grammar, Category categoryContent) {
 		ArrayList<Block> blockArray = new ArrayList<>();
 		EList<AbstractRule> rules = grammar.getRules();
 
@@ -208,6 +217,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					block.setOutput(null);
 				}
 				blockArray.add(block);
+				categoryContent.addCategoryItem(new CategoryItem(block.getType()));
 				System.out.println("rule contents: \n" + dump(rule, "    ")); 
 			}
 		}
