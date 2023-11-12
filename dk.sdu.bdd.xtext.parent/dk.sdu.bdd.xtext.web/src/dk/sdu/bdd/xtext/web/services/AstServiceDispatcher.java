@@ -103,11 +103,15 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		//TODO: Better categoires
 		//setup toolbox
 		toolBox = new CategoryToolBox();
-		Category all = new Category("all");
-		toolBox.addCategory(all);
+		Category modelCategory = new Category("Model");
+		toolBox.addCategory(modelCategory);
+		modelCategory.addCategoryItem(new CategoryItem("Model"));
+		modelCategory.addCategoryItem(new CategoryItem("ModelRef"));
 		
 		blockArray = new ArrayList<>();
-		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), all));
+		blockArray.addAll(parseGrammar(grammarAccess.getGrammar()));
+		
+		
 		
 		Iterator<Block> blockIterator =  blockArray.iterator();
 		
@@ -122,7 +126,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			
 			if (block.getPreviousStatement() == null && block.getOutput() == null && 
 					!block.getMessage0().contains("model")) {
-				all.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
 			}
@@ -190,7 +193,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 	}
 	
-	ArrayList<Block> parseGrammar(Grammar grammar, Category categoryContent) {
+	ArrayList<Block> parseGrammar(Grammar grammar) {
 		ArrayList<Block> blockArray = new ArrayList<>();
 		EList<AbstractRule> rules = grammar.getRules();
 
@@ -205,7 +208,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 					block.setOutput(null);
 				}
 				blockArray.add(block);
-				categoryContent.addCategoryItem(new CategoryItem(block.getType())); 
 				System.out.println("rule contents: \n" + dump(rule, "    ")); 
 			}
 		}
