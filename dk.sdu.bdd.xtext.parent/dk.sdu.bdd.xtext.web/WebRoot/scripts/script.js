@@ -210,7 +210,7 @@ function loadBlocks(element) {
 
 			response.toolBox.contents.push({ "kind": "category", "name": "Terminals", contents: termArr })
 
-			response.toolBox.contents = filterCategories(currentTab, response.toolBox.contents);
+			response.toolBox.contents = filterCategories(element, response.toolBox.contents);
 
 			scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
 			entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
