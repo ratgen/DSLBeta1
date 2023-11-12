@@ -52,6 +52,9 @@ let scenario = document.getElementById('xtext-editor-scenarios')
 let scenarioTab = document.getElementById('scenario-tab')
 let scenarioBlock = document.getElementById('blockly-editor2')
 let warningMessage = document.getElementById('warning-message')
+let originalToolbox;
+let entitiesToolboxInjected = false;
+let scenarioToolboxInjected = false;
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 	currentEditor.style.display = "none"
@@ -79,6 +82,14 @@ function switchEditor(e) {
 		currentTab = e.target
 		currentBlockly = blockly
 		setSelectionBorder(currentTab)
+
+    // var newContents = filterCategories(currentTab, originalToolbox.contents);
+    // var newToolbox = originalToolbox;
+    // newToolbox.contents = newContents;
+
+    // Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
+		// Blockly.inject("blockly-editor", { "toolbox": newToolbox });
+    loadBlocks(currentTab, true);
 	}
 }
 
@@ -140,7 +151,7 @@ window.onload = () => {
     let input = document.getElementById('file-input')
     input.addEventListener('change', readFile) 
 
-    loadBlocks(currentTab)
+    loadBlocks(currentTab, false)
   }, 200)
 }
 
@@ -153,15 +164,16 @@ astBtn.onclick = () => {
 		})
 }
 
-function loadBlocks(element) {
+function loadBlocks(element, skipAddingBlocks) {
 	fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
 			console.log(response)
 			response.blocks = JSON.parse(response.blocks)
 			response.toolBox = JSON.parse(response.toolBox)
-			Blockly.defineBlocksWithJsonArray(response.blocks)
 
+      if (!skipAddingBlocks)
+			  Blockly.defineBlocksWithJsonArray(response.blocks)
 
 			let id_validator = function(newValue) {
 				//if it returns '', then the input is correct
@@ -210,10 +222,25 @@ function loadBlocks(element) {
 
 			response.toolBox.contents.push({ "kind": "category", "name": "Terminals", contents: termArr })
 
-			response.toolBox.contents = filterCategories(element, response.toolBox.contents);
+      originalToolbox = response.toolBox;
+			response.toolBox.contents = filterCategories(element, originalToolbox.contents);
 
-			scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
-			entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
+
+      let scenarioWorkspace;
+      let entityWorkspace;
+
+      if (element === scenarioTab && !scenarioToolboxInjected)
+      {
+        scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
+        scenarioToolboxInjected = true;
+      }
+
+      if (element === entitiesTab && !entitiesToolboxInjected)
+      {
+			  entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
+        entitiesToolboxInjected = true;
+      }
+
 			console.log(response)
 
 			if (entities != undefined) {
@@ -221,14 +248,28 @@ function loadBlocks(element) {
 			}
 
 			function onClick(event) {
-				Blockly.svgResize(scenarioWorkspace);
-				Blockly.svgResize(entityWorkspace);
+        if (scenarioWorkspace != undefined)
+				  Blockly.svgResize(scenarioWorkspace);
+          
+        if (entityWorkspace != undefined)
+				  Blockly.svgResize(entityWorkspace);
 			}
 
 			function onchange(event) {
 				console.log(event);
-				let entityBlockArray = entityWorkspace.getAllBlocks();
-				let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+
+				let entityBlockArray = [];
+        let scenarioBlockArray = [];
+
+        if (entityWorkspace != undefined)
+        {
+          entityBlockArray = entityWorkspace.getAllBlocks();
+        }
+
+        if (scenarioWorkspace != undefined)
+        {
+          scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+        }
 
 				let entityTab = editors[0].env.document.doc;
 				let scenarioTab = editors[1].env.document.doc;
@@ -255,8 +296,12 @@ function loadBlocks(element) {
 				scenarioTab.insertFullLines(0, scenarioArray);
 				entityTab.insertFullLines(0, entityArray);
 
-				Blockly.svgResize(scenarioWorkspace);
-				Blockly.svgResize(entityWorkspace);
+
+				if (scenarioWorkspace != undefined)
+				  Blockly.svgResize(scenarioWorkspace);
+          
+        if (entityWorkspace != undefined)
+				  Blockly.svgResize(entityWorkspace);
 
 				var scenarioTabElement = document.getElementById('scenario-tab')
 
@@ -270,10 +315,20 @@ function loadBlocks(element) {
 				}
 			}
 
-			document.getElementById('blockly-editor2').style.display = "none"
+      if (!skipAddingBlocks || element === entitiesTab)
+      {
+			  document.getElementById('blockly-editor2').style.display = "none"
+      }
+      else 
+      {
+        document.getElementById('blockly-editor').style.display = "none"
+      }
 
-			entityWorkspace.addChangeListener(onchange);
-			scenarioWorkspace.addChangeListener(onchange);
+      if (entityWorkspace != undefined)
+			  entityWorkspace.addChangeListener(onchange);
+
+      if (scenarioWorkspace != undefined)
+			  scenarioWorkspace.addChangeListener(onchange);
 
 			window.addEventListener('click', onClick, false);
 
