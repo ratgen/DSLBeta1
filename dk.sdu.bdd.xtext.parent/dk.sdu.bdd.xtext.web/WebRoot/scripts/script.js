@@ -1,48 +1,48 @@
 function readFile() {
-  let input = document.getElementById('file-input')
-  let file = input.files[0]
-  let reader = new FileReader()
-  reader.readAsText(file, 'UTF-8')
-  reader.onload = () => {
-    var fileContent = reader.result
-    let editor = getCurrentAceEditor()
-    let doc= editor.env.document.doc
-    if (doc!== null || doc!== undefined) {
-      doc.setValue(fileContent)
-      let fileName = document.getElementById('fileName');
-      fileName.value = file.name
-      localStorage.setItem("fileName", file.name)
-    }
-  }
+	let input = document.getElementById('file-input')
+	let file = input.files[0]
+	let reader = new FileReader()
+	reader.readAsText(file, 'UTF-8')
+	reader.onload = () => {
+		var fileContent = reader.result
+		let editor = getCurrentAceEditor()
+		let doc = editor.env.document.doc
+		if (doc !== null || doc !== undefined) {
+			doc.setValue(fileContent)
+			let fileName = document.getElementById('fileName');
+			fileName.value = file.name
+			localStorage.setItem("fileName", file.name)
+		}
+	}
 }
 
-function printChildren(a){
-  let s = "";
-  a.forEach((element) => {
-    s = s + element.getFieldValue("TEXT");
-  })
-  return s;
+function printChildren(a) {
+	let s = "";
+	a.forEach((element) => {
+		s = s + element.getFieldValue("TEXT");
+	})
+	return s;
 }
 function onDocumentChange() {
-  let editor = getCurrentAceEditor()
-  let document = editor.env.document.doc
-  let fileContent = document.getValue()
-  localStorage.setItem(editor.container.id + "fileContent", fileContent)
+	let editor = getCurrentAceEditor()
+	let document = editor.env.document.doc
+	let fileContent = document.getValue()
+	localStorage.setItem(editor.container.id + "fileContent", fileContent)
 }
 
 function getSavedDocument(editor) {
-  let doc = editor.env.document.doc
-  let editorId = editor.container.id
-  let fileContent = localStorage.getItem(editorId + "fileContent");
-  if (fileContent !== null) {
-    doc.insert({row: 0, column: 0}, fileContent)
-  }
-  let fileName = localStorage.getItem(editorId + "fileName")
-  if (fileContent !== null) {
-    let fileNameElement = document.getElementById(editorId + 'fileName');
-    if (fileNameElement !== null )
-      fileNameElement.value = fileName
-  }
+	let doc = editor.env.document.doc
+	let editorId = editor.container.id
+	let fileContent = localStorage.getItem(editorId + "fileContent");
+	if (fileContent !== null) {
+		doc.insert({ row: 0, column: 0 }, fileContent)
+	}
+	let fileName = localStorage.getItem(editorId + "fileName")
+	if (fileContent !== null) {
+		let fileNameElement = document.getElementById(editorId + 'fileName');
+		if (fileNameElement !== null)
+			fileNameElement.value = fileName
+	}
 }
 
 let entities = document.getElementById('xtext-editor-entities')
@@ -54,73 +54,71 @@ let scenarioBlock = document.getElementById('blockly-editor2')
 let warningMessage = document.getElementById('warning-message')
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
-  currentEditor.style.display = "none"
-  currentBlockly.style.display = "none"
-  newEditor.style.display = "block"
-  newBlockly.style.display = "block"
+	currentEditor.style.display = "none"
+	currentBlockly.style.display = "none"
+	newEditor.style.display = "block"
+	newBlockly.style.display = "block"
 }
 
 function switchEditor(e) {
-  if (e.target.disabled)  
-    return;
+	if (e.target.disabled)
+		return;
 
-  var b = ""
-  if (e.target != currentTab ) {
-    removeSelectionBorder(currentTab)
-    let editorId = e.target.dataset.editorId
+	var b = ""
+	if (e.target != currentTab) {
+		removeSelectionBorder(currentTab)
+		let editorId = e.target.dataset.editorId
 
-    if (editorId == "xtext-editor-entities") {b = "blockly-editor"}
-    else if (editorId == "xtext-editor-scenarios") {b = "blockly-editor2"}
+		if (editorId == "xtext-editor-entities") { b = "blockly-editor" }
+		else if (editorId == "xtext-editor-scenarios") { b = "blockly-editor2" }
 
-    let editor = document.getElementById(editorId)
-    let blockly = document.getElementById(b)
-    displayEditor(currentEditor, editor, currentBlockly, blockly)
-    currentEditor = editor
-    currentTab = e.target
-    currentBlockly = blockly
-    setSelectionBorder(currentTab)
-  }
+		let editor = document.getElementById(editorId)
+		let blockly = document.getElementById(b)
+		displayEditor(currentEditor, editor, currentBlockly, blockly)
+		currentEditor = editor
+		currentTab = e.target
+		currentBlockly = blockly
+		setSelectionBorder(currentTab)
+	}
 }
 
 function onEntityEditorChange() {
-  if (entities.innerText != null && entities.innerText.replace(/[^a-zA-Z]/g, '').trim() !== '')
-  {
-    setEnabled(scenarioTab);
-    enabledByText = true;
-  }
-  else if (!enabledByCodeBlocks)
-  {
-    setDisabled(scenarioTab);
-    enabledByText = false;
-  }
+	if (entities.innerText != null && entities.innerText.replace(/[^a-zA-Z]/g, '').trim() !== '') {
+		setEnabled(scenarioTab);
+		enabledByText = true;
+	}
+	else if (!enabledByCodeBlocks) {
+		setDisabled(scenarioTab);
+		enabledByText = false;
+	}
 }
 
 function setSelectionBorder(element) {
-  element.style.border = "2px black solid";
+	element.style.border = "2px black solid";
 }
 
 function removeSelectionBorder(element) {
-  element.style.border = "2px white solid"
+	element.style.border = "2px white solid"
 }
 
 function setDisabled(element) {
-  element.style.backgroundColor = "#f2f2f2";
-  element.style.pointerEvents = "none";
-  element.disabled = true;
-  warningMessage.style.visibility = "visible";
+	element.style.backgroundColor = "#f2f2f2";
+	element.style.pointerEvents = "none";
+	element.disabled = true;
+	warningMessage.style.visibility = "visible";
 }
 
 function setEnabled(element) {
-  element.style.backgroundColor = "#ddd";
-  element.style.pointerEvents = "auto";
-  element.disabled = false;
-  warningMessage.style.visibility = "hidden";
+	element.style.backgroundColor = "#ddd";
+	element.style.pointerEvents = "auto";
+	element.disabled = false;
+	warningMessage.style.visibility = "hidden";
 }
 
 if (entitiesTab != undefined)
-  entitiesTab.onclick = switchEditor
+	entitiesTab.onclick = switchEditor
 if (scenarioTab != undefined)
-  scenarioTab.onclick = switchEditor
+	scenarioTab.onclick = switchEditor
 
 currentEditor = entities
 currentTab = entitiesTab
@@ -134,155 +132,155 @@ setSelectionBorder(entitiesTab);
 
 window.onload = () => {
   setTimeout (() => {
-  loadBlocks(currentTab)
+    for (let editor of editors) {
+      getSavedDocument(editor)
+      let document = editor.env.document.doc
+      document.on('change', onDocumentChange)
+    }
+    let input = document.getElementById('file-input')
+    input.addEventListener('change', readFile) 
+
+    loadBlocks(currentTab)
   }, 200)
 }
 
 let astBtn = document.getElementById('get-ast')
 astBtn.onclick = () => {
-  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
-    .then(response => response.json())
-    .then(response => {
-      console.log(response)
-    })
+	fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
+		.then(response => response.json())
+		.then(response => {
+			console.log(response)
+		})
 }
 
 function loadBlocks(element) {
-	for (let editor of editors) {
-    getSavedDocument(editor)
-    let document = editor.env.document.doc
-    document.on('change', onDocumentChange)
-  }
-  let input = document.getElementById('file-input')
-  input.addEventListener('change', readFile) 
-
-  fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
-    .then(response => response.json())
-    .then(response => {
-      console.log(response)
-      response.blocks = JSON.parse(response.blocks)
-      response.toolBox = JSON.parse(response.toolBox)
-      Blockly.defineBlocksWithJsonArray(response.blocks)
+	fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
+		.then(response => response.json())
+		.then(response => {
+			console.log(response)
+			response.blocks = JSON.parse(response.blocks)
+			response.toolBox = JSON.parse(response.toolBox)
+			Blockly.defineBlocksWithJsonArray(response.blocks)
 
 
-      let id_validator = function(newValue) {
-        //if it returns '', then the input is correct
-        let res = newValue.replace(/[\^a-zA-Z_][a-zA-Z_0-9]*/g, '')
+			let id_validator = function(newValue) {
+				//if it returns '', then the input is correct
+				let res = newValue.replace(/[\^a-zA-Z_][a-zA-Z_0-9]*/g, '')
 
-        if (res == ''){ 
-          return undefined;
-        }
-        return null;
-      }
+				if (res == '') {
+					return undefined;
+				}
+				return null;
+			}
 
-      Blockly.Blocks["ID"] = {
-        init: function() {
-		  this.setColour(200)
-          this.setOutput(true, 'ID')
-          this.appendDummyInput()
-            .appendField(new Blockly.FieldTextInput('ID', id_validator));
+			Blockly.Blocks["ID"] = {
+				init: function() {
+					this.setColour(200)
+					this.setOutput(true, 'ID')
+					this.appendDummyInput()
+						.appendField(new Blockly.FieldTextInput('ID', id_validator));
 
-        }
-      }
+				}
+			}
 
-      let string_validator = function(newValue) {
-        
-        let res = newValue.replace(/[^\"]*/g, '')
-        if (res == ''){ 
-          return undefined;
-        }
-        return null;
-      }
+			let string_validator = function(newValue) {
+
+				let res = newValue.replace(/[^\"]*/g, '')
+				if (res == '') {
+					return undefined;
+				}
+				return null;
+			}
 
 
-      Blockly.Blocks["STRING"] = {
-        init: function() {
-		  this.setColour(300)
-          this.setOutput(true, 'STRING')
-          this.appendDummyInput()
-            .appendField("\"")
-            .appendField(new Blockly.FieldTextInput('String', string_validator))
-            .appendField("\"");
-        }
-      }
+			Blockly.Blocks["STRING"] = {
+				init: function() {
+					this.setColour(300)
+					this.setOutput(true, 'STRING')
+					this.appendDummyInput()
+						.appendField("\"")
+						.appendField(new Blockly.FieldTextInput('String', string_validator))
+						.appendField("\"");
+				}
+			}
 
-      let termArr = []
-      termArr.push({"kind" : "block", "type" : "ID"})
-      termArr.push({"kind" : "block", "type" : "STRING"})
+			let termArr = []
+			termArr.push({ "kind": "block", "type": "ID" })
+			termArr.push({ "kind": "block", "type": "STRING" })
 
-      response.toolBox.contents.push({"kind" : "category", "name" : "Terminals", contents: termArr})
-      
-      response.toolBox.contents=filterCategories(currentTab, response.toolBox.contents);
+			response.toolBox.contents.push({ "kind": "category", "name": "Terminals", contents: termArr })
 
-      scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
-      entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
-      console.log(response)      
+			response.toolBox.contents = filterCategories(currentTab, response.toolBox.contents);
 
-      if (entities != undefined) {
-        entities.addEventListener("input", onEntityEditorChange);
-      }
-      
-      function onClick(event) {
-        Blockly.svgResize(scenarioWorkspace);
-        Blockly.svgResize(entityWorkspace);
-      }
+			scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
+			entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
+			console.log(response)
 
-      function onchange(event){
-        console.log(event);
-        let entityBlockArray = entityWorkspace.getAllBlocks();
-        let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+			if (entities != undefined) {
+				entities.addEventListener("input", onEntityEditorChange);
+			}
 
-        let entityTab = editors[0].env.document.doc;
-        let scenarioTab = editors[1].env.document.doc;
+			function onClick(event) {
+				Blockly.svgResize(scenarioWorkspace);
+				Blockly.svgResize(entityWorkspace);
+			}
 
-        scenarioArray = []
-        entityArray = []
+			function onchange(event) {
+				console.log(event);
+				let entityBlockArray = entityWorkspace.getAllBlocks();
+				let scenarioBlockArray = scenarioWorkspace.getAllBlocks();
 
-        // do not remove all lines
-        //scenarioTab.removeFullLines(0, scenarioTab.getLength());
-        //entityTab.removeFullLines(0, entityTab.getLength());
+				let entityTab = editors[0].env.document.doc;
+				let scenarioTab = editors[1].env.document.doc;
 
-        entityBlockArray.forEach((block) => {
-          if (block.type == "modelblock"){
-            scenarioArray = addBlocksToArray(block.getDescendants());
-          }
-        })
+				scenarioArray = []
+				entityArray = []
 
-        scenarioBlockArray.forEach((block) => {
-          if (block.type == "modelUsingBlock"){
-            entityArray = addBlocksToArray(block.getDescendants());
-          }
-        })
+				// do not remove all lines
+				//scenarioTab.removeFullLines(0, scenarioTab.getLength());
+				//entityTab.removeFullLines(0, entityTab.getLength());
 
-        scenarioTab.insertFullLines(0, scenarioArray);
-        entityTab.insertFullLines(0, entityArray);
+				entityBlockArray.forEach((block) => {
+					if (block.type == "modelblock") {
+						scenarioArray = addBlocksToArray(block.getDescendants());
+					}
+				})
 
-        Blockly.svgResize(scenarioWorkspace);
-        Blockly.svgResize(entityWorkspace);
+				scenarioBlockArray.forEach((block) => {
+					if (block.type == "modelUsingBlock") {
+						entityArray = addBlocksToArray(block.getDescendants());
+					}
+				})
 
-        var scenarioTabElement = document.getElementById('scenario-tab')
+				scenarioTab.insertFullLines(0, scenarioArray);
+				entityTab.insertFullLines(0, entityArray);
 
-        if (entityWorkspace.getAllBlocks().length > 0) {
-          setEnabled(scenarioTabElement);
-          enabledByCodeBlocks = true;
-        }
-        else if (!enabledByText) {
-          setDisabled(scenarioTabElement);
-          enabledByCodeBlocks = false;
-        }
-      }
+				Blockly.svgResize(scenarioWorkspace);
+				Blockly.svgResize(entityWorkspace);
 
-      document.getElementById('blockly-editor2').style.display = "none"
+				var scenarioTabElement = document.getElementById('scenario-tab')
 
-      entityWorkspace.addChangeListener(onchange);
-      scenarioWorkspace.addChangeListener(onchange);
+				if (entityWorkspace.getAllBlocks().length > 0) {
+					setEnabled(scenarioTabElement);
+					enabledByCodeBlocks = true;
+				}
+				else if (!enabledByText) {
+					setDisabled(scenarioTabElement);
+					enabledByCodeBlocks = false;
+				}
+			}
 
-      window.addEventListener('click', onClick, false);
+			document.getElementById('blockly-editor2').style.display = "none"
 
-      onchange();
-      console.log(response)
-      onEntityEditorChange();
-    })
+			entityWorkspace.addChangeListener(onchange);
+			scenarioWorkspace.addChangeListener(onchange);
+
+			window.addEventListener('click', onClick, false);
+
+			onchange();
+			console.log(response)
+			onEntityEditorChange();
+		})
 }
 
 function filterCategories(element, contents) {
