@@ -134,7 +134,21 @@ setSelectionBorder(entitiesTab);
 
 window.onload = () => {
   setTimeout (() => {
-  for (let editor of editors) {
+  loadBlocks(currentTab)
+  }, 200)
+}
+
+let astBtn = document.getElementById('get-ast')
+astBtn.onclick = () => {
+  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
+    .then(response => response.json())
+    .then(response => {
+      console.log(response)
+    })
+}
+
+function loadBlocks(element) {
+	for (let editor of editors) {
     getSavedDocument(editor)
     let document = editor.env.document.doc
     document.on('change', onDocumentChange)
@@ -197,7 +211,8 @@ window.onload = () => {
       termArr.push({"kind" : "block", "type" : "STRING"})
 
       response.toolBox.contents.push({"kind" : "category", "name" : "Terminals", contents: termArr})
-
+      
+      response.toolBox.contents=filterCategories(currentTab, response.toolBox.contents);
 
       scenarioWorkspace = Blockly.inject("blockly-editor2", {"toolbox": response.toolBox});
       entityWorkspace = Blockly.inject("blockly-editor", {"toolbox": response.toolBox});
@@ -206,7 +221,7 @@ window.onload = () => {
       if (entities != undefined) {
         entities.addEventListener("input", onEntityEditorChange);
       }
-
+      
       function onClick(event) {
         Blockly.svgResize(scenarioWorkspace);
         Blockly.svgResize(entityWorkspace);
@@ -268,14 +283,15 @@ window.onload = () => {
       console.log(response)
       onEntityEditorChange();
     })
-  }, 200)
 }
 
-let astBtn = document.getElementById('get-ast')
-astBtn.onclick = () => {
-  fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
-    .then(response => response.json())
-    .then(response => {
-      console.log(response)
-    })
+function filterCategories(element, contents) {
+	if (element === entitiesTab) {
+		let categories = ["Scenario Definitions", "Imperative Scenarios"];
+		return contents.filter(item => !categories.includes(item));
+	}
+	else if (element === scenarioTab) {
+		let categories = ["Declarative Entities and Definitions", "Imperative Entities and Definitions"];
+		return contents.filter(item => !categories.includes(item));
+	}
 }
