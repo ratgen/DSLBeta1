@@ -103,12 +103,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		//TODO: Better categoires
 		//setup toolbox
 		toolBox = new CategoryToolBox();	
-		
-		Category modelCategory = new Category("Model");
-		toolBox.addCategory(modelCategory);
-		modelCategory.addCategoryItem(new CategoryItem("Model"));
-		modelCategory.addCategoryItem(new CategoryItem("ModelRef"));
-		
+				
 		Category general = new Category("General");
 		toolBox.addCategory(general);
 		
@@ -137,9 +132,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			Category cat = block.getBlockCategory();
 			ArrayList<CategoryItem> catContents = cat.getContents();
 			
+			System.out.println("cat name: " + cat.getName());
+			System.out.println("cat content size: " + cat.getContents().size());
+			
 			if (catContents != null &&
-					catContents.size() != 0 
-					&& !block.getType().contains("subBlock")) {
+					!block.getType().contains("subBlock")) {
 				
 				System.out.print("type ");
 				System.out.println(block.getType());
@@ -174,9 +171,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						existingCategory.addCategoryItem(i);
 			}
 		}
-		
-		general.popCategoryItem("Model");
-		general.popCategoryItem("ModelRef");
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;

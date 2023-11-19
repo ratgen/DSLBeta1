@@ -193,9 +193,8 @@ public class Block  {
 			case "PREP":
 			case "ENTITY_IDENTITY":
 			case "ADVERB":
-				return "General";
 			default:
-				return "Unknown";
+				return "General";
 		}
 	}
 }
