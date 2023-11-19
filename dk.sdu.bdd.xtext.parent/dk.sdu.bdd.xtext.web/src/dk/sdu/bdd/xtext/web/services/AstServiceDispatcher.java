@@ -168,8 +168,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		}
 		
 		for (Category c : toolBox.getContents()) {
-            c = removeDuplicates(c);
-            
+            c.setContents(removeDuplicates(c));        
         }
 		
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -586,16 +585,16 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	    return res;
 	}
 	
-	public static Category removeDuplicates(Category oldCategory) 
+	public static ArrayList<CategoryItem> removeDuplicates(Category oldCategory) 
     { 
-        Category newCategory = new Category(oldCategory.getName()); 
+		ArrayList<CategoryItem> newCategoryItems = new ArrayList<>(); 
 
         for (CategoryItem i : oldCategory.getContents())
         {
-            if (!newCategory.getContents().stream().anyMatch(ci -> ci.getType().equals(i.getType())))
-                newCategory.addCategoryItem(i);
+            if (!newCategoryItems.stream().anyMatch(ci -> ci.getType().equals(i.getType())))
+            	newCategoryItems.add(i);
         } 
 
-        return newCategory; 
+        return newCategoryItems; 
     }
 }
