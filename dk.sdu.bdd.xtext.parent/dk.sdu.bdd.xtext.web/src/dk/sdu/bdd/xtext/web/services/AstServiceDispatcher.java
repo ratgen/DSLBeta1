@@ -588,8 +588,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	
 	public static Category removeDuplicates(Category oldCategory) 
     { 
-
-        // Create a new ArrayList 
         Category newCategory = new Category(oldCategory.getName()); 
 
         for (CategoryItem i : oldCategory.getContents())
@@ -598,7 +596,6 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
                 newCategory.addCategoryItem(i);
         } 
 
-        // return the new list 
         return newCategory; 
     }
 }
