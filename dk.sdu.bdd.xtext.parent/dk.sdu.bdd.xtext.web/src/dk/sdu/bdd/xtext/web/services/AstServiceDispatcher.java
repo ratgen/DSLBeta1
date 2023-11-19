@@ -2,6 +2,8 @@ package dk.sdu.bdd.xtext.web.services;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.TreeIterator;
@@ -100,7 +102,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	ServiceDescriptor getBlocksService(IServiceContext context) {
 		blockFeatures = new BlockFeatures();
 				
-		//TODO: Better categoires
+		//TODO: Better categories
 		//setup toolbox
 		toolBox = new CategoryToolBox();	
 				
@@ -164,6 +166,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 						existingCategory.addCategoryItem(i);
 			}
 		}
+		
+		for (Category c : toolBox.getContents()) {
+            c = removeDuplicates(c);
+            
+        }
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;
@@ -578,4 +585,20 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	    
 	    return res;
 	}
+	
+	public static Category removeDuplicates(Category oldCategory) 
+    { 
+
+        // Create a new ArrayList 
+        Category newCategory = new Category(oldCategory.getName()); 
+
+        for (CategoryItem i : oldCategory.getContents())
+        {
+            if (!newCategory.getContents().stream().anyMatch(ci -> ci.getType().equals(i.getType())))
+                newCategory.addCategoryItem(i);
+        } 
+
+        // return the new list 
+        return newCategory; 
+    }
 }
