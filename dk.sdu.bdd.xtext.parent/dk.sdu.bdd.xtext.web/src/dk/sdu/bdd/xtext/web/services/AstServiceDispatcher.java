@@ -109,10 +109,11 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		modelCategory.addCategoryItem(new CategoryItem("Model"));
 		modelCategory.addCategoryItem(new CategoryItem("ModelRef"));
 		
-		Category others = new Category("Others");
+		Category general = new Category("General");
+		toolBox.addCategory(general);
 		
 		blockArray = new ArrayList<>();
-		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), others));
+		blockArray.addAll(parseGrammar(grammarAccess.getGrammar(), general));
 		
 		Iterator<Block> blockIterator =  blockArray.iterator();
 		
@@ -121,18 +122,18 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			block.addAllPrevious(blockFeatures.getFeature(block.getType(), StatementTypes.previousStatement));
 			block.addAllNext(blockFeatures.getFeature(block.getType(), StatementTypes.nextStatement));
 			ArrayList<String> outputs = blockFeatures.getFeature(block.getType(), StatementTypes.output);
+			
 			if (outputs != null && block.getPreviousStatement() == null && block.getNextStatement() == null) {
 				block.setOutput(outputs.get(0));
 			}
 			
 			if (block.getPreviousStatement() == null && block.getOutput() == null && 
 					!block.getMessage0().contains("model")) {
-				others.popCategoryItem(block.getType());
+				general.popCategoryItem(block.getType());
 				blockIterator.remove();
 				continue;
 			}
-			
-			
+						
 			Category cat = block.getBlockCategory();
 			ArrayList<CategoryItem> catContents = cat.getContents();
 			
@@ -145,7 +146,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 				System.out.print("category ");
 				System.out.println(cat.getName());
 				
-				others.popCategoryItem(block.getType());
+				general.popCategoryItem(block.getType());
 				
 				Category existingCategory = null;
 				
@@ -174,9 +175,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			}
 		}
 		
-		others.popCategoryItem("Model");
-		others.popCategoryItem("ModelRef");
-		toolBox.addCategory(others);
+		general.popCategoryItem("Model");
+		general.popCategoryItem("ModelRef");
 		
 		ObjectMapper objectMapper = new ObjectMapper();
 		//remove all fields that are null;
