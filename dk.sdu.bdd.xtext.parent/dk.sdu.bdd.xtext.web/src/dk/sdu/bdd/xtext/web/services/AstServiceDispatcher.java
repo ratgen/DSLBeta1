@@ -132,16 +132,9 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 			Category cat = block.getBlockCategory();
 			ArrayList<CategoryItem> catContents = cat.getContents();
 			
-			System.out.println("cat name: " + cat.getName());
-			System.out.println("cat content size: " + cat.getContents().size());
 			
 			if (catContents != null &&
 					!block.getType().contains("subBlock")) {
-				
-				System.out.print("type ");
-				System.out.println(block.getType());
-				System.out.print("category ");
-				System.out.println(cat.getName());
 				
 				general.popCategoryItem(block.getType());
 				
