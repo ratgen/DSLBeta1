@@ -55,6 +55,26 @@ let warningMessage = document.getElementById('warning-message')
 let originalToolbox;
 let entitiesToolboxInjected = false;
 let scenarioToolboxInjected = false;
+let scenarioWorkspace;
+let entityWorkspace;
+
+const runCodeForEntity = () => {
+	if (entitiesToolboxInjected)
+	{
+		const entityCode = getBddGenerator().workspaceToCode(entityWorkspace);
+		console.log(entityCode);
+		entities.innerText = entityCode;
+	}	
+};
+
+const runCodeForScenario = () => {
+	if (scenarioToolboxInjected)
+	{
+		const scenarioCode = getBddGenerator().workspaceToCode(scenarioWorkspace);
+		console.log(scenarioCode);
+		scenario.innerText = scenarioCode;
+	}	
+};
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 	currentEditor.style.display = "none"
@@ -89,7 +109,7 @@ function switchEditor(e) {
 
     // Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
 		// Blockly.inject("blockly-editor", { "toolbox": newToolbox });
-    loadBlocks(currentTab, true);
+    	loadBlocks(currentTab, true);
 	}
 }
 
@@ -160,7 +180,7 @@ astBtn.onclick = () => {
 	fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
+			// console.log(response)
 		})
 }
 
@@ -168,7 +188,7 @@ function loadBlocks(element, skipAddingBlocks) {
 	fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
+			// console.log(response)
 			response.blocks = JSON.parse(response.blocks)
 			response.toolBox = JSON.parse(response.toolBox)
 
@@ -190,7 +210,7 @@ function loadBlocks(element, skipAddingBlocks) {
 					this.setColour(200)
 					this.setOutput(true, 'ID')
 					this.appendDummyInput()
-						.appendField(new Blockly.FieldTextInput('ID', id_validator));
+						.appendField(new Blockly.FieldTextInput('ID', id_validator), 'TEXT_INPUT');
 
 				}
 			}
@@ -211,7 +231,7 @@ function loadBlocks(element, skipAddingBlocks) {
 					this.setOutput(true, 'STRING')
 					this.appendDummyInput()
 						.appendField("\"")
-						.appendField(new Blockly.FieldTextInput('String', string_validator))
+						.appendField(new Blockly.FieldTextInput('String', string_validator), 'TEXT_INPUT')
 						.appendField("\"");
 				}
 			}
@@ -222,54 +242,50 @@ function loadBlocks(element, skipAddingBlocks) {
 
 			response.toolBox.contents.push({ "kind": "category", "name": "Terminals", contents: termArr })
 
-      originalToolbox = response.toolBox;
+      		originalToolbox = response.toolBox;
 			response.toolBox.contents = filterCategories(element, originalToolbox.contents);
 
+			if (element === scenarioTab && !scenarioToolboxInjected)
+			{
+				scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
+				scenarioToolboxInjected = true;
+			}
 
-      let scenarioWorkspace;
-      let entityWorkspace;
+			if (element === entitiesTab && !entitiesToolboxInjected)
+			{
+					entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
+				entitiesToolboxInjected = true;
+			}
 
-      if (element === scenarioTab && !scenarioToolboxInjected)
-      {
-        scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
-        scenarioToolboxInjected = true;
-      }
-
-      if (element === entitiesTab && !entitiesToolboxInjected)
-      {
-			  entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
-        entitiesToolboxInjected = true;
-      }
-
-			console.log(response)
+			// console.log(response)
 
 			if (entities != undefined) {
 				entities.addEventListener("input", onEntityEditorChange);
 			}
 
 			function onClick(event) {
-        if (scenarioWorkspace != undefined)
-				  Blockly.svgResize(scenarioWorkspace);
-          
-        if (entityWorkspace != undefined)
-				  Blockly.svgResize(entityWorkspace);
+				if (scenarioWorkspace != undefined)
+					Blockly.svgResize(scenarioWorkspace);
+				
+				if (entityWorkspace != undefined)
+					Blockly.svgResize(entityWorkspace);
 			}
 
 			function onchange(event) {
-				console.log(event);
+				// console.log(event);
 
 				let entityBlockArray = [];
-        let scenarioBlockArray = [];
+				let scenarioBlockArray = [];
 
-        if (entityWorkspace != undefined)
-        {
-          entityBlockArray = entityWorkspace.getAllBlocks();
-        }
+				if (entityWorkspace != undefined)
+				{
+					entityBlockArray = entityWorkspace.getAllBlocks();
+				}
 
-        if (scenarioWorkspace != undefined)
-        {
-          scenarioBlockArray = scenarioWorkspace.getAllBlocks();
-        }
+				if (scenarioWorkspace != undefined)
+				{
+					scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+				}
 
 				let entityTab = editors[0].env.document.doc;
 				let scenarioTab = editors[1].env.document.doc;
@@ -298,10 +314,10 @@ function loadBlocks(element, skipAddingBlocks) {
 
 
 				if (scenarioWorkspace != undefined)
-				  Blockly.svgResize(scenarioWorkspace);
+					Blockly.svgResize(scenarioWorkspace);
           
-        if (entityWorkspace != undefined)
-				  Blockly.svgResize(entityWorkspace);
+				if (entityWorkspace != undefined)
+					Blockly.svgResize(entityWorkspace);
 
 				var scenarioTabElement = document.getElementById('scenario-tab')
 
@@ -313,16 +329,19 @@ function loadBlocks(element, skipAddingBlocks) {
 					setDisabled(scenarioTabElement);
 					enabledByCodeBlocks = false;
 				}
+
+				runCodeForEntity();
+				runCodeForScenario();
 			}
 
-      if (!skipAddingBlocks || element === entitiesTab)
-      {
-			  document.getElementById('blockly-editor2').style.display = "none"
-      }
-      else 
-      {
-        document.getElementById('blockly-editor').style.display = "none"
-      }
+			if (!skipAddingBlocks || element === entitiesTab)
+			{
+					document.getElementById('blockly-editor2').style.display = "none"
+			}
+			else 
+			{
+				document.getElementById('blockly-editor').style.display = "none"
+			}
 
       if (entityWorkspace != undefined)
 			  entityWorkspace.addChangeListener(onchange);
@@ -333,7 +352,7 @@ function loadBlocks(element, skipAddingBlocks) {
 			window.addEventListener('click', onClick, false);
 
 			onchange();
-			console.log(response)
+			//console.log(response)
 			onEntityEditorChange();
 		})
 }
