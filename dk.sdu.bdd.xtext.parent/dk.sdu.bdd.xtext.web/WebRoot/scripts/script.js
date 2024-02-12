@@ -58,8 +58,8 @@ let scenarioToolboxInjected = false;
 let scenarioWorkspace;
 let entityWorkspace;
 
-const runCodeForEntity = () => {
-	if (entitiesToolboxInjected)
+const runCodeForEntity = (element) => {
+	if (entitiesToolboxInjected && element === entitiesTab)
 	{
 		const entityCode = getBddGenerator().workspaceToCode(entityWorkspace);
 		// console.log(entityCode);
@@ -72,8 +72,8 @@ const runCodeForEntity = () => {
 	}	
 };
 
-const runCodeForScenario = () => {
-	if (scenarioToolboxInjected)
+const runCodeForScenario = (element) => {
+	if (scenarioToolboxInjected && element === scenarioTab)
 	{
 		const scenarioCode = getBddGenerator().workspaceToCode(scenarioWorkspace);
 		// console.log(scenarioCode);
@@ -322,7 +322,6 @@ function loadBlocks(element, skipAddingBlocks) {
 				scenarioTab.insertFullLines(0, scenarioArray);
 				entityTab.insertFullLines(0, entityArray);
 
-
 				if (scenarioWorkspace != undefined)
 					Blockly.svgResize(scenarioWorkspace);
           
@@ -340,13 +339,13 @@ function loadBlocks(element, skipAddingBlocks) {
 					enabledByCodeBlocks = false;
 				}
 
-				runCodeForEntity();
-				runCodeForScenario();
+				runCodeForEntity(element);
+				runCodeForScenario(element);
 			}
 
 			if (!skipAddingBlocks || element === entitiesTab)
 			{
-					document.getElementById('blockly-editor2').style.display = "none"
+				document.getElementById('blockly-editor2').style.display = "none"
 			}
 			else 
 			{
