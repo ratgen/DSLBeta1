@@ -202,7 +202,7 @@ function loadBlocks(element, skipAddingBlocks) {
 			response.blocks = JSON.parse(response.blocks)
 			response.toolBox = JSON.parse(response.toolBox)
 
-      if (!skipAddingBlocks)
+      		if (!skipAddingBlocks)
 			  Blockly.defineBlocksWithJsonArray(response.blocks)
 
 			let id_validator = function(newValue) {
@@ -353,10 +353,10 @@ function loadBlocks(element, skipAddingBlocks) {
 				document.getElementById('blockly-editor').style.display = "none"
 			}
 
-      if (entityWorkspace != undefined)
+      		if (entityWorkspace != undefined)
 			  entityWorkspace.addChangeListener(onchange);
 
-      if (scenarioWorkspace != undefined)
+      		if (scenarioWorkspace != undefined)
 			  scenarioWorkspace.addChangeListener(onchange);
 
 			window.addEventListener('click', onClick, false);
