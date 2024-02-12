@@ -62,8 +62,13 @@ const runCodeForEntity = () => {
 	if (entitiesToolboxInjected)
 	{
 		const entityCode = getBddGenerator().workspaceToCode(entityWorkspace);
-		console.log(entityCode);
-		entities.innerText = entityCode;
+		// console.log(entityCode);
+
+		let editor = getCurrentAceEditor()
+		let doc = editor.env.document.doc
+		if (doc !== null || doc !== undefined) {
+			doc.setValue(entityCode);		
+		}
 	}	
 };
 
@@ -71,8 +76,13 @@ const runCodeForScenario = () => {
 	if (scenarioToolboxInjected)
 	{
 		const scenarioCode = getBddGenerator().workspaceToCode(scenarioWorkspace);
-		console.log(scenarioCode);
-		scenario.innerText = scenarioCode;
+		// console.log(scenarioCode);
+		
+		let editor = getCurrentAceEditor()
+		let doc = editor.env.document.doc
+		if (doc !== null || doc !== undefined) {
+			doc.setValue(scenarioCode);		
+		}
 	}	
 };
 
@@ -103,11 +113,11 @@ function switchEditor(e) {
 		currentBlockly = blockly
 		setSelectionBorder(currentTab)
 
-    // var newContents = filterCategories(currentTab, originalToolbox.contents);
-    // var newToolbox = originalToolbox;
-    // newToolbox.contents = newContents;
+		// var newContents = filterCategories(currentTab, originalToolbox.contents);
+		// var newToolbox = originalToolbox;
+		// newToolbox.contents = newContents;
 
-    // Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
+		// Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
 		// Blockly.inject("blockly-editor", { "toolbox": newToolbox });
     	loadBlocks(currentTab, true);
 	}
