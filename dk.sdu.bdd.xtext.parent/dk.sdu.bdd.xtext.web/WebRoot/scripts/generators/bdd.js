@@ -52,9 +52,67 @@ bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_is_,'] = function(
     return code;
 };
 
-// bddGenerator.forBlock['subBlock_DeclarativeEntityDef_actions'] = function(block, generator) {
-    
-// };
+bddGenerator.forBlock['subBlock_DeclarativeEntityDef_actions:'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+
+    const input = generator.statementToCode(block, 'subBlock_DeclarativeEntityDef_actions:_input_2');
+
+    const code = `actions: ${name}\n${input}`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_the'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+    const code = `the ${name}`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_[_]'] = function(block) {
+    const fieldValue = block.getFieldValue('alternativs');
+    const code = `[${fieldValue}]`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+    const fieldValue = block.getFieldValue('alternativs');
+    const code = `${fieldValue} ${name}`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_,'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+
+    const input = generator.statementToCode(block, 'subBlock_subBlock_DeclarativeEntityDef_actions:_,_input_2');
+
+    const code = `, ${name}\n${input}`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,_the'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+    const code = `the ${name}`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,_[_]'] = function(block) {
+    const fieldValue = block.getFieldValue('alternativs');
+    const code = `[${fieldValue}]`;
+    return code;
+};
+
+bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,'] = function(block, generator) {
+    const name = generator.valueToCode(block, 'name_ID',
+        Order.ATOMIC);
+    const fieldValue = block.getFieldValue('alternativs');
+    const code = `${fieldValue} ${name}`;
+    return code;
+};
 
 // bddGenerator.forBlock['subBlock_DeclarativeEntityDef_states'] = function(block, generator) {
     
