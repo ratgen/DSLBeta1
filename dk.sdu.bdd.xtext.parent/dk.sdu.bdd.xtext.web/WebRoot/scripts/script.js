@@ -113,13 +113,6 @@ function switchEditor(e) {
 		currentTab = e.target
 		currentBlockly = blockly
 		setSelectionBorder(currentTab)
-
-		// var newContents = filterCategories(currentTab, originalToolbox.contents);
-		// var newToolbox = originalToolbox;
-		// newToolbox.contents = newContents;
-
-		// Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
-		// Blockly.inject("blockly-editor", { "toolbox": newToolbox });
     	loadBlocks(currentTab, true);
 	}
 }
