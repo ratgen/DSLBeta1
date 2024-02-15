@@ -83,6 +83,7 @@ public class Block  {
 	public ArrayList<Argument> getArgs0() {
 		return args0;
 	}
+
 	public void setArgs0(ArrayList<Argument> args0) {
 		this.args0 = args0;
 	}
@@ -122,7 +123,10 @@ public class Block  {
 		lastIsArg = false;
 	}
 	
-	public void addArgument(Argument arg) {
+	public void addArgument(Argument arg) {		
+		if (this.args0.stream().anyMatch(a -> a.getName().equals(arg.getName())))
+			return;
+		
 		this.message0 = this.message0 + "%" + this.argCount + " ";
 		argCount++;
 		this.args0.add(arg);

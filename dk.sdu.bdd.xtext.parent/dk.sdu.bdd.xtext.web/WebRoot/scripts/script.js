@@ -67,7 +67,8 @@ const runCodeForEntity = (element) => {
 		let editor = getCurrentAceEditor()
 		let doc = editor.env.document.doc
 		if (doc !== null || doc !== undefined) {
-			doc.setValue(entityCode);		
+			console.log(entityCode);
+			doc.setValue(entityCode);
 		}
 	}	
 };
