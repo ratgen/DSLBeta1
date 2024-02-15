@@ -67,8 +67,7 @@ const runCodeForEntity = (element) => {
 		let editor = getCurrentAceEditor()
 		let doc = editor.env.document.doc
 		if (doc !== null || doc !== undefined) {
-			console.log(entityCode);
-			doc.setValue(entityCode);
+			doc.setValue(entityCode.replace(/^\s*$\n?/gm, '')); // removes blank lines
 		}
 	}	
 };
@@ -82,7 +81,7 @@ const runCodeForScenario = (element) => {
 		let editor = getCurrentAceEditor()
 		let doc = editor.env.document.doc
 		if (doc !== null || doc !== undefined) {
-			doc.setValue(scenarioCode);		
+			doc.setValue(scenarioCode.replace(/^\s*$\n?/gm, '')); // removes blank lines	
 		}
 	}	
 };
