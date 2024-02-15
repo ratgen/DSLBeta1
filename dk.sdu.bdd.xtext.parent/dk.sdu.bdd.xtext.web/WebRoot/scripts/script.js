@@ -57,17 +57,18 @@ let entitiesToolboxInjected = false;
 let scenarioToolboxInjected = false;
 let scenarioWorkspace;
 let entityWorkspace;
+let blockArray;
 
 const runCodeForEntity = (element) => {
 	if (entitiesToolboxInjected && element === entitiesTab)
 	{
-		const entityCode = getBddGenerator().workspaceToCode(entityWorkspace);
+		const entityCode = getBddGenerator(blockArray).workspaceToCode(entityWorkspace);
 		// console.log(entityCode);
 
 		let editor = getCurrentAceEditor()
 		let doc = editor.env.document.doc
 		if (doc !== null || doc !== undefined) {
-			doc.setValue(entityCode.replace(/^\s*$\n?/gm, '')); // removes blank lines
+			doc.setValue(entityCode.replace(/^\s*$\n?/gm, '').replace(/ +/g, ' ')); // removes blank lines & multiple spaces
 		}
 	}	
 };
@@ -75,13 +76,13 @@ const runCodeForEntity = (element) => {
 const runCodeForScenario = (element) => {
 	if (scenarioToolboxInjected && element === scenarioTab)
 	{
-		const scenarioCode = getBddGenerator().workspaceToCode(scenarioWorkspace);
+		const scenarioCode = getBddGenerator(blockArray).workspaceToCode(scenarioWorkspace);
 		// console.log(scenarioCode);
 		
 		let editor = getCurrentAceEditor()
 		let doc = editor.env.document.doc
 		if (doc !== null || doc !== undefined) {
-			doc.setValue(scenarioCode.replace(/^\s*$\n?/gm, '')); // removes blank lines	
+			doc.setValue(scenarioCode.replace(/^\s*$\n?/gm, '').replace(/ +/g, ' ')); // removes blank lines & multiple spaces	
 		}
 	}	
 };
@@ -201,6 +202,7 @@ function loadBlocks(element, skipAddingBlocks) {
 			// console.log(response)
 			response.blocks = JSON.parse(response.blocks)
 			response.toolBox = JSON.parse(response.toolBox)
+			blockArray = response.blocks
 
       		if (!skipAddingBlocks)
 			  Blockly.defineBlocksWithJsonArray(response.blocks)

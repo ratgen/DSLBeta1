@@ -4,114 +4,6 @@ const Order = {
 
 bddGenerator = new Blockly.Generator('bdd');
 
-// Model
-bddGenerator.forBlock['Model'] = function(block, generator) {
-    const modelName = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const statementMembers = generator.statementToCode(block, 'alternatives_statement'); // like an object
-
-    const code = `model ${modelName}\n${statementMembers}`;
-    return code;
-};
-
-bddGenerator.forBlock['ModelRef'] = function(block, generator) {
-    const modelName = generator.valueToCode(block, 'ModelRef_ID', Order.ATOMIC);
-    const code = `using ${modelName}`;
-    return code;
-};
-
-// Declarative Entities and Definitions
-bddGenerator.forBlock['DeclarativeEntityDef'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const input2 = generator.statementToCode(block, 'DeclarativeEntityDef_input_2');
-    const input3 = generator.statementToCode(block, 'DeclarativeEntityDef_input_3');
-
-    const code = `declarative entity ${name}\n${input2}\n{\n${input3}\n}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_DeclarativeEntityDef_is'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'subBlock_DeclarativeEntityDef_is_ID', Order.ATOMIC);
-    const input = generator.statementToCode(block, 'subBlock_DeclarativeEntityDef_is_input_2');
-
-    const code = `is ${name}\n${input}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_is_,'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'subBlock_subBlock_DeclarativeEntityDef_is_,_ID', Order.ATOMIC);
-    const code = `, ${name}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_DeclarativeEntityDef_actions:'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const input = generator.statementToCode(block, 'subBlock_DeclarativeEntityDef_actions:_input_2');
-
-    const code = `actions: ${name}\n${input}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_the'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const code = `the ${name}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_[_]'] = function(block) {
-    const fieldValue = block.getFieldValue('alternativs');
-    const code = `[${fieldValue}]`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const fieldValue = block.getFieldValue('alternativs');
-    const code = `${fieldValue} ${name}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_actions:_,'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const input = generator.statementToCode(block, 'subBlock_subBlock_DeclarativeEntityDef_actions:_,_input_2');
-
-    const code = `, ${name}\n${input}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,_the'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID',
-        Order.ATOMIC);
-    const code = `the ${name}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,_[_]'] = function(block) {
-    const fieldValue = block.getFieldValue('alternativs');
-    const code = `[${fieldValue}]`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_subBlock_DeclarativeEntityDef_actions:_,'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const fieldValue = block.getFieldValue('alternativs');
-    const code = `${fieldValue} ${name}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_DeclarativeEntityDef_properties:'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const input = generator.statementToCode(block, 'subBlock_DeclarativeEntityDef_properties:_input_2');
-
-    const code = `properties: ${name}\n${input}`;
-    return code;
-};
-
-bddGenerator.forBlock['subBlock_subBlock_DeclarativeEntityDef_properties:_,'] = function(block, generator) {
-    const name = generator.valueToCode(block, 'name_ID', Order.ATOMIC);
-    const code = `, ${name}`;
-    return code;
-};
-
 // Terminals
 bddGenerator.forBlock['STRING'] = function(block) {
     const textValue = block.getFieldValue('TEXT_INPUT');
@@ -133,7 +25,34 @@ bddGenerator.scrub_ = function(block, code, thisOnly) {
     return code;
 };
 
-function getBddGenerator()
+function getBddGenerator(blockArray)
 {
+    blockArray.forEach(registerRuleForBlock);
     return bddGenerator;
+}
+
+function registerRuleForBlock(blockArrayElement)
+{
+    bddGenerator.forBlock[blockArrayElement.type] = function(block, generator) {        
+        var code = blockArrayElement.message0;
+        for (var i = 0; i < blockArrayElement.args0.length; i++) {
+            var argument = blockArrayElement.args0[i];
+            var argumentValue = getArgumentValue(argument.type, argument.name, block, generator);
+
+            code = code.replace(`%${i+1}`, argumentValue); // starts from %1
+        }
+        return code;
+    };
+}
+
+function getArgumentValue(argumentType, argumentName, block, generator) {
+    if (argumentType === "input_value") {
+        return generator.valueToCode(block, argumentName, Order.ATOMIC);
+    }
+    else if (argumentType === "input_statement") {
+        return generator.statementToCode(block, argumentName);
+    }
+    else if (argumentType === "field_dropdown" || argumentType === "field_input") {
+        return block.getFieldValue(argumentName);
+    }
 }
