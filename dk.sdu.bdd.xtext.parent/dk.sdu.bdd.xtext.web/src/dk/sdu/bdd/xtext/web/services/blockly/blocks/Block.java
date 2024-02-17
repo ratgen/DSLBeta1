@@ -125,7 +125,9 @@ public class Block  {
 	
 	public void addArgument(Argument arg) {		
 		if (this.args0.stream().anyMatch(a -> a.getName().equals(arg.getName())))
-			return;
+		{
+			arg.setName(arg.getName() + this.argCount);
+		}
 		
 		this.message0 = this.message0 + "%" + this.argCount + " ";
 		argCount++;
