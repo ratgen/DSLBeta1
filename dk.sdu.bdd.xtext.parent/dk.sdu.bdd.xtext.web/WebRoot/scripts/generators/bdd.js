@@ -20,7 +20,7 @@ bddGenerator.forBlock['ID'] = function(block) {
 bddGenerator.scrub_ = function(block, code, thisOnly) {
     const nextBlock = block.nextConnection && block.nextConnection.targetBlock();
     if (nextBlock && !thisOnly) {
-      return code + '\n' + bddGenerator.blockToCode(nextBlock);
+      return '\n' + code + '\n' + bddGenerator.blockToCode(nextBlock);
     }    
     return code;
 };
@@ -41,7 +41,11 @@ function registerRuleForBlock(blockArrayElement)
 
             code = code.replace(`%${i+1}`, argumentValue); // starts from %1
         }
-        return code;
+        
+        if (!blockArrayElement.output)
+            return code;
+        else
+            return [code, Order.ATOMIC];
     };
 }
 
