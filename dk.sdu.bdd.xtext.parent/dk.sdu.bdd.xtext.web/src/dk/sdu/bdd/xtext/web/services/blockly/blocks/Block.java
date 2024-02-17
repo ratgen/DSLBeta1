@@ -158,45 +158,43 @@ public class Block  {
 			case "Model":
 			case "ModelRef":
 				return "Model";
-			case "DeclarativeEntityDef":
-			case "DeclarativeEntityRef":
-			case "DeclarativeEntityStatePhrase":
-			case "DeclarativeEntityPropertyStatePhrase":
-			case "DeclarativeEntityAction":
-			case "DeclarativeEntityPropertyRef":
-				return "Declarative Entities and Definitions";
-			case "ImperativeEntityDef":
-			case "ImperativeEntityRef":
-			case "ImperativeEntityStatePhrase":
-			case "ImperativeEntityPropertyStatePhrase":
-			case "ImperativeEntityAction":
-			case "ImperativePropertyRef":
-				return "Imperative Entities and Definitions";
-			case "ActionDef":
-			case "ImperativeActionDef":
-			case "VerbAction":
-			case "ActionRef":
-			case "ImperativeActionRef":
-				return "Actions and Verbs";
+			case "DeclarativeEntityDef":		
+				return "Declarative Entities";
+			case "ImperativeEntityDef":			
+				return "Imperative Entities";			
 			case "StateDef":
 			case "PropertyDef":
 			case "ImperativeStateDef":
 			case "ImperativePropertyDef":
 				return "States and Properties";
-			case "Scenario":
-			case "PrePostWords":
-			case "WhenWords": 
-				return "Scenario Definitions";
-			case "ImperativeScenario":
-			case "ImperativeScenarioState":
-				return "Imperative Scenarios";
 			case "DeclarativeScenarioState":
 			case "DeclarativeScenarioAction":
+			case "DeclarativeEntityRef":
+			case "DeclarativeEntityStatePhrase":
+			case "DeclarativeEntityPropertyStatePhrase":
+			case "DeclarativeEntityAction":
+			case "DeclarativeEntityPropertyRef":
+			case "ActionDef":
+			case "ImperativeActionDef":
+			case "VerbAction":
+			case "ActionRef":
+			case "Scenario":
+			case "PrePostWords":
+			case "WhenWords":
 				return "Declarative Scenarios";
+			case "ImperativeScenario":
+			case "ImperativeScenarioState":
+			case "ImperativeEntityRef":
+			case "ImperativeEntityStatePhrase":
+			case "ImperativeEntityPropertyStatePhrase":
+			case "ImperativeEntityAction":
+			case "ImperativePropertyRef":
+			case "ImperativeActionRef":
+			case "ADVERB":
+				return "Imperative Scenarios";			
 			case "DOUBLE":
 			case "PREP":
 			case "ENTITY_IDENTITY":
-			case "ADVERB":
 			default:
 				return "General";
 		}
