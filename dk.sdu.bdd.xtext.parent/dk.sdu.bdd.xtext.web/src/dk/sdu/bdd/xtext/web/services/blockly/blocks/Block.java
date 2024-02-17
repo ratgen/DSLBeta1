@@ -83,6 +83,7 @@ public class Block  {
 	public ArrayList<Argument> getArgs0() {
 		return args0;
 	}
+
 	public void setArgs0(ArrayList<Argument> args0) {
 		this.args0 = args0;
 	}
@@ -122,7 +123,12 @@ public class Block  {
 		lastIsArg = false;
 	}
 	
-	public void addArgument(Argument arg) {
+	public void addArgument(Argument arg) {		
+		if (this.args0.stream().anyMatch(a -> a.getName().equals(arg.getName())))
+		{
+			arg.setName(arg.getName() + this.argCount);
+		}
+		
 		this.message0 = this.message0 + "%" + this.argCount + " ";
 		argCount++;
 		this.args0.add(arg);
@@ -154,45 +160,43 @@ public class Block  {
 			case "Model":
 			case "ModelRef":
 				return "Model";
-			case "DeclarativeEntityDef":
-			case "DeclarativeEntityRef":
-			case "DeclarativeEntityStatePhrase":
-			case "DeclarativeEntityPropertyStatePhrase":
-			case "DeclarativeEntityAction":
-			case "DeclarativeEntityPropertyRef":
-				return "Declarative Entities and Definitions";
-			case "ImperativeEntityDef":
-			case "ImperativeEntityRef":
-			case "ImperativeEntityStatePhrase":
-			case "ImperativeEntityPropertyStatePhrase":
-			case "ImperativeEntityAction":
-			case "ImperativePropertyRef":
-				return "Imperative Entities and Definitions";
-			case "ActionDef":
-			case "ImperativeActionDef":
-			case "VerbAction":
-			case "ActionRef":
-			case "ImperativeActionRef":
-				return "Actions and Verbs";
+			case "DeclarativeEntityDef":		
+				return "Declarative Entities";
+			case "ImperativeEntityDef":			
+				return "Imperative Entities";			
 			case "StateDef":
 			case "PropertyDef":
 			case "ImperativeStateDef":
 			case "ImperativePropertyDef":
 				return "States and Properties";
-			case "Scenario":
-			case "PrePostWords":
-			case "WhenWords": 
-				return "Scenario Definitions";
-			case "ImperativeScenario":
-			case "ImperativeScenarioState":
-				return "Imperative Scenarios";
 			case "DeclarativeScenarioState":
 			case "DeclarativeScenarioAction":
+			case "DeclarativeEntityRef":
+			case "DeclarativeEntityStatePhrase":
+			case "DeclarativeEntityPropertyStatePhrase":
+			case "DeclarativeEntityAction":
+			case "DeclarativeEntityPropertyRef":
+			case "ActionDef":
+			case "ImperativeActionDef":
+			case "VerbAction":
+			case "ActionRef":
+			case "Scenario":
+			case "PrePostWords":
+			case "WhenWords":
 				return "Declarative Scenarios";
+			case "ImperativeScenario":
+			case "ImperativeScenarioState":
+			case "ImperativeEntityRef":
+			case "ImperativeEntityStatePhrase":
+			case "ImperativeEntityPropertyStatePhrase":
+			case "ImperativeEntityAction":
+			case "ImperativePropertyRef":
+			case "ImperativeActionRef":
+			case "ADVERB":
+				return "Imperative Scenarios";			
 			case "DOUBLE":
 			case "PREP":
 			case "ENTITY_IDENTITY":
-			case "ADVERB":
 			default:
 				return "General";
 		}

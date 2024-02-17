@@ -178,6 +178,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		try {
 			String blockarr = objectMapper.writeValueAsString(blockArray);
 			String toolboxstr = objectMapper.writeValueAsString(toolBox);
+			System.out.println(blockarr);
 			System.out.println(toolboxstr);
 			
 			ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		

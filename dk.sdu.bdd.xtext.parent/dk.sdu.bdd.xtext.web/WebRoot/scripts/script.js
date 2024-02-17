@@ -55,6 +55,37 @@ let warningMessage = document.getElementById('warning-message')
 let originalToolbox;
 let entitiesToolboxInjected = false;
 let scenarioToolboxInjected = false;
+let scenarioWorkspace;
+let entityWorkspace;
+let blockArray;
+
+const runCodeForEntity = (element) => {
+	if (entitiesToolboxInjected && element === entitiesTab)
+	{
+		const entityCode = getBddGenerator(blockArray).workspaceToCode(entityWorkspace);
+		// console.log(entityCode);
+
+		let editor = getCurrentAceEditor()
+		let doc = editor.env.document.doc
+		if (doc !== null || doc !== undefined) {
+			doc.setValue(entityCode.replace(/^\s*$\n?/gm, '').replace(/ +/g, ' ')); // removes blank lines & multiple spaces
+		}
+	}	
+};
+
+const runCodeForScenario = (element) => {
+	if (scenarioToolboxInjected && element === scenarioTab)
+	{
+		const scenarioCode = getBddGenerator(blockArray).workspaceToCode(scenarioWorkspace);
+		// console.log(scenarioCode);
+		
+		let editor = getCurrentAceEditor()
+		let doc = editor.env.document.doc
+		if (doc !== null || doc !== undefined) {
+			doc.setValue(scenarioCode.replace(/^\s*$\n?/gm, '').replace(/ +/g, ' ')); // removes blank lines & multiple spaces	
+		}
+	}	
+};
 
 function displayEditor(currentEditor, newEditor, currentBlockly, newBlockly) {
 	currentEditor.style.display = "none"
@@ -82,14 +113,7 @@ function switchEditor(e) {
 		currentTab = e.target
 		currentBlockly = blockly
 		setSelectionBorder(currentTab)
-
-    // var newContents = filterCategories(currentTab, originalToolbox.contents);
-    // var newToolbox = originalToolbox;
-    // newToolbox.contents = newContents;
-
-    // Blockly.inject("blockly-editor2", { "toolbox": newToolbox });
-		// Blockly.inject("blockly-editor", { "toolbox": newToolbox });
-    loadBlocks(currentTab, true);
+    	loadBlocks(currentTab, true);
 	}
 }
 
@@ -160,7 +184,7 @@ astBtn.onclick = () => {
 	fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
+			// console.log(response)
 		})
 }
 
@@ -168,11 +192,12 @@ function loadBlocks(element, skipAddingBlocks) {
 	fetch('/xtext-service/blocks?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
+			// console.log(response)
 			response.blocks = JSON.parse(response.blocks)
 			response.toolBox = JSON.parse(response.toolBox)
+			blockArray = response.blocks
 
-      if (!skipAddingBlocks)
+      		if (!skipAddingBlocks)
 			  Blockly.defineBlocksWithJsonArray(response.blocks)
 
 			let id_validator = function(newValue) {
@@ -190,7 +215,7 @@ function loadBlocks(element, skipAddingBlocks) {
 					this.setColour(200)
 					this.setOutput(true, 'ID')
 					this.appendDummyInput()
-						.appendField(new Blockly.FieldTextInput('ID', id_validator));
+						.appendField(new Blockly.FieldTextInput('ID', id_validator), 'TEXT_INPUT');
 
 				}
 			}
@@ -211,7 +236,7 @@ function loadBlocks(element, skipAddingBlocks) {
 					this.setOutput(true, 'STRING')
 					this.appendDummyInput()
 						.appendField("\"")
-						.appendField(new Blockly.FieldTextInput('String', string_validator))
+						.appendField(new Blockly.FieldTextInput('String', string_validator), 'TEXT_INPUT')
 						.appendField("\"");
 				}
 			}
@@ -222,54 +247,50 @@ function loadBlocks(element, skipAddingBlocks) {
 
 			response.toolBox.contents.push({ "kind": "category", "name": "Terminals", contents: termArr })
 
-      originalToolbox = response.toolBox;
+      		originalToolbox = response.toolBox;
 			response.toolBox.contents = filterCategories(element, originalToolbox.contents);
 
+			if (element === scenarioTab && !scenarioToolboxInjected)
+			{
+				scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
+				scenarioToolboxInjected = true;
+			}
 
-      let scenarioWorkspace;
-      let entityWorkspace;
+			if (element === entitiesTab && !entitiesToolboxInjected)
+			{
+					entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
+				entitiesToolboxInjected = true;
+			}
 
-      if (element === scenarioTab && !scenarioToolboxInjected)
-      {
-        scenarioWorkspace = Blockly.inject("blockly-editor2", { "toolbox": response.toolBox });
-        scenarioToolboxInjected = true;
-      }
-
-      if (element === entitiesTab && !entitiesToolboxInjected)
-      {
-			  entityWorkspace = Blockly.inject("blockly-editor", { "toolbox": response.toolBox });
-        entitiesToolboxInjected = true;
-      }
-
-			console.log(response)
+			// console.log(response)
 
 			if (entities != undefined) {
 				entities.addEventListener("input", onEntityEditorChange);
 			}
 
 			function onClick(event) {
-        if (scenarioWorkspace != undefined)
-				  Blockly.svgResize(scenarioWorkspace);
-          
-        if (entityWorkspace != undefined)
-				  Blockly.svgResize(entityWorkspace);
+				if (scenarioWorkspace != undefined)
+					Blockly.svgResize(scenarioWorkspace);
+				
+				if (entityWorkspace != undefined)
+					Blockly.svgResize(entityWorkspace);
 			}
 
 			function onchange(event) {
-				console.log(event);
+				// console.log(event);
 
 				let entityBlockArray = [];
-        let scenarioBlockArray = [];
+				let scenarioBlockArray = [];
 
-        if (entityWorkspace != undefined)
-        {
-          entityBlockArray = entityWorkspace.getAllBlocks();
-        }
+				if (entityWorkspace != undefined)
+				{
+					entityBlockArray = entityWorkspace.getAllBlocks();
+				}
 
-        if (scenarioWorkspace != undefined)
-        {
-          scenarioBlockArray = scenarioWorkspace.getAllBlocks();
-        }
+				if (scenarioWorkspace != undefined)
+				{
+					scenarioBlockArray = scenarioWorkspace.getAllBlocks();
+				}
 
 				let entityTab = editors[0].env.document.doc;
 				let scenarioTab = editors[1].env.document.doc;
@@ -296,12 +317,11 @@ function loadBlocks(element, skipAddingBlocks) {
 				scenarioTab.insertFullLines(0, scenarioArray);
 				entityTab.insertFullLines(0, entityArray);
 
-
 				if (scenarioWorkspace != undefined)
-				  Blockly.svgResize(scenarioWorkspace);
+					Blockly.svgResize(scenarioWorkspace);
           
-        if (entityWorkspace != undefined)
-				  Blockly.svgResize(entityWorkspace);
+				if (entityWorkspace != undefined)
+					Blockly.svgResize(entityWorkspace);
 
 				var scenarioTabElement = document.getElementById('scenario-tab')
 
@@ -313,38 +333,41 @@ function loadBlocks(element, skipAddingBlocks) {
 					setDisabled(scenarioTabElement);
 					enabledByCodeBlocks = false;
 				}
+
+				runCodeForEntity(element);
+				runCodeForScenario(element);
 			}
 
-      if (!skipAddingBlocks || element === entitiesTab)
-      {
-			  document.getElementById('blockly-editor2').style.display = "none"
-      }
-      else 
-      {
-        document.getElementById('blockly-editor').style.display = "none"
-      }
+			if (!skipAddingBlocks || element === entitiesTab)
+			{
+				document.getElementById('blockly-editor2').style.display = "none"
+			}
+			else 
+			{
+				document.getElementById('blockly-editor').style.display = "none"
+			}
 
-      if (entityWorkspace != undefined)
+      		if (entityWorkspace != undefined)
 			  entityWorkspace.addChangeListener(onchange);
 
-      if (scenarioWorkspace != undefined)
+      		if (scenarioWorkspace != undefined)
 			  scenarioWorkspace.addChangeListener(onchange);
 
 			window.addEventListener('click', onClick, false);
 
 			onchange();
-			console.log(response)
+			//console.log(response)
 			onEntityEditorChange();
 		})
 }
 
 function filterCategories(element, contents) {
 	if (element === entitiesTab) {
-		let categories = ["Scenario Definitions", "Imperative Scenarios"];
+		let categories = ["Declarative Scenarios", "Imperative Scenarios"];
 		return contents.filter(item => !categories.includes(item.name));
 	}
 	else if (element === scenarioTab) {
-		let categories = ["Declarative Entities and Definitions", "Imperative Entities and Definitions"];
+		let categories = ["Declarative Entities", "Imperative Entities"];
 		return contents.filter(item => !categories.includes(item.name));
 	}
 }
