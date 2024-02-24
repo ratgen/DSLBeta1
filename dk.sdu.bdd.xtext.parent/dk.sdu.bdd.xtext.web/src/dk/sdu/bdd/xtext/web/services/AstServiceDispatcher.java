@@ -27,6 +27,8 @@ import org.eclipse.xtext.ParserRule;
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
 import org.eclipse.xtext.TypeRef;
+import org.eclipse.xtext.parser.IParseResult;
+import org.eclipse.xtext.resource.XtextResourceSet;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 
@@ -79,17 +81,23 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
-
+		AstServiceProvider provider = new AstServiceProvider();
 		
 		EList<Resource> list = resourceSet.getResources();
-		AstServiceProvider provider = new AstServiceProvider();
-		ArrayList<String> astArr = new ArrayList<>();
-		list.forEach((item) -> {
-			String models = provider.parseResource(item);
-			if (!models.equals("")) {
-				astArr.add(models);
-			}
-		});
+		ArrayList<Object> astArr = new ArrayList<>();
+		
+		if (list.size() > 0)
+		{
+			System.out.println(list.size());
+			for (Resource resourceListElement : list) {
+				System.out.println(resourceListElement);
+	            Object rootElement = resourceListElement.getContents().get(0);
+	            astArr.add(rootElement);
+	        }
+		}
+		
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 		serviceDescriptor.setService(() -> {
@@ -573,6 +581,8 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	public static String dump(EObject mod_, String indent) {
+		System.out.println("dumping...");
+		
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {

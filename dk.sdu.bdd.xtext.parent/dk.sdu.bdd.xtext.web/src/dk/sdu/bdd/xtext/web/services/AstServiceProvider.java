@@ -43,7 +43,7 @@ public class AstServiceProvider {
 		return "";
 	}
 	
-	public String parseArr(ArrayList<String> arr) {
+	public String parseArr(ArrayList<Object> arr) {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		

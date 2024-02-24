@@ -184,7 +184,11 @@ astBtn.onclick = () => {
 	fetch('/xtext-service/ast?resource=multi-resource/scenarios.bdd')
 		.then(response => response.json())
 		.then(response => {
-			console.log(response)
+			console.log(response);
+			console.log(JSON.stringify(response));
+
+			const testSerialized = Blockly.serialization.workspaces.save(entityWorkspace);
+			console.log(testSerialized);
 		})
 }
 
