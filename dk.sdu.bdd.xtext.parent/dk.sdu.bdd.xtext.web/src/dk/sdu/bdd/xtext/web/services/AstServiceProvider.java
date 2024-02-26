@@ -43,7 +43,7 @@ public class AstServiceProvider {
 	private void serializeEObject(EObject eObject, ObjectNode parentNode) {
         parentNode = getParentNodeWithProperties(eObject, parentNode);
 		
-        ArrayNode childrenArray = parentNode.putArray("children");
+        ArrayNode childrenArray = parentNode.putArray("nodes");
         for (EObject child : eObject.eContents()) {
             ObjectNode childNode = new ObjectMapper().createObjectNode();
             serializeEObject(child, childNode);
@@ -52,7 +52,7 @@ public class AstServiceProvider {
     }
 	
 	private ObjectNode getParentNodeWithProperties(EObject eObject, ObjectNode parentNode) {	
-        parentNode.put("node", getEObjectString(eObject));
+        parentNode.put("value", getEObjectString(eObject));
 		
 		return parentNode;
 	}
