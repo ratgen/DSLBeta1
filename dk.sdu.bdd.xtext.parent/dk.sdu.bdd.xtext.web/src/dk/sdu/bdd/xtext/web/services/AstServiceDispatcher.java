@@ -84,24 +84,10 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		AstServiceProvider provider = new AstServiceProvider();
 		
 		EList<Resource> list = resourceSet.getResources();
-		ArrayList<Object> astArr = new ArrayList<>();
-		
-		if (list.size() > 0)
-		{
-			System.out.println(list.size());
-			for (Resource resourceListElement : list) {
-				System.out.println(resourceListElement);
-	            Object rootElement = resourceListElement.getContents().get(0);
-	            astArr.add(rootElement);
-	        }
-		}
-		
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.setSerializationInclusion(Include.NON_NULL);
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 		serviceDescriptor.setService(() -> {
-	        return new AstServiceResult(provider.parseArr(astArr));
+			return new AstServiceResult(provider.getAstJson(list));
 	     });
 		return serviceDescriptor;
 
