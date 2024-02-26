@@ -1,5 +1,8 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -26,9 +29,6 @@ import org.eclipse.xtext.ParserRule;
 
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
-import org.eclipse.xtext.TypeRef;
-import org.eclipse.xtext.parser.IParseResult;
-import org.eclipse.xtext.resource.XtextResourceSet;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 
@@ -81,13 +81,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
-		AstServiceProvider provider = new AstServiceProvider();
 		
 		EList<Resource> list = resourceSet.getResources();
 		
+		AstServiceProvider provider = new AstServiceProvider();
+		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 		serviceDescriptor.setService(() -> {
-			return new AstServiceResult(provider.getAstJson(list));
+			return new AstServiceResult(provider.getAst(list));
 	     });
 		return serviceDescriptor;
 
@@ -572,7 +573,7 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {
-	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	        res +=  "-> " + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    }
 	    res += "\n";
 	    for (EObject f :mod_.eContents()) {
