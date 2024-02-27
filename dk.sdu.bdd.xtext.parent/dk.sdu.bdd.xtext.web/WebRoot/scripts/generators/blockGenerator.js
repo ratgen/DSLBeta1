@@ -72,11 +72,20 @@ function addBlockToWorkspace(parsedObj, workspace) {
         });
 
         var targetBlock = workspace.getBlockById(previousBlock.id);
-        var input = targetBlock.inputList.find(function(i) {
-            return i.name === inputArgument.name;
-        });
 
-        input.connection.connect(blockToAdd.previousConnection);
+        if (inputArgument && targetBlock.inputList) // connect as an input
+        {
+            var input = targetBlock.inputList.find(function(i) {
+                return i.name === inputArgument.name;
+            });
+
+            input.connection.connect(blockToAdd.previousConnection);
+        }
+        else // connect directly as previous statement
+        {
+            blockToAdd.setNextStatement(true);
+            targetBlock.nextConnection.connect(blockToAdd.previousConnection);
+        }
     }
 
     workspace.getBlockById(blockToAdd.id).initSvg();
