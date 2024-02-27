@@ -1,4 +1,5 @@
 let blockDefinitions;
+let previousBlock;
 
 function generateBlocksFromAst(ast, workspace, blockArray) {
     if (blockArray)
@@ -6,6 +7,7 @@ function generateBlocksFromAst(ast, workspace, blockArray) {
     
     if (workspace)
     {
+        previousBlock = null;
         workspace.clear();
         generateBlock(ast, workspace);
     }
@@ -50,7 +52,7 @@ function addBlockToWorkspace(parsedObj, workspace) {
         idBlock.setFieldValue(parsedObj.id, 'TEXT_INPUT');
         
         var inputArgument = blockDefinition.args0.find(function(a) {
-            return a.check.includes('ID');
+            return a.check.includes('ID') && a.type === 'input_value';
         });
 
         var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
@@ -59,8 +61,28 @@ function addBlockToWorkspace(parsedObj, workspace) {
         workspace.getBlockById(idBlock.id).initSvg();
     }
 
+    if (previousBlock)
+    {
+        var previousBlockDefinition = blockDefinitions.find(function(b) {
+            return b.type === previousBlock.type;
+        });
+
+        var inputArgument = previousBlockDefinition.args0.find(function(a) {
+            return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
+        });
+
+        var targetBlock = workspace.getBlockById(previousBlock.id);
+        var input = targetBlock.inputList.find(function(i) {
+            return i.name === inputArgument.name;
+        });
+
+        input.connection.connect(blockToAdd.previousConnection);
+    }
+
     workspace.getBlockById(blockToAdd.id).initSvg();
-    workspace.render();   
+    workspace.render();
+
+    previousBlock = blockToAdd;
 }
 
 function parseValueString(str) {
