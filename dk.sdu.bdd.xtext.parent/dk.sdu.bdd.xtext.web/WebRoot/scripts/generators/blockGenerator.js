@@ -73,14 +73,17 @@ function addBlockToWorkspace(parsedObj, workspace) {
                 console.log("Can't add the block with type: " + parsedObj.type);
         }
 
-        if (substringToSearch)
-        {
-            var inputArgument = previousBlockDefinition.args0.find(function(a) {
-                return a.check.some(function(checkItem) {
-                    return checkItem.includes(substringToSearch);
-                }) && a.type === 'input_statement';
-            });
+        if (!substringToSearch)
+            return;
 
+        var inputArgument = previousBlockDefinition.args0.find(function(a) {
+            return a.check.some(function(checkItem) {
+                return checkItem.includes(substringToSearch);
+            }) && a.type === 'input_statement';
+        });
+
+        if (inputArgument) // means we can connect to the previous block as an input
+        {
             var blockType = inputArgument.check.find(function(c) {
                 return c.includes(substringToSearch);
             });
@@ -90,11 +93,19 @@ function addBlockToWorkspace(parsedObj, workspace) {
                 return b.type === blockType;
             });
         }
+        else // connect to the previous-previous block as an input instead
+        {
+            previousBlock = previousBlock.getPreviousBlock();
+            addBlockToWorkspace(parsedObj, workspace);
+        }
     }
     else
     {
         blockToAdd = workspace.newBlock(parsedObj.type);
     }
+
+    if (!blockToAdd)
+        return;
 
     if (parsedObj.id)
         addIdBlock(parsedObj.id, blockDefinition, blockToAdd, workspace);
