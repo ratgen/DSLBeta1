@@ -41,14 +41,14 @@ function addBlockToWorkspace(parsedObj, workspace) {
         return;
 
     var blockToAdd = null;
-    var previousBlockDefinition = null;
+    var previousBlockDefinition = null;    
 
     if (previousBlock)
     {
-        previousBlockDefinition = blockDefinitions.find(function(b) {
+        var previousBlockDefinition = blockDefinitions.find(function(b) {
             return b.type === previousBlock.type;
         });
-    }
+    }    
 
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === parsedObj.type;
@@ -56,27 +56,39 @@ function addBlockToWorkspace(parsedObj, workspace) {
 
     if (!blockDefinition) // this means we have to work with subblocks
     {
+        var substringToSearch = null;
+
         switch (parsedObj.type)
         {
             case 'PropertyDef':               
-                var inputArgument = previousBlockDefinition.args0.find(function(a) {
-                    return a.check.some(function(checkItem) {
-                        return checkItem.includes('properties');
-                    }) && a.type === 'input_statement';
-                });
-
-                var blockType = inputArgument.check.find(function(c) {
-                    return c.includes('properties');
-                });
-
-                blockToAdd = workspace.newBlock(blockType);
-                blockDefinition = blockDefinitions.find(function(b) {
-                    return b.type === blockType;
-                });                
-
+                substringToSearch = "properties";
+                break;
+            case 'ActionDef':
+                substringToSearch = "actions";
+                break;
+            case 'StateDef':
+                substringToSearch = "states";
                 break;
             default:
                 console.log("Can't add the block with type: " + parsedObj.type);
+        }
+
+        if (substringToSearch)
+        {
+            var inputArgument = previousBlockDefinition.args0.find(function(a) {
+                return a.check.some(function(checkItem) {
+                    return checkItem.includes(substringToSearch);
+                }) && a.type === 'input_statement';
+            });
+
+            var blockType = inputArgument.check.find(function(c) {
+                return c.includes(substringToSearch);
+            });
+
+            blockToAdd = workspace.newBlock(blockType);
+            blockDefinition = blockDefinitions.find(function(b) {
+                return b.type === blockType;
+            });
         }
     }
     else
@@ -84,51 +96,54 @@ function addBlockToWorkspace(parsedObj, workspace) {
         blockToAdd = workspace.newBlock(parsedObj.type);
     }
 
-    if (!blockToAdd)
-        return;
-
-    if (parsedObj.id) // add an id block connection
-    {
-        var idBlock = workspace.newBlock('ID');
-        idBlock.setFieldValue(parsedObj.id, 'TEXT_INPUT');
-        
-        var inputArgument = blockDefinition.args0.find(function(a) {
-            return a.check.includes('ID') && a.type === 'input_value';
-        });
-
-        var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
-        idBlock.outputConnection.connect(inputConnection);
-
-        workspace.getBlockById(idBlock.id).initSvg();
-    }
-
+    if (parsedObj.id)
+        addIdBlock(parsedObj.id, blockDefinition, blockToAdd, workspace);
+    
     if (previousBlockDefinition)
-    {
-        var inputArgument = previousBlockDefinition.args0.find(function(a) {
-            return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
-        });
-
-        var targetBlock = workspace.getBlockById(previousBlock.id);
-
-        if (inputArgument && targetBlock.inputList) // connect as an input
-        {
-            var input = targetBlock.inputList.find(function(i) {
-                return i.name === inputArgument.name;
-            });
-
-            input.connection.connect(blockToAdd.previousConnection);
-        }
-        else // connect directly as previous statement
-        {
-            blockToAdd.setNextStatement(true);
-            targetBlock.nextConnection.connect(blockToAdd.previousConnection);
-        }
-    }
+        addPreviousBlock(previousBlock, previousBlockDefinition, blockToAdd, workspace);
 
     workspace.getBlockById(blockToAdd.id).initSvg();
-    previousBlock = blockToAdd;    
+    previousBlock = blockToAdd; 
 
     workspace.render();
+}
+
+function addPreviousBlock(previousBlock, previousBlockDefinition, blockToAdd, workspace)
+{
+    var inputArgument = previousBlockDefinition.args0.find(function(a) {
+        return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
+    });
+
+    var targetBlock = workspace.getBlockById(previousBlock.id);
+
+    if (inputArgument && targetBlock.inputList) // connect as an input
+    {
+        var input = targetBlock.inputList.find(function(i) {
+            return i.name === inputArgument.name;
+        });
+
+        input.connection.connect(blockToAdd.previousConnection);
+    }
+    else // connect directly as previous statement
+    {
+        blockToAdd.setNextStatement(true);
+        targetBlock.nextConnection.connect(blockToAdd.previousConnection);
+    }
+}
+
+function addIdBlock(idValue, blockDefinition, blockToAdd, workspace) 
+{
+    var idBlock = workspace.newBlock('ID');
+    idBlock.setFieldValue(idValue, 'TEXT_INPUT');
+    
+    var inputArgument = blockDefinition.args0.find(function(a) {
+        return a.check.includes('ID') && a.type === 'input_value';
+    });
+
+    var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
+    idBlock.outputConnection.connect(inputConnection);
+
+    workspace.getBlockById(idBlock.id).initSvg();
 }
 
 function parseValueString(str) {
