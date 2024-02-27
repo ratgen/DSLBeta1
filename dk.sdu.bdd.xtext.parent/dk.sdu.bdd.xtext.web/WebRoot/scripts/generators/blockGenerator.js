@@ -1,9 +1,14 @@
-function generateBlocksFromAst(ast, workspace) {
+let blockDefinitions;
+
+function generateBlocksFromAst(ast, workspace, blockArray) {
+    if (blockArray)
+        blockDefinitions = blockArray;
+    
     if (workspace)
     {
         workspace.clear();
         generateBlock(ast, workspace);
-    }        
+    }
 }
 
 function generateBlock(obj, workspace) {
@@ -19,7 +24,7 @@ function generateBlock(obj, workspace) {
             var parsedObj = parseValueString(obj._children.value._value);
 
             if (parsedObj)
-                addBlockToWorkspace(parsedObj, workspace);            
+                addBlockToWorkspace(parsedObj, workspace);     
         }
 
         if (obj._children.nodes)
@@ -30,12 +35,32 @@ function generateBlock(obj, workspace) {
 }
 
 function addBlockToWorkspace(parsedObj, workspace) {
-    if (parsedObj.type)
+    if (!parsedObj.type || !blockDefinitions)
+        return;
+
+    var blockDefinition = blockDefinitions.find(function(b) {
+        return b.type === parsedObj.type;
+    });
+
+    var blockToAdd = workspace.newBlock(parsedObj.type);
+
+    if (parsedObj.id) // add an id block connection
     {
-        var blockToAdd = workspace.newBlock(parsedObj.type);
-        workspace.getBlockById(blockToAdd.id).initSvg();
-        workspace.render();
-    }    
+        var idBlock = workspace.newBlock('ID');
+        idBlock.setFieldValue(parsedObj.id, 'TEXT_INPUT');
+        
+        var inputArgument = blockDefinition.args0.find(function(a) {
+            return a.check.includes('ID');
+        });
+
+        var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
+        idBlock.outputConnection.connect(inputConnection);
+
+        workspace.getBlockById(idBlock.id).initSvg();
+    }
+
+    workspace.getBlockById(blockToAdd.id).initSvg();
+    workspace.render();   
 }
 
 function parseValueString(str) {
@@ -53,7 +78,8 @@ function parseValueString(str) {
         var id = matches[3];
 
         return { type: type, reference: reference, id: id };
-    } else {
+    } 
+    else {
         return null;
     }
 }
