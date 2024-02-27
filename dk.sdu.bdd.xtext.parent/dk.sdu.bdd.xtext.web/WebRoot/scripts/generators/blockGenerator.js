@@ -40,11 +40,52 @@ function addBlockToWorkspace(parsedObj, workspace) {
     if (!parsedObj.type || !blockDefinitions)
         return;
 
+    var blockToAdd = null;
+    var previousBlockDefinition = null;
+
+    if (previousBlock)
+    {
+        previousBlockDefinition = blockDefinitions.find(function(b) {
+            return b.type === previousBlock.type;
+        });
+    }
+
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === parsedObj.type;
     });
 
-    var blockToAdd = workspace.newBlock(parsedObj.type);
+    if (!blockDefinition) // this means we have to work with subblocks
+    {
+        switch (parsedObj.type)
+        {
+            case 'PropertyDef':               
+                var inputArgument = previousBlockDefinition.args0.find(function(a) {
+                    return a.check.some(function(checkItem) {
+                        return checkItem.includes('properties');
+                    }) && a.type === 'input_statement';
+                });
+
+                var blockType = inputArgument.check.find(function(c) {
+                    return c.includes('properties');
+                });
+
+                blockToAdd = workspace.newBlock(blockType);
+                blockDefinition = blockDefinitions.find(function(b) {
+                    return b.type === blockType;
+                });                
+
+                break;
+            default:
+                console.log("Can't add the block with type: " + parsedObj.type);
+        }
+    }
+    else
+    {
+        blockToAdd = workspace.newBlock(parsedObj.type);
+    }
+
+    if (!blockToAdd)
+        return;
 
     if (parsedObj.id) // add an id block connection
     {
@@ -61,12 +102,8 @@ function addBlockToWorkspace(parsedObj, workspace) {
         workspace.getBlockById(idBlock.id).initSvg();
     }
 
-    if (previousBlock)
+    if (previousBlockDefinition)
     {
-        var previousBlockDefinition = blockDefinitions.find(function(b) {
-            return b.type === previousBlock.type;
-        });
-
         var inputArgument = previousBlockDefinition.args0.find(function(a) {
             return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
         });
@@ -89,9 +126,9 @@ function addBlockToWorkspace(parsedObj, workspace) {
     }
 
     workspace.getBlockById(blockToAdd.id).initSvg();
-    workspace.render();
+    previousBlock = blockToAdd;    
 
-    previousBlock = blockToAdd;
+    workspace.render();
 }
 
 function parseValueString(str) {
