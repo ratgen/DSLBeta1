@@ -66,7 +66,7 @@ function addBlockToWorkspace(parsedObj, workspace) {
             case 'ActionDef':
                 substringToSearch = "actions";
                 break;
-            case 'StateDef':
+            case 'StateName':
                 substringToSearch = "states";
                 break;
             default:
