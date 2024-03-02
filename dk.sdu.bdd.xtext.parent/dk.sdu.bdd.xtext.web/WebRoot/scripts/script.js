@@ -195,6 +195,7 @@ astBtn.onclick = () => {
 		.then(response => {
 			generateBlocksFromAst(response.ast);
 			console.log(response);
+			console.log(JSON.stringify(response));
 
 			const testSerialized = Blockly.serialization.workspaces.save(entityWorkspace);
 			console.log(testSerialized);
