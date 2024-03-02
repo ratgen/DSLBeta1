@@ -1,61 +1,58 @@
 let blockDefinitions;
 
 function generateBlocksFromAst(ast, workspace, blockArray) {
-    if (!workspace || !blockArray || !ast)
+    if (!workspace || !blockArray)
         return;
 
     if (blockArray)
         blockDefinitions = blockArray;
     
     workspace.clear();
-    generateBlock(ast._children[0], null, workspace); // there is only 1 model
+    generateBlocks(ast, workspace, null);
+    workspace.render();
 }
 
-function generateBlock(obj, parentObj, workspace)
+function generateBlocks(root, workspace, parentBlock)
 {
-    if (obj._children && !Array.isArray(obj._children)) {
-        if (obj._children.value)
-        {
-            console.log(obj._children.value._value);
-            var parsedObj = parseValueString(obj._children.value._value);
-            var parsedParentObj = null;
+    if (!root || !root._children)
+        return;
 
-            if (parentObj)
-                parsedParentObj = parseValueString(parentObj._children.value._value);
+    var childrenIsArray = Array.isArray(root._children);
 
-            if (parsedObj)
-                addBlockToWorkspace(parsedObj, parsedParentObj, workspace);     
+    for (var i = 0; i < (childrenIsArray ? root._children.length : 1); i++) {
+        var current = childrenIsArray ? root._children[i]._children : root._children;
+        if (!current)
+            continue;
+
+        var currentParentBlock = null;
+
+        if (current.value) {
+            var parsedObj = parseValueString(current.value._value);    
+            if (parsedObj && parsedObj.type) {
+                currentParentBlock = addBlockToWorkspace(parsedObj, workspace, parentBlock);                   
+            }
         }
 
-        if (obj._children.nodes)
-        {
-            for (let child of obj._children.nodes._children) {
-                generateBlock(child, obj, workspace);
+        if (current.nodes) {
+            for (var j = 0; j < current.nodes._children.length; j++) {
+                var currentChild = current.nodes._children[j];
+                generateBlocks(currentChild, workspace, currentParentBlock);                
             }
         }
     }
 }
 
-function addBlockToWorkspace(parsedObj, parsedParentObj, workspace) {
-    if (!parsedObj.type || !blockDefinitions)
-        return;
-
-    var blockToAdd = null;
-    var parentBlockDefinition = null;    
-
-    if (parsedParentObj)
-    {
-        var parentBlockDefinition = blockDefinitions.find(function(b) {
-            return b.type === parsedParentObj.type;
-        });
-    }    
-
+function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === parsedObj.type;
     });
 
-    if (!blockDefinition) // this means we have to work with subblocks
-    {
+    var blockToAdd = null;
+
+    if (blockDefinition) { // good. we know this block
+        blockToAdd = workspace.newBlock(parsedObj.type);
+    }
+    else { // blocks that should be handled separately
         var substringToSearch = null;
 
         switch (parsedObj.type)
@@ -76,13 +73,17 @@ function addBlockToWorkspace(parsedObj, parsedParentObj, workspace) {
         if (!substringToSearch)
             return;
 
+        var parentBlockDefinition = blockDefinitions.find(function(b) {
+            return b.type === parentBlock.type;
+        });
+
         var inputArgument = parentBlockDefinition.args0.find(function(a) {
             return a.check.some(function(checkItem) {
                 return checkItem.includes(substringToSearch);
             }) && a.type === 'input_statement';
         });
 
-        if (inputArgument) // means we can connect to the parent block as an input
+        if (inputArgument) // means we can connect to the previous block as an input
         {
             var blockType = inputArgument.check.find(function(c) {
                 return c.includes(substringToSearch);
@@ -94,28 +95,30 @@ function addBlockToWorkspace(parsedObj, parsedParentObj, workspace) {
             });
         }
         else 
-            console.log("Can't connect to block as input: " + parsedObj.type);
-    }
-    else
-    {
-        blockToAdd = workspace.newBlock(parsedObj.type);
+        {
+            console.log("Can't add block as an input argument.");
+        }
     }
 
     if (!blockToAdd)
-        return;
+        return null;
 
     if (parsedObj.id)
-        addIdBlock(parsedObj.id, blockDefinition, blockToAdd, workspace);
-    
-    if (parentBlockDefinition)
-        connectParentBlock(parsedParentObj, parentBlockDefinition, blockToAdd, workspace);
+        addIdBlock(parsedObj.id, blockToAdd, workspace);
+
+    if (parentBlock)
+        addParentBlock(parentBlock, blockToAdd, workspace);
 
     workspace.getBlockById(blockToAdd.id).initSvg();
-    workspace.render();
+    return blockToAdd;
 }
 
-function connectParentBlock(parentBlock, parentBlockDefinition, blockToAdd, workspace)
+function addParentBlock(parentBlock, blockToAdd, workspace)
 {
+    var parentBlockDefinition = blockDefinitions.find(function(b) {
+        return b.type === parentBlock.type;
+    });
+
     var inputArgument = parentBlockDefinition.args0.find(function(a) {
         return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
     });
@@ -137,8 +140,12 @@ function connectParentBlock(parentBlock, parentBlockDefinition, blockToAdd, work
     }
 }
 
-function addIdBlock(idValue, blockDefinition, blockToAdd, workspace) 
+function addIdBlock(idValue, blockToAdd, workspace) 
 {
+    var blockDefinition = blockDefinitions.find(function(b) {
+        return b.type === blockToAdd.type;
+    });
+
     var idBlock = workspace.newBlock('ID');
     idBlock.setFieldValue(idValue, 'TEXT_INPUT');
     
