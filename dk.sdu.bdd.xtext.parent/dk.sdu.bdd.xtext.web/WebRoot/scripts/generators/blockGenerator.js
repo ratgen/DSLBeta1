@@ -34,6 +34,10 @@ function generateBlocks(root, workspace, parentBlock)
                 var addedBlock = addBlockToWorkspace(parsedObj, workspace, parentBlock); 
                 currentParentBlock = addedBlock ? addedBlock : parentBlock;
             }
+            else
+            {
+                currentParentBlock = parentBlock;
+            }
         }
 
         if (current.nodes) {
@@ -68,11 +72,11 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
                 break;
             default:
                 console.log("Can't add the block with type: " + parsedObj.type);
-                return;
+                return null;
         }
 
         if (!substringToSearch)
-            return;
+            return null;
 
         var parentBlockDefinition = blockDefinitions.find(function(b) {
             return b.type === parentBlock.type;
