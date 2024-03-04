@@ -61,13 +61,16 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
 
         switch (parsedObj.type)
         {
-            case 'PropertyDef':               
+            case 'PropertyDef':
+            case 'ImperativePropertyDef':              
                 substringToSearch = "properties";
                 break;
             case 'ActionDef':
+            case 'ImperativeActionDef':
                 substringToSearch = "actions";
                 break;
             case 'StateName':
+            case 'ImperativeStateName':
                 substringToSearch = "states";
                 break;
             default:

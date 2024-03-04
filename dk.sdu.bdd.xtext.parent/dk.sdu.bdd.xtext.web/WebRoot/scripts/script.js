@@ -197,8 +197,8 @@ astBtn.onclick = () => {
 			console.log(response);
 			console.log(JSON.stringify(response));
 
-			const testSerialized = Blockly.serialization.workspaces.save(entityWorkspace);
-			console.log(testSerialized);
+			// const testSerialized = Blockly.serialization.workspaces.save(entityWorkspace);
+			// console.log(testSerialized);
 		})
 }
 
