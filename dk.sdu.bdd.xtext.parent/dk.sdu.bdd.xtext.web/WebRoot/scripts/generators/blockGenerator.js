@@ -27,17 +27,17 @@ function generateBlocks(root, workspace, parentBlock)
         var currentParentBlock = null;
 
         if (current.value) {
+            console.log(current.value._value);
+
             var parsedObj = parseValueString(current.value._value);    
             if (parsedObj && parsedObj.type) {
-                currentParentBlock = addBlockToWorkspace(parsedObj, workspace, parentBlock);                   
+                var addedBlock = addBlockToWorkspace(parsedObj, workspace, parentBlock); 
+                currentParentBlock = addedBlock ? addedBlock : parentBlock;
             }
         }
 
         if (current.nodes) {
-            for (var j = 0; j < current.nodes._children.length; j++) {
-                var currentChild = current.nodes._children[j];
-                generateBlocks(currentChild, workspace, currentParentBlock);                
-            }
+            generateBlocks(current.nodes, workspace, currentParentBlock);
         }
     }
 }
@@ -68,6 +68,7 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
                 break;
             default:
                 console.log("Can't add the block with type: " + parsedObj.type);
+                return;
         }
 
         if (!substringToSearch)
@@ -161,7 +162,7 @@ function addIdBlock(idValue, blockToAdd, workspace)
 
 function parseValueString(str) {
     // Regular expression to match the type, reference, and ID
-    var regex = /(\w+)\s*(?:->\s*(\w+))?\s*\(name:\s+(\w+)\)/;
+    var regex = /(\w+)\s*(?:->\s*(\w+))?\s*\(name:\s+(\w+)(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)/;
 
     // Use match to extract the type, reference, and ID from the string
     var matches = str.match(regex);
