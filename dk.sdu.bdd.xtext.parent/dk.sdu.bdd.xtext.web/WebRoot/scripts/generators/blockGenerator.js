@@ -132,12 +132,20 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
             return i.name === inputArgument.name;
         });
 
+        targetBlock.inputList.forEach(function(existingInput) {
+            var connection = existingInput.connection;
+    
+            // if a previous block exists, form a connection
+            if (connection && connection.targetBlock()) {
+                var previousConnection = connection.targetBlock().previousConnection;
+                if (previousConnection) {
+                    blockToAdd.setNextStatement(true);
+                    blockToAdd.nextConnection.connect(previousConnection);
+                }
+            }
+        });
+
         input.connection.connect(blockToAdd.previousConnection);
-    }
-    else // connect directly as previous statement
-    {
-        blockToAdd.setNextStatement(true);
-        targetBlock.nextConnection.connect(blockToAdd.previousConnection);
     }
 }
 
