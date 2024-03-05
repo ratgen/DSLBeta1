@@ -20,7 +20,7 @@ function generateBlocks(root, workspace, parentBlock)
     var childrenIsArray = Array.isArray(root._children);
 
     for (var i = 0; i < (childrenIsArray ? root._children.length : 1); i++) {
-        var current = childrenIsArray ? root._children[i]._children : root._children;
+        var current = childrenIsArray ? root._children[root._children.length - 1 - i]._children : root._children;
         if (!current)
             continue;
 
