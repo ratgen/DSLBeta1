@@ -99,7 +99,7 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
                 });
 
                 inputArgument = previousBlockDefinition.args0.find(function(a) {
-                    return a.check.some(function(checkItem) {
+                    return a.check && a.check.some(function(checkItem) {
                         return (checkItem.includes(substringToSearch) && 
                             !checkItem.startsWith("subBlock_subBlock_subBlock"));
                     }) && a.type === 'input_statement';
@@ -113,7 +113,7 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
                     });
     
                     inputArgument = previousBlockDefinition.args0.find(function(a) {
-                        return a.check.some(function(checkItem) {
+                        return a.check && a.check.some(function(checkItem) {
                             return (checkItem.includes(substringToSearch) && 
                                 !checkItem.startsWith("subBlock_subBlock_subBlock"));
                         }) && a.type === 'input_statement';
@@ -128,7 +128,7 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
             else // means we have to connect to the parent instead
             {
                 inputArgument = parentBlockDefinition.args0.find(function(a) {
-                    return a.check.some(function(checkItem) {
+                    return a.check && a.check.some(function(checkItem) {
                         return checkItem.includes(substringToSearch);
                     }) && a.type === 'input_statement';
                 });
@@ -140,10 +140,15 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
 
             // manual intervention for wrong types
             if (blockType === `subBlock_subBlock_DeclarativeEntityDef_${substringToSearch}:`)
+            {
                 blockType = `subBlock_subBlock_DeclarativeEntityDef_${substringToSearch}:_,`;
+            }
 
-            if (blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:`)
-                blockType = `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_,`;
+            if (blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_/` ||
+                blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_[_]`)
+            {
+                blockType = `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_,`;   
+            }
 
             blockToAdd = workspace.newBlock(blockType);
         }
@@ -174,7 +179,7 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
     });
 
     var inputArgument = parentBlockDefinition.args0.find(function(a) {
-        return a.check.includes(blockToAdd.type) && a.type === 'input_statement';
+        return a.check && a.check.includes(blockToAdd.type) && a.type === 'input_statement';
     });
 
     var targetBlock = workspace.getBlockById(parentBlock.id);
@@ -212,7 +217,7 @@ function addIdBlock(idValue, blockToAdd, workspace)
     idBlock.setFieldValue(idValue, 'TEXT_INPUT');
     
     var inputArgument = blockDefinition.args0.find(function(a) {
-        return a.check.includes('ID') && a.type === 'input_value';
+        return a.check && a.check.includes('ID') && a.type === 'input_value';
     });
 
     var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
