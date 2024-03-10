@@ -1,20 +1,16 @@
 let blockDefinitions;
 let previousBlock;
-let currentAst;
+let blockDefinitionsToIgnore = []
 
 function generateBlocksFromAst(ast, workspace, blockArray) {
     if (!workspace || !blockArray)
         return;
-
-    if (ast === currentAst)
-        return;
-
+    
     if (blockArray)
         blockDefinitions = blockArray;
     
     workspace.clear();
     previousBlock = null;
-    currentAst = ast;
     generateBlocks(ast, workspace, null);
     workspace.render();
 }
@@ -104,7 +100,8 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
 
                 inputArgument = previousBlockDefinition.args0.find(function(a) {
                     return a.check.some(function(checkItem) {
-                        return checkItem.includes(substringToSearch);
+                        return (checkItem.includes(substringToSearch) && 
+                            !checkItem.startsWith("subBlock_subBlock_subBlock"));
                     }) && a.type === 'input_statement';
                 });
 
@@ -117,7 +114,8 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     
                     inputArgument = previousBlockDefinition.args0.find(function(a) {
                         return a.check.some(function(checkItem) {
-                            return checkItem.includes(substringToSearch);
+                            return (checkItem.includes(substringToSearch) && 
+                                !checkItem.startsWith("subBlock_subBlock_subBlock"));
                         }) && a.type === 'input_statement';
                     });
                 }
@@ -137,8 +135,15 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
             }
             
             var blockType = inputArgument.check.find(function(c) {
-                return c.includes(substringToSearch);
+                return (c.includes(substringToSearch));
             });
+
+            // manual intervention for wrong types
+            if (blockType === `subBlock_subBlock_DeclarativeEntityDef_${substringToSearch}:`)
+                blockType = `subBlock_subBlock_DeclarativeEntityDef_${substringToSearch}:_,`;
+
+            if (blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:`)
+                blockType = `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_,`;
 
             blockToAdd = workspace.newBlock(blockType);
         }
