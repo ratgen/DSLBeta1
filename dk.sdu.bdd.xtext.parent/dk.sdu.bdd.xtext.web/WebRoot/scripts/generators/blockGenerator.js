@@ -98,9 +98,6 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
             });
 
             blockToAdd = workspace.newBlock(blockType);
-            blockDefinition = blockDefinitions.find(function(b) {
-                return b.type === blockType;
-            });
         }
         else 
         {
