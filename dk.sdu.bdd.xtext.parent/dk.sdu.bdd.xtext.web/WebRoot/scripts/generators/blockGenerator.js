@@ -1,8 +1,12 @@
 let blockDefinitions;
 let previousBlock;
+let currentAst;
 
 function generateBlocksFromAst(ast, workspace, blockArray) {
     if (!workspace || !blockArray)
+        return;
+
+    if (ast === currentAst)
         return;
 
     if (blockArray)
@@ -10,6 +14,7 @@ function generateBlocksFromAst(ast, workspace, blockArray) {
     
     workspace.clear();
     previousBlock = null;
+    currentAst = ast;
     generateBlocks(ast, workspace, null);
     workspace.render();
 }
