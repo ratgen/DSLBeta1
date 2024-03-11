@@ -144,7 +144,8 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
                 blockType = `subBlock_subBlock_DeclarativeEntityDef_${substringToSearch}:_,`;
             }
 
-            if (blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_/` ||
+            if (blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:` ||
+                blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_/` ||
                 blockType === `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_[_]`)
             {
                 blockType = `subBlock_subBlock_ImperativeEntityDef_${substringToSearch}:_,`;   
