@@ -3,7 +3,7 @@ let previousBlock;
 let blockDefinitionsToIgnore = []
 
 function generateBlocksFromAst(ast, workspace, blockArray) {
-    if (!workspace || !blockArray)
+    if (!workspace || !blockArray || !ast || !ast._children)
         return;
     
     if (blockArray)
@@ -11,7 +11,7 @@ function generateBlocksFromAst(ast, workspace, blockArray) {
     
     workspace.clear();
     previousBlock = null;
-    generateBlocks(ast, workspace, null);
+    generateBlocks(ast._children[0], workspace, null); // only generate for first child
     workspace.render();
 }
 

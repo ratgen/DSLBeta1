@@ -192,6 +192,7 @@ public class Block  {
 			case "ImperativeEntityAction":
 			case "ImperativePropertyRef":
 			case "ImperativeActionRef":
+			case "ImperativeVerbAction":
 			case "ADVERB":
 				return "Imperative Scenarios";			
 			case "DOUBLE":
