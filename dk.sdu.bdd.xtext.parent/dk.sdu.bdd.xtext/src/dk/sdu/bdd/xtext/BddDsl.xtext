@@ -76,11 +76,11 @@ ImperativeScenario:
 ;
 
 PrePostWords:
-	('the'|'all' 'the'|'I')? ('do' 'not' | 'does' 'not')?
+	('the'|'all'|'I'|'I' 'do' 'not')? 
 ;
 
 WhenWords:
-	('I'|'the')? ('do' 'not'| 'does' 'not')?
+	('I' | 'I' 'do' 'not' |'the')?
 ;
 
 DeclarativeScenarioState: 
