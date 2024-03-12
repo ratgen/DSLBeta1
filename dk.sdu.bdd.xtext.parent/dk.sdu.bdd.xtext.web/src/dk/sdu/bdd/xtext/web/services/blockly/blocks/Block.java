@@ -163,12 +163,7 @@ public class Block  {
 			case "DeclarativeEntityDef":		
 				return "Declarative Entities";
 			case "ImperativeEntityDef":			
-				return "Imperative Entities";			
-			case "StateDef":
-			case "PropertyDef":
-			case "ImperativeStateDef":
-			case "ImperativePropertyDef":
-				return "States and Properties";
+				return "Imperative Entities";
 			case "DeclarativeScenarioState":
 			case "DeclarativeScenarioAction":
 			case "DeclarativeEntityRef":
@@ -176,13 +171,10 @@ public class Block  {
 			case "DeclarativeEntityPropertyStatePhrase":
 			case "DeclarativeEntityAction":
 			case "DeclarativeEntityPropertyRef":
-			case "ActionDef":
-			case "ImperativeActionDef":
 			case "VerbAction":
 			case "ActionRef":
 			case "Scenario":
-			case "PrePostWords":
-			case "WhenWords":
+			case "PropertyRef":
 				return "Declarative Scenarios";
 			case "ImperativeScenario":
 			case "ImperativeScenarioState":
@@ -194,10 +186,7 @@ public class Block  {
 			case "ImperativeActionRef":
 			case "ImperativeVerbAction":
 			case "ADVERB":
-				return "Imperative Scenarios";			
-			case "DOUBLE":
-			case "PREP":
-			case "ENTITY_IDENTITY":
+				return "Imperative Scenarios";
 			default:
 				return "General";
 		}
