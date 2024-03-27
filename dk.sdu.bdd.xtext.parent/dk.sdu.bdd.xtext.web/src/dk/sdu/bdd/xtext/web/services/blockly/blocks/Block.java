@@ -169,7 +169,9 @@ public class Block  {
 			case "DeclarativeEntityRef":
 			case "DeclarativeEntityStatePhrase":
 			case "DeclarativeEntityPropertyStatePhrase":
+			case "DeclarativeEntityStatePhraseWithProperty":
 			case "DeclarativeEntityAction":
+			case "DeclarativeEntityPropertyAction":
 			case "DeclarativeEntityPropertyRef":
 			case "VerbAction":
 			case "ActionRef":
@@ -181,7 +183,9 @@ public class Block  {
 			case "ImperativeEntityRef":
 			case "ImperativeEntityStatePhrase":
 			case "ImperativeEntityPropertyStatePhrase":
+			case "ImperativeEntityStatePhraseWithProperty":
 			case "ImperativeEntityAction":
+			case "ImperativeEntityPropertyAction":
 			case "ImperativePropertyRef":
 			case "ImperativeActionRef":
 			case "ImperativeVerbAction":
