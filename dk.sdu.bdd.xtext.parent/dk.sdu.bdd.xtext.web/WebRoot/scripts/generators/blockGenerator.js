@@ -176,6 +176,9 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     if (parsedObj.scenarioName)
         addStringBlock(parsedObj.scenarioName, blockToAdd, workspace);
 
+    if (parsedObj.strValue)
+        addStringBlock(parsedObj.strValue, blockToAdd, workspace);
+
     if (parentBlock)
         addParentBlock(parentBlock, blockToAdd, workspace);
 
