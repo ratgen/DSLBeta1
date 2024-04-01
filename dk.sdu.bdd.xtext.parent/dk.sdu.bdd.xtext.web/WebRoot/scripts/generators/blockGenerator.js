@@ -262,7 +262,7 @@ function addStringBlock(stringValue, blockToAdd, workspace)
 }
 
 function parseValueString(str) {
-    var regex = /(\w+)\s*(?:\(value:\s*(\w+(?:\s+\w+)*))?(?:\(scenarioName:\s*(\w+(?:\s+\w+)*))?(?:\(entityValue:\s*(\w+(?:\s+\w+)*))?(?:\(propertyValue:\s*(\w+(?:\s+\w+)*))?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)/;
+    var regex = /(\w+)\s*(?:\(value:\s*(\w+(?:\s+\w+)*)\))?(?:\(scenarioName:\s*(\w+(?:\s+\w+)*)\))?(?:\(entityValue:\s*(\w+(?:\s+\w+)*)\))?(?:\(propertyValue:\s*(\w+(?:\s+\w+)*)\))?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)?/;
     var matches = str.match(regex);
 
     if (matches) {
