@@ -61,9 +61,9 @@ public class AstServiceProvider {
 	    var res = mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {
-	        res +=  "-> " + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    }
 	    
-	    return res;
+	    return res.trim();
 	}
 }

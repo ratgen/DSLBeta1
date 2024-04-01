@@ -57,7 +57,7 @@ ImperativeStateName: name = ID (('and'|'off') ID)?;
 ImperativePropertyDef: name = ID (ID?);
 
 Scenario:
-       'Scenario:' STRING
+       'Scenario:' scenarioName = STRING
        'Given' preStateE = DeclarativeScenarioState
        imperative1 = ImperativeScenario?
        

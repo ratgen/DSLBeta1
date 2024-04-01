@@ -1,6 +1,5 @@
 let blockDefinitions;
 let previousBlock;
-let blockDefinitionsToIgnore = []
 
 function generateBlocksFromAst(ast, workspace, blockArray, tabName) {
     if (!workspace || !blockArray || !ast || !ast._children)
@@ -174,6 +173,9 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     if (parsedObj.id)
         addIdBlock(parsedObj.id, blockToAdd, workspace);
 
+    if (parsedObj.scenarioName)
+        addStringBlock(parsedObj.scenarioName, blockToAdd, workspace);
+
     if (parentBlock)
         addParentBlock(parentBlock, blockToAdd, workspace);
 
@@ -237,21 +239,52 @@ function addIdBlock(idValue, blockToAdd, workspace)
     workspace.getBlockById(idBlock.id).initSvg();
 }
 
-function parseValueString(str) {
-    // Regular expression to match the type, reference, and ID
-    var regex = /(\w+)\s*(?:->\s*(\w+))?\s*\(name:\s+(\w+)(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)/;
+function addStringBlock(stringValue, blockToAdd, workspace)
+{
+    var blockDefinition = blockDefinitions.find(function(b) {
+        return b.type === blockToAdd.type;
+    });
 
-    // Use match to extract the type, reference, and ID from the string
+    var stringBlock = workspace.newBlock('STRING');
+    stringBlock.setFieldValue(stringValue, 'TEXT_INPUT');
+    
+    var inputArgument = blockDefinition.args0.find(function(a) {
+        return a.check && a.check.includes('STRING') && a.type === 'input_value';
+    });
+
+    var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
+    stringBlock.outputConnection.connect(inputConnection);
+
+    workspace.getBlockById(stringBlock.id).initSvg();
+}
+
+function parseValueString(str) {
+    var regex = /(\w+)\s*(?:\(scenarioName:\s*(\w+(?:\s+\w+)*))?(?:\(entityValue:\s*"([^"]+)")?(?:\(propertyValue:\s*"([^"]+)")?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(value:\s*"([^"]+)")?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)/;
+
     var matches = str.match(regex);
 
-    // Check if matches were found
-    if (matches && matches.length >= 3) {
-        // Extract type, reference, and ID from the matches array
+    if (matches) {
         var type = matches[1];
-        var reference = matches[2] || null;
-        var id = matches[3];
+        var scenarioName = matches[2] || null;
+        var entityValue = matches[3] || null;
+        var propertyValue = matches[4] || null;
+        var reference = matches[5] || null;
+        var id = matches[6] || null;
+        var strValue = matches[7] || null;
+        var preposition = matches[8] || null;
+        var argument = matches[9] || null;
 
-        return { type: type, reference: reference, id: id };
+        return {
+            type: type,
+            scenarioName: scenarioName,
+            entityValue: entityValue,
+            propertyValue: propertyValue,
+            reference: reference, 
+            id: id,
+            strValue: strValue,
+            preposition: preposition,
+            argument: argument
+        };
     } 
     else {
         return null;
