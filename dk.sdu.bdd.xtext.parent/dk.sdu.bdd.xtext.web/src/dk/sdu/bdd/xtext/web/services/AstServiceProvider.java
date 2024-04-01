@@ -64,6 +64,6 @@ public class AstServiceProvider {
 	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    }
 	    
-	    return res.trim();
+	    return res.trim().replace("\"", "");
 	}
 }
