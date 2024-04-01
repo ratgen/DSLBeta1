@@ -2,7 +2,7 @@ let blockDefinitions;
 let previousBlock;
 let blockDefinitionsToIgnore = []
 
-function generateBlocksFromAst(ast, workspace, blockArray) {
+function generateBlocksFromAst(ast, workspace, blockArray, tabName) {
     if (!workspace || !blockArray || !ast || !ast._children)
         return;
     
@@ -11,7 +11,17 @@ function generateBlocksFromAst(ast, workspace, blockArray) {
     
     workspace.clear();
     previousBlock = null;
-    generateBlocks(ast._children[0], workspace, null); // only generate for first child
+
+    if (tabName === 'entities' && ast._children.length > 0)
+    {
+        generateBlocks(ast._children[ast._children.length - 1], workspace, null); // entities are here
+    }
+
+    if (tabName === 'scenarios' && ast._children.length > 1)
+    {
+        generateBlocks(ast._children[0], workspace, null); // scenarios are here
+    }
+
     workspace.render();
 }
 
@@ -30,7 +40,7 @@ function generateBlocks(root, workspace, parentBlock)
         var currentParentBlock = null;
 
         if (current.value) {
-            console.log(current.value._value);
+            console.log('Current value: ' + current.value._value);
 
             var parsedObj = parseValueString(current.value._value);    
             if (parsedObj && parsedObj.type) {

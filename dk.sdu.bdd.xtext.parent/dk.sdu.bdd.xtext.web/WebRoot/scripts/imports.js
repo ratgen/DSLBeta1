@@ -13,7 +13,6 @@ require.config({
 
 let editors
 let currentEditor;
-let currentTab;
 
 function getCurrentAceEditor() {
   /*
