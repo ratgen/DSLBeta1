@@ -265,19 +265,25 @@ function addStringBlock(stringValue, blockToAdd, workspace)
 }
 
 function parseValueString(str) {
-    var regex = /(\w+)\s*(?:\(value:\s*(\w+(?:\s+\w+)*)\))?(?:\(scenarioName:\s*(\w+(?:\s+\w+)*)\))?(?:\(entityValue:\s*(\w+(?:\s+\w+)*)\))?(?:\(propertyValue:\s*(\w+(?:\s+\w+)*)\))?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)?/;
+    var regex = /(\w+)\s*(?:\(preposition:\s+(\w+))?(?:,\s*preposition2:\s+(\w+))?(?:,\s*toBeWord:\s+(\w+))?(?:,\s*value:\s*(\w+(?:\s+\w+)*))?\)?(?:\(scenarioName:\s*(\w+(?:\s+\w+)*)\))?(?:\(entityValue:\s*(\w+(?:\s+\w+)*)\))?(?:\(propertyValue:\s*(\w+(?:\s+\w+)*)\))?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)?/;
+    
+    // (?:\(value:\s*(\w+(?:\s+\w+)*)\))?
+    // (?:\(preposition:\s+(\w+))?(?:,\s*preposition2:\s+(\w+))?(?:,\s*toBeWord:\s+(\w+))?(?:,\s*value:\s*(\w+(?:\s+\w+)*)?\)?
     var matches = str.match(regex);
 
     if (matches) {
         var type = matches[1];
-        var strValue = matches[2] || null;
-        var scenarioName = matches[3] || null;
-        var entityValue = matches[4] || null;
-        var propertyValue = matches[5] || null;
-        var reference = matches[6] || null;
-        var id = matches[7] || null;
-        var preposition = matches[8] || null;
-        var argument = matches[9] || null;
+        var preposition = matches[2] || null;
+        var preposition2 = matches[3] || null;
+        var toBeWord = matches[4] || null;
+        var strValue = matches[5] || null;
+        var scenarioName = matches[6] || null;
+        var entityValue = matches[7] || null;
+        var propertyValue = matches[8] || null;
+        var reference = matches[9] || null;
+        var id = matches[10] || null;
+        var preposition3 = matches[11] || null;
+        var argument = matches[12] || null;
 
         return {
             type: type,
@@ -288,7 +294,10 @@ function parseValueString(str) {
             id: id,
             strValue: strValue,
             preposition: preposition,
-            argument: argument
+            preposition2: preposition2,
+            preposition3: preposition3,
+            argument: argument,
+            toBeWord: toBeWord
         };
     } 
     else {

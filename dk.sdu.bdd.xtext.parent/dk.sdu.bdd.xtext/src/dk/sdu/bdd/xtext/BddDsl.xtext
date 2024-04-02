@@ -132,53 +132,53 @@ ImperativePropertyRef:
 ;
 
 DeclarativeEntityStatePhrase:
-	entity = DeclarativeEntityRef ToBeWords state = [StateName]
+	entity = DeclarativeEntityRef toBeWord = ToBeWords state = [StateName]
 ;
 
 DeclarativeEntityStatePhraseWithProperty:
-	entity = DeclarativeEntityRef ToBeWords state = [StateName] 'with' property = PropertyRef
+	entity = DeclarativeEntityRef toBeWord = ToBeWords state = [StateName] 'with' property = PropertyRef
 ;
 
 ImperativeEntityStatePhrase:
-	entity = ImperativeEntityRef ToBeWords state = [ImperativeStateName]
+	entity = ImperativeEntityRef toBeWord = ToBeWords state = [ImperativeStateName]
 ;
 
 ImperativeEntityStatePhraseWithProperty:
-	entity = ImperativeEntityRef ToBeWords state = [ImperativeStateName] 'with' property = ImperativePropertyRef
+	entity = ImperativeEntityRef toBeWord = ToBeWords state = [ImperativeStateName] 'with' property = ImperativePropertyRef
 ;
 
 DeclarativeEntityPropertyStatePhrase:
-	property = PropertyRef? PREP  entity = DeclarativeEntityRef
-	ToBeWords value = ENTITY_IDENTITY
+	property = PropertyRef? preposition = PREP  entity = DeclarativeEntityRef
+	toBeWord = ToBeWords value = ENTITY_IDENTITY
 ;
 
 ImperativeEntityPropertyStatePhrase:
-	 property = ImperativePropertyRef? PREP  entity = ImperativeEntityRef
-	 ToBeWords value = ENTITY_IDENTITY
+	 property = ImperativePropertyRef? preposition = PREP  entity = ImperativeEntityRef
+	 toBeWord = ToBeWords value = ENTITY_IDENTITY
 ;
 
 VerbAction:
-	action = ActionRef PREP (entity = DeclarativeEntityRef)? (PREP entity2 = DeclarativeEntityRef)? (PREP entity3 = DeclarativeEntityRef)?
+	action = ActionRef preposition = PREP (entity = DeclarativeEntityRef)? (preposition2 = PREP entity2 = DeclarativeEntityRef)? (preposition3 = PREP entity3 = DeclarativeEntityRef)?
 ;
 
 DeclarativeEntityAction: 
-	entity = DeclarativeEntityRef actionRef = ActionRef PREP entity2 = DeclarativeEntityRef
+	entity = DeclarativeEntityRef actionRef = ActionRef preposition = PREP entity2 = DeclarativeEntityRef
 ;
 
 DeclarativeEntityPropertyAction:
-	entity = DeclarativeEntityRef actionRef = ActionRef PREP property = PropertyRef PREP entity2 = DeclarativeEntityRef
+	entity = DeclarativeEntityRef actionRef = ActionRef preposition = PREP property = PropertyRef preposition2 = PREP entity2 = DeclarativeEntityRef
 ;
 
 ImperativeVerbAction:
-	action = ImperativeActionRef PREP (entity = ImperativeEntityRef)? (PREP entity2 = ImperativeEntityRef)? (PREP entity3 = ImperativeEntityRef)? 
+	action = ImperativeActionRef preposition = PREP (entity = ImperativeEntityRef)? (preposition2 = PREP entity2 = ImperativeEntityRef)? (preposition3 = PREP entity3 = ImperativeEntityRef)? 
 ;
 
 ImperativeEntityAction: 
-	entity = ImperativeEntityRef actionRef = ImperativeActionRef PREP entity2 = ImperativeEntityRef
+	entity = ImperativeEntityRef actionRef = ImperativeActionRef preposition = PREP entity2 = ImperativeEntityRef
 ;
 
 ImperativeEntityPropertyAction:
-	entity = ImperativeEntityRef actionRef = ImperativeActionRef PREP property = ImperativePropertyRef PREP entity2 = ImperativeEntityRef
+	entity = ImperativeEntityRef actionRef = ImperativeActionRef preposition = PREP property = ImperativePropertyRef preposition2 = PREP entity2 = ImperativeEntityRef
 ;
 
 DOUBLE returns ecore::EDouble : INT'.'INT;
