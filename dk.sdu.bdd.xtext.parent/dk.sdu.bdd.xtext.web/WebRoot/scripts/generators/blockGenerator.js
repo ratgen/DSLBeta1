@@ -65,19 +65,21 @@ function generateBlocks(root, workspace, parentBlock)
 }
 
 function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
-    // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef
+    // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef etc.
     // they require special blocks to be connected.
     if (parsedObj.type === 'DeclarativeEntityRef') {
         addIdBlock(parsedObj.id, parentBlock, workspace);
         addValueBlock(parsedObj.entityValue, parentBlock, workspace);
         return parentBlock;
     }
-    else if (parsedObj.type === 'PropertyRef' && parentBlock.tooltip === 'DeclarativeEntityPropertyAction') {
+    else if (parsedObj.type === 'PropertyRef' 
+        && (parentBlock.tooltip === 'DeclarativeEntityPropertyAction' || parentBlock.tooltip === 'DeclarativeEntityStatePhraseWithProperty')) {
         addIdBlock(parsedObj.id, parentBlock, workspace);
         addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
         return parentBlock;
     }
-    else if (parsedObj.type === 'ActionRef') {
+    else if (parsedObj.type === 'ActionRef' 
+        || (parsedObj.type === 'StateName' && parentBlock.tooltip === 'DeclarativeEntityStatePhraseWithProperty')) {
         addIdBlock(parsedObj.id, parentBlock, workspace);
         return parentBlock;
     }
