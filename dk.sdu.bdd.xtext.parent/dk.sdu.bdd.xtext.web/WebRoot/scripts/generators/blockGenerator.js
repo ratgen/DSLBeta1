@@ -195,6 +195,18 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     if (parsedObj.strValue)
         addStringBlock(parsedObj.strValue, blockToAdd, workspace);
 
+    if (parsedObj.preposition)
+        setDropdownValue(parsedObj.preposition, blockToAdd, workspace, false);
+
+    if (parsedObj.preposition2)
+        setDropdownValue(parsedObj.preposition2, blockToAdd, workspace, true);
+
+    if (parsedObj.toBeWord)
+        setDropdownValue(parsedObj.preposition3, blockToAdd, workspace, false);
+
+    if (parsedObj.preposition3)
+        setDropdownValue(parsedObj.preposition3, blockToAdd, workspace, false); 
+
     if (parentBlock)
         addParentBlock(parentBlock, blockToAdd, workspace);
 
@@ -325,6 +337,34 @@ function addValueBlock(valueString, parentBlock, workspace) {
     addParentBlock(parentBlock, blockToAdd, workspace);
     addStringBlock(valueString, blockToAdd, workspace);
     workspace.getBlockById(blockToAdd.id).initSvg();
+}
+
+function setDropdownValue(dropdownValue, blockToAdd, workspace, skip) {
+    var block = workspace.getBlockById(blockToAdd.id); // Get the block by its ID
+    var blockDefinition = blockDefinitions.find(function(b) {
+        return b.type === blockToAdd.type;
+    });
+    
+    var dropdownInputName = null;    
+    for (var i = 0; i < blockDefinition.args0.length; i++) {
+        var a = blockDefinition.args0[i];
+
+        if (a.options && a.type === 'field_dropdown') {    
+            if (a.options.find(element => element.includes(dropdownValue))) {
+                if (skip) {
+                    skip = false;
+                    continue;
+                }
+                else {
+                    dropdownInputName = a.name;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (dropdownInputName)
+        block.setFieldValue(dropdownValue, dropdownInputName)
 }
 
 function parseValueString(str) {
