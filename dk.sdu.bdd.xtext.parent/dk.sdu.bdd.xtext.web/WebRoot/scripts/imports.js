@@ -13,7 +13,6 @@ require.config({
 
 let editors
 let currentEditor;
-let currentTab;
 
 function getCurrentAceEditor() {
   /*
@@ -21,7 +20,7 @@ function getCurrentAceEditor() {
    * current editor.
    */
   for (let editor of editors) {
-    if (editor.container == currentEditor) 
+    if (editor.container === currentEditor) 
       return editor
   }
 }

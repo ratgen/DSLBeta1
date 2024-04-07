@@ -1,5 +1,8 @@
 package dk.sdu.bdd.xtext.web.services;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -26,7 +29,6 @@ import org.eclipse.xtext.ParserRule;
 
 import org.eclipse.xtext.RuleCall;
 import org.eclipse.xtext.TerminalRule;
-import org.eclipse.xtext.TypeRef;
 
 import dk.sdu.bdd.xtext.services.BddDslGrammarAccess;
 
@@ -79,21 +81,14 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 		
 		String resource = context.getParameter("resource");
 		ResourceSet resourceSet = resourceSetProvider.get(resource, context);
-
 		
 		EList<Resource> list = resourceSet.getResources();
+		
 		AstServiceProvider provider = new AstServiceProvider();
-		ArrayList<String> astArr = new ArrayList<>();
-		list.forEach((item) -> {
-			String models = provider.parseResource(item);
-			if (!models.equals("")) {
-				astArr.add(models);
-			}
-		});
 		
 		ServiceDescriptor serviceDescriptor = new ServiceDescriptor();		
 		serviceDescriptor.setService(() -> {
-	        return new AstServiceResult(provider.parseArr(astArr));
+			return new AstServiceResult(provider.getAst(list));
 	     });
 		return serviceDescriptor;
 
@@ -573,10 +568,12 @@ public class AstServiceDispatcher extends XtextServiceDispatcher {
 	}
 	
 	public static String dump(EObject mod_, String indent) {
+		System.out.println("dumping...");
+		
 	    var res = indent + mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    
 	    for (EObject a :mod_.eCrossReferences()) {
-	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	        res +=  "-> " + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
 	    }
 	    res += "\n";
 	    for (EObject f :mod_.eContents()) {

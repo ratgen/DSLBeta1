@@ -42,7 +42,8 @@ ActionDef:
 	name = ID (('and'|'the') ID)?  ('[' (preposition = PREP) ']')?	 ('the' argument = ID)?
 ;
 
-PREP: ('on' | 'of' | 'in' | 'from' | 'to' | 'into' | 'for' | 'with' | 'out' | 'off' | 'on' 'the' 'row');
+PREP: ('on' | 'of' | 'in' | 'from' |  'to' |  'into' |'for' | 'with' | 'out' | 'off' | 'up' | 'down')?
+;
 
 
 StateDef: postive = StateName ('/' negative = StateName)?;
@@ -50,13 +51,13 @@ StateName: name = ID (('and'|'off') ID)?;
 
 PropertyDef: name = ID (ID?);
 
-ImperativeStateDef: postive = ImperativeStateName PREP? ('/' negative = ImperativeStateName)?;
-ImperativeStateName: name = (ID) ('and'|'off')?  (ID)?;
+ImperativeStateDef: postive = ImperativeStateName ('/' negative = ImperativeStateName)?;
+ImperativeStateName: name = ID (('and'|'off') ID)?;
 
 ImperativePropertyDef: name = ID (ID?);
 
 Scenario:
-       'Scenario:' STRING
+       'Scenario:' scenarioName = STRING
        'Given' preStateE = DeclarativeScenarioState
        imperative1 = ImperativeScenario?
        
@@ -76,42 +77,42 @@ ImperativeScenario:
 ;
 
 PrePostWords:
-	('the'|'all' 'the'|'I')? ('do' 'not' | 'does' 'not')?
+	('all')?
 ;
 
-WhenWords:
-	('I'|'the')? ('do' 'not'| 'does' 'not')?
+ToBeWords:
+	('is'|'are'|'is' 'not'|'are' 'not')?
 ;
 
 DeclarativeScenarioState: 
-	PrePostWords states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase)
-	('And' PrePostWords states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase))*
+	PrePostWords states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase | DeclarativeEntityStatePhraseWithProperty)
+	('And' PrePostWords states += (DeclarativeEntityPropertyStatePhrase | DeclarativeEntityStatePhrase | DeclarativeEntityStatePhraseWithProperty))*
 ;
 
 ImperativeScenarioState:
-	PrePostWords states += (ImperativeEntityPropertyStatePhrase | ImperativeEntityStatePhrase)
-	('And' PrePostWords states += (ImperativeEntityPropertyStatePhrase | ImperativeEntityStatePhrase))*
+	PrePostWords states += (ImperativeEntityPropertyStatePhrase | ImperativeEntityStatePhrase | ImperativeEntityStatePhraseWithProperty)
+	('And' PrePostWords states += (ImperativeEntityPropertyStatePhrase | ImperativeEntityStatePhrase | ImperativeEntityStatePhraseWithProperty))*
 ;
 
 DeclarativeScenarioAction:
-	WhenWords actions += (DeclarativeEntityAction | VerbAction)
-	('And' WhenWords actions += (DeclarativeEntityAction | VerbAction))*
+	actions += (DeclarativeEntityAction | VerbAction | DeclarativeEntityPropertyAction)
+	('And' actions += (DeclarativeEntityAction | VerbAction | DeclarativeEntityPropertyAction))*
 ;
 
 ImperativeScenarioAction:
-	WhenWords actions += ImperativeEntityAction
-	('And' WhenWords actions += ImperativeEntityAction)*
+	actions += (ImperativeEntityAction | ImperativeVerbAction | ImperativeEntityPropertyAction)
+	('And' actions += (ImperativeEntityAction | ImperativeVerbAction | ImperativeEntityPropertyAction))*
 ;
 
 ENTITY_IDENTITY: (('#' INT) | STRING);
 ADVERB: ('linearly');
 
 DeclarativeEntityRef:
-	 entity = [DeclarativeEntityDef] (entityValue = ENTITY_IDENTITY)?
+	'the' entity = [DeclarativeEntityDef] (entityValue = ENTITY_IDENTITY)?
 ;
 
 ImperativeEntityRef:
-	 entity = [ImperativeEntityDef] (entityValue = ENTITY_IDENTITY)?
+	'the' entity = [ImperativeEntityDef] (entityValue = ENTITY_IDENTITY)?
 ;
 
 ActionRef:
@@ -123,40 +124,61 @@ ImperativeActionRef:
 ;
 
 PropertyRef:
-    property = [PropertyDef] (propertyValue = ENTITY_IDENTITY)?
+    'the' property = [PropertyDef] (propertyValue = ENTITY_IDENTITY)?
 ;
 
 ImperativePropertyRef:
-    property = [ImperativePropertyDef] (propertyValue = ENTITY_IDENTITY)?
+    'the' property = [ImperativePropertyDef] (propertyValue = ENTITY_IDENTITY)?
 ;
 
 DeclarativeEntityStatePhrase:
-	entity = DeclarativeEntityRef ('is'|'are') ('not')? state = [StateName]	
+	entity = DeclarativeEntityRef toBeWord = ToBeWords state = [StateName]
+;
+
+DeclarativeEntityStatePhraseWithProperty:
+	entity = DeclarativeEntityRef toBeWord = ToBeWords state = [StateName] 'with' property = PropertyRef
 ;
 
 ImperativeEntityStatePhrase:
-	entity = ImperativeEntityRef 'is' state = [ImperativeStateName]
+	entity = ImperativeEntityRef toBeWord = ToBeWords state = [ImperativeStateName]
+;
+
+ImperativeEntityStatePhraseWithProperty:
+	entity = ImperativeEntityRef toBeWord = ToBeWords state = [ImperativeStateName] 'with' property = ImperativePropertyRef
 ;
 
 DeclarativeEntityPropertyStatePhrase:
-	property = PropertyRef? (PREP|PREP 'the')  entity = DeclarativeEntityRef
-	(('is'|'is' 'not')  | ('are'|'are' 'not')) value = ENTITY_IDENTITY
+	property = PropertyRef? preposition = PREP  entity = DeclarativeEntityRef
+	toBeWord = ToBeWords value = ENTITY_IDENTITY
 ;
 
 ImperativeEntityPropertyStatePhrase:
-	 property = ImperativePropertyRef (PREP|PREP 'the') entity = ImperativeEntityRef 'is' propertyValue = STRING 
+	 property = ImperativePropertyRef? preposition = PREP  entity = ImperativeEntityRef
+	 toBeWord = ToBeWords value = ENTITY_IDENTITY
 ;
 
 VerbAction:
-	action = ActionRef (PREP 'the' | 'the' | PREP)? (entity = DeclarativeEntityRef)? PREP entity2 = DeclarativeEntityRef (PREP | PREP 'the') entity3 = DeclarativeEntityRef?
+	action = ActionRef preposition = PREP (entity = DeclarativeEntityRef)? (preposition2 = PREP entity2 = DeclarativeEntityRef)? (preposition3 = PREP entity3 = DeclarativeEntityRef)?
 ;
 
 DeclarativeEntityAction: 
-	entity = DeclarativeEntityRef actionRef = ActionRef PREP? ('the')? entity2 = DeclarativeEntityRef
+	entity = DeclarativeEntityRef actionRef = ActionRef preposition = PREP entity2 = DeclarativeEntityRef
+;
+
+DeclarativeEntityPropertyAction:
+	entity = DeclarativeEntityRef actionRef = ActionRef preposition = PREP property = PropertyRef preposition2 = PREP entity2 = DeclarativeEntityRef
+;
+
+ImperativeVerbAction:
+	action = ImperativeActionRef preposition = PREP (entity = ImperativeEntityRef)? (preposition2 = PREP entity2 = ImperativeEntityRef)? (preposition3 = PREP entity3 = ImperativeEntityRef)? 
 ;
 
 ImperativeEntityAction: 
-	entity = ImperativeEntityRef (adverb=ADVERB)? actionRef = ImperativeActionRef PREP? (propertyRef = ImperativePropertyRef)? (PREP propertyValue = STRING propertyRef2 = ImperativePropertyRef)? 
+	entity = ImperativeEntityRef actionRef = ImperativeActionRef preposition = PREP entity2 = ImperativeEntityRef
+;
+
+ImperativeEntityPropertyAction:
+	entity = ImperativeEntityRef actionRef = ImperativeActionRef preposition = PREP property = ImperativePropertyRef preposition2 = PREP entity2 = ImperativeEntityRef
 ;
 
 DOUBLE returns ecore::EDouble : INT'.'INT;

@@ -1,58 +1,69 @@
 package dk.sdu.bdd.xtext.web.services;
 
-import java.util.ArrayList;
-
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import dk.sdu.bdd.xtext.bddDsl.ImperativeEntityDef;
-import dk.sdu.bdd.xtext.bddDsl.Model;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AstServiceProvider {
 	public AstServiceProvider() {
 		
 	}
 	
-	public String parseResource(Resource resource) {
-		ObjectMapper objectMapper = new ObjectMapper();
+	public ArrayNode getAst(EList<Resource> resourceList) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(Include.NON_NULL);
 
-		
-		//used for working with the AST.
-		URI uri = resource.getURI();
-		System.out.println("Resource  URI: " + uri);
-		EList<EObject> objectContents = resource.getContents();
-		System.out.println("item contents " + objectContents);
-		for (EObject obj : objectContents) {
-			System.out.println("EObject_string: " + obj.toString());
-			
-			System.out.println(AstServiceDispatcher.dump(obj, "   "));
+        ArrayNode astArray = mapper.createArrayNode();
 
-		    if (obj instanceof Model) {
-		    	Model model = (Model) obj;
-		    	EList<ImperativeEntityDef> entityList =  model.getImperativeEntityDef();
-		    	return ((Model) obj).getName();
-		    }
-		}
-		System.out.println();
-		System.out.println();
-		return "";
+        for (Resource resource : resourceList) {
+            if (resource.isLoaded() && !resource.getContents().isEmpty()) {
+            	System.err.println("Resource: " + resource.getURI());
+            	ObjectNode astJson = serializeAST(resource);
+                astArray.add(astJson);                                
+            } else {
+                System.err.println("Empty or unloaded resource: " + resource.getURI());
+            }
+        }
+        
+        return astArray;
 	}
 	
-	public String parseArr(ArrayList<String> arr) {
-		ObjectMapper objectMapper = new ObjectMapper();
-
+	private ObjectNode serializeAST(Resource resource) {
+        ObjectNode rootNode = new ObjectMapper().createObjectNode();
+        EObject rootElement = resource.getContents().get(0);
+        serializeEObject(rootElement, rootNode);
+        return rootNode;
+    }
+	
+	private void serializeEObject(EObject eObject, ObjectNode parentNode) {
+        parentNode = getParentNodeWithProperties(eObject, parentNode);
 		
-		//used for working with the AST.
-		try {
-			return objectMapper.writeValueAsString(arr);
-
-		} catch (JsonProcessingException e) {
-			return "err";
-		}
+        ArrayNode childrenArray = parentNode.putArray("nodes");
+        for (EObject child : eObject.eContents()) {
+            ObjectNode childNode = new ObjectMapper().createObjectNode();
+            serializeEObject(child, childNode);
+            childrenArray.add(childNode);
+        }
+    }
+	
+	private ObjectNode getParentNodeWithProperties(EObject eObject, ObjectNode parentNode) {	
+        parentNode.put("value", getEObjectString(eObject));
+		
+		return parentNode;
+	}
+	
+	private String getEObjectString(EObject mod_) {	
+	    var res = mod_.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	    
+	    for (EObject a :mod_.eCrossReferences()) {
+	        res +=  "->" + a.toString().replaceFirst(".*[.]impl[.](.*)Impl[^(]*", "$1 ");
+	    }
+	    
+	    return res.trim().replace("\"", "");
 	}
 }

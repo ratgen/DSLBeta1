@@ -9,6 +9,7 @@
     <script src="webjars/requirejs/2.3.6/require.min.js"></script>
     <script src="./scripts/imports.js" defer></script>
     <script src="./scripts/generators/bdd.js" defer></script>
+    <script src="./scripts/generators/blockGenerator.js" defer></script>
     <script src="./scripts/script.js" defer></script>
   </head>
   <body>
@@ -35,8 +36,8 @@
             data-editor-xtext-lang="bdd">
           </div>
         </div>
-        <div class="blockly" id="blockly-editor"></div>
-        <div class="blockly" id="blockly-editor2"></div>
+        <div class="blockly" id="blockly-editor" style="display:block;"></div>
+        <div class="blockly" id="blockly-editor2" style="display:none;"></div>
       </div>
       <div>
         <button id="save-button" value="Save" title="Save">Save</button>
