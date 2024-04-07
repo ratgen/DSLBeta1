@@ -66,7 +66,24 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     var blockToAdd = null;
 
     if (blockDefinition) { // good. we know this block
-        blockToAdd = workspace.newBlock(parsedObj.type);
+        // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef
+        // they require special blocks to be connected.
+        if (parsedObj.type === 'DeclarativeEntityRef') {
+            addIdBlock(parsedObj.id, parentBlock, workspace);
+            addValueBlock(parsedObj.entityValue, parentBlock, workspace);
+            return parentBlock;
+        }
+        else if (parsedObj.type === 'PropertyRef') {
+            addIdBlock(parsedObj.id, parentBlock, workspace);
+            addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
+            return parentBlock;
+        }
+        else if (parsedObj.type === 'ActionRef') {
+            addIdBlock(parsedObj.id, parentBlock, workspace);
+            return parentBlock;
+        }
+        else
+            blockToAdd = workspace.newBlock(parsedObj.type);
     }
     else { // blocks that should be handled separately
         var substringToSearch = null;
@@ -194,10 +211,29 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
         return b.type === parentBlock.type;
     });
 
-    var inputArgument = parentBlockDefinition.args0.find(function(a) {
-        return a.check && a.check.includes(blockToAdd.type) 
-            && (a.type === 'input_statement' || a.type === 'input_value');
-    });
+    var inputArgument = null;
+
+    for (var i = 0; i < parentBlockDefinition.args0.length; i++) {
+        var a = parentBlockDefinition.args0[i];
+
+        if (a.check && (a.type === 'input_statement' || a.type === 'input_value')) {    
+            for (var j = 0; j < a.check.length; j++) {
+                if (a.check[j].includes(blockToAdd.type)) {
+                    if (a.type === 'input_value') {
+                        var input = parentBlock.getInput(a.name);
+                        if (!input || !input.connection.isConnected()) {
+                            inputArgument = a;
+                            break;
+                        }
+                    }
+                    else {
+                        inputArgument = a;
+                        break;
+                    }
+                }                    
+            }            
+        }
+    }
 
     var targetBlock = workspace.getBlockById(parentBlock.id);
 
@@ -224,16 +260,6 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
             input.connection.connect(blockToAdd.previousConnection);
         }
         else if (inputArgument.type === 'input_value') {
-            var input = parentBlock.getInput(inputArgument.name);
-
-            if (input && input.connection.isConnected()) {
-                inputArgument = parentBlockDefinition.args0.find(function(a) {
-                    return a.check && a.check.includes(blockToAdd.type) 
-                        && a.type === 'input_value'
-                        && a.name !== inputArgument.name;
-                });
-            }
-
             var inputConnection = parentBlock.getInput(inputArgument.name).connection;
             blockToAdd.outputConnection.connect(inputConnection);
         }
@@ -248,10 +274,28 @@ function addIdBlock(idValue, blockToAdd, workspace)
 
     var idBlock = workspace.newBlock('ID');
     idBlock.setFieldValue(idValue, 'TEXT_INPUT');
-    
+
     var inputArgument = blockDefinition.args0.find(function(a) {
         return a.check && a.check.includes('ID') && a.type === 'input_value';
     });
+    
+    // var inputArgument = null;
+
+    // for (var i = 0; i < blockDefinition.args0.length; i++) {
+    //     var a = blockDefinition.args0[i];
+
+    //     if (a.check && a.type === 'input_value') {    
+    //         for (var j = 0; j < a.check.length; j++) {
+    //             if (a.check[j] === 'ID') {
+    //                 var input = blockToAdd.getInput(a.name);
+    //                 if (!input || !input.connection.isConnected()) {
+    //                     inputArgument = a;
+    //                     break;
+    //                 }
+    //             }
+    //         }            
+    //     }
+    // }
 
     var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
     idBlock.outputConnection.connect(inputConnection);
@@ -279,6 +323,13 @@ function addStringBlock(stringValue, blockToAdd, workspace)
     stringBlock.outputConnection.connect(inputConnection);
 
     workspace.getBlockById(stringBlock.id).initSvg();
+}
+
+function addValueBlock(valueString, parentBlock, workspace) {
+    var blockToAdd = workspace.newBlock('ENTITY_IDENTITY');
+    addParentBlock(parentBlock, blockToAdd, workspace);
+    addStringBlock(valueString, blockToAdd, workspace);
+    workspace.getBlockById(blockToAdd.id).initSvg();
 }
 
 function parseValueString(str) {
