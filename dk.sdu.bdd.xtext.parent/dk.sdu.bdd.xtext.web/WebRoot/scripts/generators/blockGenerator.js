@@ -195,7 +195,8 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
     });
 
     var inputArgument = parentBlockDefinition.args0.find(function(a) {
-        return a.check && a.check.includes(blockToAdd.type) && a.type === 'input_statement';
+        return a.check && a.check.includes(blockToAdd.type) 
+            && (a.type === 'input_statement' || a.type === 'input_value');
     });
 
     var targetBlock = workspace.getBlockById(parentBlock.id);
@@ -206,20 +207,36 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
             return i.name === inputArgument.name;
         });
 
-        targetBlock.inputList.forEach(function(existingInput) {
-            var connection = existingInput.connection;
-    
-            // if a previous block exists, form a connection
-            if (connection && connection.targetBlock()) {
-                var previousConnection = connection.targetBlock().previousConnection;
-                if (previousConnection) {
-                    blockToAdd.setNextStatement(true);
-                    blockToAdd.nextConnection.connect(previousConnection);
+        if (inputArgument.type === 'input_statement') {
+            targetBlock.inputList.forEach(function(existingInput) {
+                var connection = existingInput.connection;
+        
+                // if a previous block exists, form a connection
+                if (connection && connection.targetBlock()) {
+                    var previousConnection = connection.targetBlock().previousConnection;
+                    if (previousConnection) {
+                        blockToAdd.setNextStatement(true);
+                        blockToAdd.nextConnection.connect(previousConnection);
+                    }
                 }
-            }
-        });
+            });
+    
+            input.connection.connect(blockToAdd.previousConnection);
+        }
+        else if (inputArgument.type === 'input_value') {
+            var input = parentBlock.getInput(inputArgument.name);
 
-        input.connection.connect(blockToAdd.previousConnection);
+            if (input && input.connection.isConnected()) {
+                inputArgument = parentBlockDefinition.args0.find(function(a) {
+                    return a.check && a.check.includes(blockToAdd.type) 
+                        && a.type === 'input_value'
+                        && a.name !== inputArgument.name;
+                });
+            }
+
+            var inputConnection = parentBlock.getInput(inputArgument.name).connection;
+            blockToAdd.outputConnection.connect(inputConnection);
+        }
     }
 }
 
@@ -266,9 +283,6 @@ function addStringBlock(stringValue, blockToAdd, workspace)
 
 function parseValueString(str) {
     var regex = /(\w+)\s*(?:\(preposition:\s+(\w+))?(?:,\s*preposition2:\s+(\w+))?(?:,\s*toBeWord:\s+(\w+))?(?:,\s*value:\s*(\w+(?:\s+\w+)*))?\)?(?:\(scenarioName:\s*(\w+(?:\s+\w+)*)\))?(?:\(entityValue:\s*(\w+(?:\s+\w+)*)\))?(?:\(propertyValue:\s*(\w+(?:\s+\w+)*)\))?(?:->\s*(\w+))?\s*(?:\(name:\s+(\w+))?(?:,\s*preposition:\s+(\w+))?(?:,\s*argument:\s+(\w+))?\)?/;
-    
-    // (?:\(value:\s*(\w+(?:\s+\w+)*)\))?
-    // (?:\(preposition:\s+(\w+))?(?:,\s*preposition2:\s+(\w+))?(?:,\s*toBeWord:\s+(\w+))?(?:,\s*value:\s*(\w+(?:\s+\w+)*)?\)?
     var matches = str.match(regex);
 
     if (matches) {
