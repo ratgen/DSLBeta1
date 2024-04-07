@@ -32,7 +32,7 @@ function generateBlocks(root, workspace, parentBlock)
     var childrenIsArray = Array.isArray(root._children);
 
     for (var i = 0; i < (childrenIsArray ? root._children.length : 1); i++) {
-        var current = childrenIsArray ? root._children[root._children.length - 1 - i]._children : root._children;
+        var current = childrenIsArray ? root._children[i]._children : root._children;
         if (!current)
             continue;
 
@@ -59,31 +59,30 @@ function generateBlocks(root, workspace, parentBlock)
 }
 
 function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
+    // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef
+    // they require special blocks to be connected.
+    if (parsedObj.type === 'DeclarativeEntityRef') {
+        addIdBlock(parsedObj.id, parentBlock, workspace);
+        addValueBlock(parsedObj.entityValue, parentBlock, workspace);
+        return parentBlock;
+    }
+    else if (parsedObj.type === 'PropertyRef' && parentBlock.tooltip === 'DeclarativeEntityPropertyAction') {
+        addIdBlock(parsedObj.id, parentBlock, workspace);
+        addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
+        return parentBlock;
+    }
+    else if (parsedObj.type === 'ActionRef') {
+        addIdBlock(parsedObj.id, parentBlock, workspace);
+        return parentBlock;
+    }
+
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === parsedObj.type;
     });
 
     var blockToAdd = null;
-
     if (blockDefinition) { // good. we know this block
-        // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef
-        // they require special blocks to be connected.
-        if (parsedObj.type === 'DeclarativeEntityRef') {
-            addIdBlock(parsedObj.id, parentBlock, workspace);
-            addValueBlock(parsedObj.entityValue, parentBlock, workspace);
-            return parentBlock;
-        }
-        else if (parsedObj.type === 'PropertyRef' && parentBlock.tooltip === 'DeclarativeEntityPropertyAction') {
-            addIdBlock(parsedObj.id, parentBlock, workspace);
-            addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
-            return parentBlock;
-        }
-        else if (parsedObj.type === 'ActionRef') {
-            addIdBlock(parsedObj.id, parentBlock, workspace);
-            return parentBlock;
-        }
-        else
-            blockToAdd = workspace.newBlock(parsedObj.type);
+        blockToAdd = workspace.newBlock(parsedObj.type);
     }
     else { // blocks that should be handled separately
         var substringToSearch = null;
@@ -213,7 +212,7 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
 
     var inputArgument = null;
 
-    for (var i = 0; i < parentBlockDefinition.args0.length; i++) {
+    outerLoop: for (var i = 0; i < parentBlockDefinition.args0.length; i++) {
         var a = parentBlockDefinition.args0[i];
 
         if (a.check && (a.type === 'input_statement' || a.type === 'input_value')) {    
@@ -223,12 +222,12 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
                         var input = parentBlock.getInput(a.name);
                         if (!input || !input.connection.isConnected()) {
                             inputArgument = a;
-                            break;
+                            break outerLoop;
                         }
                     }
                     else {
                         inputArgument = a;
-                        break;
+                        break outerLoop;
                     }
                 }                    
             }            
@@ -274,28 +273,24 @@ function addIdBlock(idValue, blockToAdd, workspace)
 
     var idBlock = workspace.newBlock('ID');
     idBlock.setFieldValue(idValue, 'TEXT_INPUT');
-
-    var inputArgument = blockDefinition.args0.find(function(a) {
-        return a.check && a.check.includes('ID') && a.type === 'input_value';
-    });
     
-    // var inputArgument = null;
+    var inputArgument = null;
 
-    // for (var i = 0; i < blockDefinition.args0.length; i++) {
-    //     var a = blockDefinition.args0[i];
+    outerLoop: for (var i = 0; i < blockDefinition.args0.length; i++) {
+        var a = blockDefinition.args0[i];
 
-    //     if (a.check && a.type === 'input_value') {    
-    //         for (var j = 0; j < a.check.length; j++) {
-    //             if (a.check[j] === 'ID') {
-    //                 var input = blockToAdd.getInput(a.name);
-    //                 if (!input || !input.connection.isConnected()) {
-    //                     inputArgument = a;
-    //                     break;
-    //                 }
-    //             }
-    //         }            
-    //     }
-    // }
+        if (a.check && a.type === 'input_value') {    
+            for (var j = 0; j < a.check.length; j++) {
+                if (a.check[j] === 'ID') {
+                    var input = blockToAdd.getInput(a.name);
+                    if (!input || !input.connection.isConnected()) {
+                        inputArgument = a;
+                        break outerLoop;
+                    }
+                }
+            }            
+        }
+    }
 
     var inputConnection = blockToAdd.getInput(inputArgument.name).connection;
     idBlock.outputConnection.connect(inputConnection);
