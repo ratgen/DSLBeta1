@@ -73,7 +73,7 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
             addValueBlock(parsedObj.entityValue, parentBlock, workspace);
             return parentBlock;
         }
-        else if (parsedObj.type === 'PropertyRef') {
+        else if (parsedObj.type === 'PropertyRef' && parentBlock.tooltip === 'DeclarativeEntityPropertyAction') {
             addIdBlock(parsedObj.id, parentBlock, workspace);
             addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
             return parentBlock;
