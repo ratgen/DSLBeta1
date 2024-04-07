@@ -89,7 +89,7 @@ const runCodeForScenario = (element) => {
 		console.log("runCodeForScenario");
 		let scenarioCode = getBddGenerator(blockArray).workspaceToCode(scenarioWorkspace);
 		
-		scenarioCode = scenarioCode.replace('Scenario', '\nScenario');
+		scenarioCode = scenarioCode.replace('Scenario:', '\nScenario:');
 		scenarioCode = scenarioCode.replace('Given', '\nGiven');
 		scenarioCode = scenarioCode.replace('When', '\nWhen');
 		scenarioCode = scenarioCode.replace('Then', '\nThen');
