@@ -31,6 +31,12 @@ function generateBlocks(root, workspace, parentBlock)
 
     var childrenIsArray = Array.isArray(root._children);
 
+    // sometimes we need to reverse the order.
+    if (childrenIsArray && (parentBlock.type === 'Model' 
+        || parentBlock.type === 'DeclarativeEntityDef')) {
+        root._children.reverse();
+    }
+
     for (var i = 0; i < (childrenIsArray ? root._children.length : 1); i++) {
         var current = childrenIsArray ? root._children[i]._children : root._children;
         if (!current)
