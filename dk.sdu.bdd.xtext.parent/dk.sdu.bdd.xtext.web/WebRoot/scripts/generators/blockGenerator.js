@@ -68,21 +68,20 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     // we have special cases: DeclarativeEntityRef, ActionRef, PropertyRef etc.
     // they require special blocks to be connected.
     if (parsedObj.type === 'DeclarativeEntityRef') {
-        addIdBlock(parsedObj.id, parentBlock, workspace);
+        addIdBlock(parsedObj.id, parentBlock, workspace, false);
         addValueBlock(parsedObj.entityValue, parentBlock, workspace);
         return parentBlock;
     }
     else if (parsedObj.type === 'PropertyRef' 
         && (parentBlock.tooltip === 'DeclarativeEntityPropertyAction' || parentBlock.tooltip === 'DeclarativeEntityStatePhraseWithProperty')) {
-        addIdBlock(parsedObj.id, parentBlock, workspace);
+        addIdBlock(parsedObj.id, parentBlock, workspace, false);
         addValueBlock(parsedObj.propertyValue, parentBlock, workspace);
         return parentBlock;
     }
-    else if (parsedObj.type === 'ActionRef' 
-        || (parsedObj.type === 'StateName' && parentBlock.tooltip === 'DeclarativeEntityStatePhraseWithProperty')) {
-        addIdBlock(parsedObj.id, parentBlock, workspace);
+    else if (parsedObj.type === 'ActionRef') {
+        addIdBlock(parsedObj.id, parentBlock, workspace, false);
         return parentBlock;
-    }
+    }    
 
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === parsedObj.type;
@@ -194,8 +193,10 @@ function addBlockToWorkspace(parsedObj, workspace, parentBlock) {
     if (!blockToAdd)
         return null;
 
-    if (parsedObj.id)
-        addIdBlock(parsedObj.id, blockToAdd, workspace);
+    if (parsedObj.reference === 'StateName' && parsedObj.type === 'DeclarativeEntityStatePhraseWithProperty') // fix the order manually
+        addIdBlock(parsedObj.id, blockToAdd, workspace, true);
+    else if (parsedObj.id)
+        addIdBlock(parsedObj.id, blockToAdd, workspace, false);
 
     if (parsedObj.scenarioName)
         addStringBlock(parsedObj.scenarioName, blockToAdd, workspace);
@@ -285,7 +286,7 @@ function addParentBlock(parentBlock, blockToAdd, workspace)
     }
 }
 
-function addIdBlock(idValue, blockToAdd, workspace) 
+function addIdBlock(idValue, blockToAdd, workspace, skipFirst) 
 {
     var blockDefinition = blockDefinitions.find(function(b) {
         return b.type === blockToAdd.type;
@@ -299,16 +300,21 @@ function addIdBlock(idValue, blockToAdd, workspace)
     outerLoop: for (var i = 0; i < blockDefinition.args0.length; i++) {
         var a = blockDefinition.args0[i];
 
-        if (a.check && a.type === 'input_value') {    
-            for (var j = 0; j < a.check.length; j++) {
-                if (a.check[j] === 'ID') {
-                    var input = blockToAdd.getInput(a.name);
-                    if (!input || !input.connection.isConnected()) {
-                        inputArgument = a;
-                        break outerLoop;
+        if (a.check && a.type === 'input_value') {   
+            if (skipFirst) {
+                skipFirst = false;
+            }
+            else { 
+                for (var j = 0; j < a.check.length; j++) {
+                    if (a.check[j] === 'ID') {                    
+                        var input = blockToAdd.getInput(a.name);
+                        if (!input || !input.connection.isConnected()) {
+                            inputArgument = a;
+                            break outerLoop;
+                        }
                     }
-                }
-            }            
+                }  
+            }          
         }
     }
 
